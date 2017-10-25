@@ -1,0 +1,119 @@
+class Level{
+  constructor(tilesTable,statics,players,enemies,npcs,maxNumOfEnemies){
+    this.handler = Game.handler;
+  	this.players = players || [];
+  	this.enemies = enemies || [];
+    this.maxNumOfEnemies = maxNumOfEnemies;
+  	this.statics = statics || [];
+  	this.npcs = npcs || [];
+  	this.tiles = tilesTable || [];
+  	this.allEntities = [];
+  	this.shoots = [];
+
+  	this.moveX = 0; // this two variables used onlyt to "move" tiles while moving player
+  	this.moveY = 0; //
+
+  	this.widthOfMap = tilesTable[0].length;	//not scaled !!!!
+  	this.heightOfMap = tilesTable.length;
+  }
+
+  sortEntityTable(){ //sorting for drawing purposes
+
+  	var temp;
+
+  	for(var i =0;i<this.allEntities.length;i++){
+  		for(var j=0;j<this.allEntities.length;j++){
+  			if(this.allEntities[i].y + this.allEntities[i].height < this.allEntities[j].y + this.allEntities[j].height){
+  				temp = this.allEntities[i];
+  				this.allEntities[i] = this.allEntities[j];
+  				this.allEntities[j] = temp;
+  			}
+  		}
+  	}
+  }
+
+  tick(){
+    this.draw(); //first draw then tick !!! otherwise not working
+
+
+
+
+    for(var i=0;i<this.players.length;i++){
+  		this.players[i].tick();
+  	}
+
+  	// for(var i=0;i<this.shoots.length;i++){
+  	// 	this.shoots[i].tick();
+  	// }
+
+  	// for(var i=0;i< this.enemies.length; i++){
+  	// 	this.enemies[i].tick();
+  	// };
+    //
+  	// this.enemies = this.enemies.filter((enemie) => enemie.health>0);
+  	// this.shoots = this.shoots.filter((shoot) => {
+  	// 	if(shoot.detonated){
+  	// 		return shoot.tickCounter < 10;
+  	// 	}else{
+  	// 		return shoot.tickCounter < 45;
+  	// 	}
+  	// });
+
+
+
+  };
+
+
+
+
+  draw(){
+
+
+
+  	for(var i = 0;i < this.tiles.length; i++){
+  		for(var j = 0;j < this.tiles[i].length; j++){
+  			if((j*32 + this.moveX) * this.handler.scale >= -(32*this.handler.scale) && (j*32 + this.moveX) * this.handler.scale <= window.innerWidth + (32*this.handler.scale)
+  				&& ( i*32 + this.moveY) * this.handler.scale >= -(32*this.handler.scale) &&  (i*32 + this.moveY) * this.handler.scale <= window.innerHeight + (32*this.handler.scale)){
+  				this.handler.tiles[this.tiles[i][j]].draw(j*32 + this.moveX, i*32 + this.moveY);
+  			}
+
+  		}
+  	}
+
+  	this.allEntities = [];
+
+    for(var i=0;i< this.players.length; i++){
+  		this.allEntities.push(this.players[i]);
+  	}
+
+  	for(var i=0;i< this.statics.length; i++){
+  		this.allEntities.push(this.statics[i]);
+  	}
+
+  	for(var i=0;i< this.enemies.length; i++){
+  		this.allEntities.push(this.enemies[i]);
+  	}
+
+  	for(var i=0;i< this.shoots.length; i++){
+  		this.allEntities.push(this.shoots[i]);
+  		//console.log(this.shoots[i]);
+  	}
+
+
+
+
+  	this.sortEntityTable();
+    
+
+  	for(var i=0;i<this.allEntities.length;i++){
+
+  		if(this.allEntities[i].x>= -(this.allEntities[i].width) && this.allEntities[i].x <= window.innerWidth + this.allEntities[i].width
+  					&& this.allEntities[i].y>= -(this.allEntities[i].height) &&  this.allEntities[i].y<= window.innerHeight + this.allEntities[i].height){
+  			this.allEntities[i].draw();
+  		}
+
+  	};
+
+  }
+
+}
