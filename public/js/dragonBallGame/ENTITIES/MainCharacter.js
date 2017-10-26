@@ -7,7 +7,7 @@ class MainCharacter extends Mob{
     [{x:9,y:3},{x:11,y:9},{x:2,y:4},{x:6,y:4},{x:10,y:8},{x:0,y:6},{x:4,y:6}],[{x:14,y:5},{x:3,y:6},{x:13,y:8},{x:14,y:5},{x:12,y:3},{x:1,y:4},{x:5,y:4}],
     [{x:13,y:9},{x:5,y:5},{x:2,y:6},{x:1,y:5}],[{x:12,y:9},{x:4,y:5},{x:1,y:6},{x:0,y:5}],
     [{x:1,y:0}]],100,100);
-
+    this.speed = 10;
     //this.id = //TODO change IT !!!!!!!!
     Game.handler.character = this; //TODO LOOK IF IT WORKS !!!!
     Game.handler.players[this.id] = this;
@@ -51,7 +51,11 @@ class MainCharacter extends Mob{
       x : this.x,
       y : this.y,
       currentSprite : this.currentSprite,
-      id : this.id
+      id : this.id,
+      collisionWidth : this.collisionWidth,
+      collisionHeight : this.collisionHeight,
+      width : this.width,
+      height : this.height
     });
 
   	if(this.health < 0){

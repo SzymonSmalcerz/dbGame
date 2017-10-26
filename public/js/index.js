@@ -24,12 +24,13 @@ var Game = {
 		levels : [],
 		scale : 1.0,
     players : {},
+    enemies : {},
     tiles : {},
     character : undefined,
 
 
 		//technicals
-		fps : 30,
+		fps : 20,
 		lastTime : 0,
 		globalTickCounter : 0, //used only for animations for tiles (nor for mobs)
 		menu : {}
@@ -220,17 +221,43 @@ var Game = {
       } );
     })
 
-
-
     socket.on("addStatics", (staticData) => {
 
       for(var i=0;i<staticData.length;i++){
         if(staticData[i].type == "tree"){
           Game.handler.currentLevel.statics.push(new Tree(staticData[i].x, staticData[i].y));
+        }else if(staticData[i].type == "house1"){
+          Game.handler.currentLevel.statics.push(new House1(staticData[i].x, staticData[i].y));
+        }else if(staticData[i].type == "house2"){
+          Game.handler.currentLevel.statics.push(new House2(staticData[i].x, staticData[i].y));
         }
       }
+   });
+
+    socket.on("enemyTick", (enemyData) => {
+
+
+      if(Game.handler.enemies[enemyData.id]){
+        Game.handler.enemies[enemyData.id].x = enemyData.x;
+        Game.handler.enemies[enemyData.id].y = enemyData.y;
+        Game.handler.enemies[enemyData.id].currentSprite = enemyData.currentSprite;
+      }
+
 
     });
+
+    socket.on("addEnemies", (enemyData) => {
+      for(var i=0;i<enemyData.length;i++){
+        if(enemyData[i].type == "hit"){
+          Game.handler.enemies[enemyData[i].id] = new Hit(enemyData[i].id,enemyData[i].x, enemyData[i].y);
+          Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData[i].id]);
+        }else if(enemyData[i].type == "hulk"){
+          Game.handler.enemies[enemyData[i].id] = new Hulk(enemyData[i].id,enemyData[i].x, enemyData[i].y);
+          Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData[i].id]);
+        }
+      }
+    });
+
   },
 	drawMenu : function(){
 

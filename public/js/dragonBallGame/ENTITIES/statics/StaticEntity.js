@@ -48,3 +48,18 @@ class Tree extends StaticEntity{
   }
 
 };
+
+class House1 extends StaticEntity{
+
+  constructor(x,y){
+    super(0,2,x,y,128/5,1.0,128/1.05,128,128);
+  }
+}
+
+
+class House2 extends StaticEntity{
+
+  constructor(x,y){
+    super(6,0,x,y,210/5,1.0,128*0.87,128,210);
+  }
+}

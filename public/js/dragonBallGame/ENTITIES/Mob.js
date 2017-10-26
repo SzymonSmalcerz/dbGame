@@ -4,6 +4,7 @@ class Mob {
 
     // SPRITE HANDLING THINGS BELOW
     this.id = id || Math.floor((Math.random() * 100000) + 1);
+    console.log(id);
     this.sprite = new Image();
     this.spritePath = spritePath;
     this.moveTable = moveTable;
@@ -22,7 +23,7 @@ class Mob {
     this.health = health || 1000;
     this.maxHealth = health || 1000;
     this.damage = damage || 3;
-    this.speed = speed || 7.5;
+    this.speed = speed || 3.5;
   	this.manaRegeneration = manaRegeneration || mana/400 || 2.5;
     this.healthRegeneration = healthRegeneration || health/400 || 25;
 
