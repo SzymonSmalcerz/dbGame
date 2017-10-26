@@ -7,7 +7,7 @@
     "test": "npm test",
     "start": "node server.js"
   },
-  "engine" : {
+  "engines" : {
     "node" : "8.4.0"
   },
   "author": "Szymon Smalcerz",
