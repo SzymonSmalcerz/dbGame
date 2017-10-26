@@ -1,7 +1,7 @@
 // const {io} = require("./server");
 
 var {Enemy,Hit, Hulk} = require("./serverSideEnemy");
-
+var {io} = require("./server");
 
 Static = {
   getTreeData : function(x,y){
@@ -57,12 +57,22 @@ var lastTimeForCheckingIfPlayersAreActive = 0;
 var hitsIds = [1,2,3];
 var hulksIds = [101,102,103];
 
+var hit1;
+var hit2;
+var hit3;
+var hulk1;
 
+var entitiesCreated = false;
 var handleSocketsWork = (socket,io) => {
-var hit1 = new Hit(hitsIds[0],750,100,connectedPlayersData,enemiesData,statics,io);
-var hit2 = new Hit(hitsIds[1],750,190,connectedPlayersData,enemiesData,statics,io);
-var hit3 = new Hit(hitsIds[2],850,130,connectedPlayersData,enemiesData,statics,io);
-var hulk1 = new Hulk(hulksIds[1],150,100,connectedPlayersData,enemiesData,statics,io);
+
+if(!entitiesCreated){
+  hit1 = new Hit(hitsIds[0],750,100,connectedPlayersData,enemiesData,statics,io);
+  hit2 = new Hit(hitsIds[1],750,190,connectedPlayersData,enemiesData,statics,io);
+  hit3 = new Hit(hitsIds[2],850,130,connectedPlayersData,enemiesData,statics,io);
+  hulk1 = new Hulk(hulksIds[1],150,100,connectedPlayersData,enemiesData,statics,io);
+  entitiesCreated = true;
+  console.log("CREATED ENTITIES");
+}
 var enemies = [hulk1,hit1,hit2,hit3];
 
 
