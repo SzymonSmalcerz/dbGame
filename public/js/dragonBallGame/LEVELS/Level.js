@@ -43,7 +43,6 @@ class Level{
 
   draw(){
 
-
     this.handler.camera.tick();
   	for(var i = 0;i < this.tiles.length; i++){
   		for(var j = 0;j < this.tiles[i].length; j++){
@@ -55,7 +54,20 @@ class Level{
   		}
   	}
 
-  	this.allEntities = [];
+    this.handleEntities();
+  	for(var i=0;i<this.allEntities.length;i++){
+
+  		if(this.allEntities[i].renderX>= -(this.allEntities[i].width) && this.allEntities[i].renderX <= window.innerWidth + this.allEntities[i].width
+  					&& this.allEntities[i].renderY>= -(this.allEntities[i].height) &&  this.allEntities[i].renderY<= window.innerHeight + this.allEntities[i].height){
+  			this.allEntities[i].draw();
+  		}
+
+  	};
+
+  }
+
+  handleEntities(){
+    this.allEntities = [];
 
     for(var i=0;i< this.players.length; i++){
   		this.allEntities.push(this.players[i]);
@@ -75,20 +87,7 @@ class Level{
   	}
 
 
-
-
   	this.sortEntityTable();
-
-
-  	for(var i=0;i<this.allEntities.length;i++){
-
-  		if(this.allEntities[i].renderX>= -(this.allEntities[i].width) && this.allEntities[i].renderX <= window.innerWidth + this.allEntities[i].width
-  					&& this.allEntities[i].renderY>= -(this.allEntities[i].height) &&  this.allEntities[i].renderY<= window.innerHeight + this.allEntities[i].height){
-  			this.allEntities[i].draw();
-  		}
-
-  	};
-
   }
 
 }

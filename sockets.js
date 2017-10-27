@@ -73,8 +73,7 @@ if(!entitiesCreated){
   entitiesCreated = true;
   console.log("CREATED ENTITIES");
 }
-// var enemies = [hulk1,hit1,hit2,hit3];
-var enemies = [];
+var enemies = [hulk1,hit1,hit2,hit3];
 
 
 

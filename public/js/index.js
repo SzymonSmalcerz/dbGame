@@ -244,10 +244,16 @@ var Game = {
 
 
       if(Game.handler.enemies[enemyData.id]){
+
+        if(Game.handler.enemies[enemyData.id].renderX){
+          Game.handler.enemies[enemyData.id].renderX += enemyData.x - Game.handler.enemies[enemyData.id].x;
+          Game.handler.enemies[enemyData.id].renderY += enemyData.y - Game.handler.enemies[enemyData.id].y;
+        }else{
+          Game.handler.enemies[enemyData.id].renderX = enemyData.x + Game.handler.currentLevel.moveX;
+          Game.handler.enemies[enemyData.id].renderY = enemyData.y + Game.handler.currentLevel.moveY;
+        }
         Game.handler.enemies[enemyData.id].x = enemyData.x;
         Game.handler.enemies[enemyData.id].y = enemyData.y;
-        Game.handler.enemies[enemyData.id].renderX = enemyData.x + Game.handler.currentLevel.moveX;
-        Game.handler.enemies[enemyData.id].renderY = enemyData.y + Game.handler.currentLevel.moveY;
         Game.handler.enemies[enemyData.id].currentSprite = enemyData.currentSprite;
       }
 
@@ -262,11 +268,6 @@ var Game = {
         }else if(enemyData[i].type == "hulk"){
           Game.handler.enemies[enemyData[i].id] = new Hulk(enemyData[i].id,enemyData[i].x, enemyData[i].y);
           Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData[i].id]);
-        }
-
-        if(Game.handler.enemies[enemyData[i].id]){
-          Game.handler.enemies[enemyData[i].id].renderX = enemyData.x + Game.handler.currentLevel.moveX;
-          Game.handler.enemies[enemyData[i].id].renderY = enemyData.y + Game.handler.currentLevel.moveY;
         }
       }
     });
