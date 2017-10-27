@@ -32,7 +32,4 @@ class OtherPlayer extends Mob{
 
   }
 
-  tick(){
-    
-  }
 }

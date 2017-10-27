@@ -10,8 +10,11 @@ class StaticEntity{
 
     this.sprite = new Image();                           //TODO
     this.sprite.src = "./js/dragonBallGame/sprites/spriteStaticEntities.png";//TODO
+
   	this.x = x;
+  	this.renderX = x;
   	this.y = y;
+  	this.renderY = y;
 
 
   	this.scale = scale || 1.0;
@@ -29,11 +32,11 @@ class StaticEntity{
   	this.handler.ctx.drawImage(this.sprite,																	// imagesource
   							   this.xPositionInImage*64,this.yPositionInImage*64,	// x and y position of particular image in sprite
   							   this.widthInImage,this.heightInImage,												// width and height of particular image in sprite
-  							   this.x,this.y,											// x and y on the screen
+  							   this.renderX,this.renderY,											// x and y on the screen
   							   this.width,this.height);		// width and height of the particular image on the screen
 
   	this.handler.collisionCtx.fillStyle = "rgba(1,0,0,1.0)";
-  	this.handler.collisionCtx.fillRect((this.x + (this.width - this.collisionWidth)/2),(this.y + (this.height - this.collisionHeight - this.height/10)), this.collisionWidth, this.collisionHeight);
+  	this.handler.collisionCtx.fillRect((this.renderX + (this.width - this.collisionWidth)/2),(this.renderY + (this.height - this.collisionHeight - this.height/10)), this.collisionWidth, this.collisionHeight);
 
   };
 

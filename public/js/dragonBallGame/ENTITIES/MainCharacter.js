@@ -10,6 +10,8 @@ class MainCharacter extends Mob{
     this.speed = 10;
     //this.id = //TODO change IT !!!!!!!!
     Game.handler.character = this; //TODO LOOK IF IT WORKS !!!!
+    this.renderX = this.x;
+    this.renderY = this.y;
     Game.handler.players[this.id] = this;
       this.up = [{x:11,y:11},{x:12,y:7},{x:4,y:2},{x:11,y:1}];
     	this.left = [{x:1,y:11},{x:13,y:11},{x:9,y:11},{x:5,y:11}];
@@ -43,6 +45,51 @@ class MainCharacter extends Mob{
         id : this.id
       });
 
+  }
+
+  move(x,y){
+
+  	this.currentSprite = this.idle;
+    var canMove = false;
+    //console.log(this.idle);
+  	if(x > 0){
+  		if(this.handler.collisionCtx.getImageData(this.renderX + this.speed + (this.width + this.collisionWidth)/2,this.renderY + this.height*0.9 - this.collisionHeight/2,1,1).data[0] !== 1 &&
+  		   this.handler.collisionCtx.getImageData(this.renderX + this.speed + (this.width + this.collisionWidth)/2,this.renderY + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1 &&
+  		   this.handler.collisionCtx.getImageData(this.renderX + this.speed + (this.width + this.collisionWidth)/2,this.renderY + this.height*0.9,1,1).data[0] !== 1)
+  			{
+  				this.x += this.speed;
+  				this.renderX += this.speed;
+  				this.currentSprite = this.right;
+  			}
+  	}else if(x < 0){
+  		if(this.handler.collisionCtx.getImageData(this.renderX - this.speed + (this.width - this.collisionWidth)/2,this.renderY + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1 &&
+  		   this.handler.collisionCtx.getImageData(this.renderX - this.speed + (this.width - this.collisionWidth)/2,this.renderY + this.height*0.9 - this.collisionHeight/2,1,1).data[0] !== 1 &&
+  		   this.handler.collisionCtx.getImageData(this.renderX - this.speed + (this.width - this.collisionWidth)/2,this.renderY + this.height*0.9,1,1).data[0] !== 1)
+  			{
+  				this.x -= this.speed;
+          this.renderX -= this.speed;
+  				this.currentSprite = this.left;
+  			}
+  	}else if(y > 0){
+  		if(this.handler.collisionCtx.getImageData(this.renderX + (this.width + this.collisionWidth)/2,this.renderY + this.speed + this.height*0.9,1,1).data[0] !== 1 &&
+  		   this.handler.collisionCtx.getImageData(this.renderX + (this.width + this.collisionWidth/2)/2,this.renderY + this.speed + this.height*0.9,1,1).data[0] !== 1 &&
+  		   this.handler.collisionCtx.getImageData(this.renderX + (this.width - this.collisionWidth)/2,this.renderY + this.speed + this.height*0.9,1,1).data[0] !== 1)
+  			{
+  				this.y += this.speed;
+          this.renderY += this.speed;
+  				this.currentSprite = this.down;
+  			}
+  	}else if(y < 0){
+
+  		if(this.handler.collisionCtx.getImageData(this.renderX + (this.width + this.collisionWidth)/2,this.renderY - this.speed + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1 &&
+  		   this.handler.collisionCtx.getImageData(this.renderX + (this.width + this.collisionWidth/2)/2,this.renderY - this.speed + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1 &&
+  		   this.handler.collisionCtx.getImageData(this.renderX + (this.width - this.collisionWidth)/2,this.renderY - this.speed + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1)
+  			{
+  				this.y -= this.speed;
+          this.renderY -= this.speed;
+  				this.currentSprite = this.up;
+  			}
+  	}
   }
 
   tick(){

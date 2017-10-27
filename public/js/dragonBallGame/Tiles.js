@@ -1,10 +1,16 @@
+var TileStatic = {
+  width : 32,
+  height : 32
+};
+
+
 class Tile{
   constructor(xPositionInImage,yPositionInImage){
     this.handler = Game.handler;
     this.xPositionInImage = xPositionInImage;
     this.yPositionInImage = yPositionInImage;
-    this.width = 32;
-    this.height = 32;
+    this.width = TileStatic.width;
+    this.height = TileStatic.height;
     this.sprite = new Image();
     this.sprite.src = "./js/dragonBallGame/sprites/spriteTiles.png";
   }

@@ -67,7 +67,7 @@ var Game = {
 		// Game.handler.collisionCtx = Game.handler.collisionCanvas.getContext('2d');
 		// document.body.appendChild(Game.handler.collisionCanvas);
 
-
+    Game.handler.camera = new Camera();
     Game.handleSockets();
     Game.handleTilesLevelsAndOther();
     Game.mainLoop();
@@ -88,7 +88,7 @@ var Game = {
       // Game.handler.ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
       Game.handler.lastTime = time;
       Game.handler.currentLevel.tick();
-      // Game.handler.camera.tick();
+
       Game.handler.globalTickCounter += 1;
 			Game.drawMenu();
 
@@ -173,7 +173,9 @@ var Game = {
           if(!Game.handler.players[playerID]) continue;
           var player = playerData[playerID];
           Game.handler.players[playerID].x = player.x;
-          Game.handler.players[playerID].y = player.y;
+          Game.handler.players[playerID].y = player.y
+          Game.handler.players[playerID].renderX = player.x + Game.handler.currentLevel.moveX;
+          Game.handler.players[playerID].renderY = player.y + Game.handler.currentLevel.moveY;
           Game.handler.players[playerID].currentSprite = player.currentSprite;
       }
     });
@@ -191,6 +193,8 @@ var Game = {
             Game.handler.players[playerID] = new OtherPlayer(player.id);//adding player to player list
             Game.handler.players[playerID].x = player.x;
             Game.handler.players[playerID].y = player.y;
+            Game.handler.players[playerID].renderX = player.x + Game.handler.currentLevel.moveX;
+            Game.handler.players[playerID].renderY = player.y + Game.handler.currentLevel.moveY;
             Game.handler.players[playerID].currentSprite = player.currentSprite;
             Game.handler.currentLevel.players.push(Game.handler.players[playerID]);
             continue;
@@ -198,6 +202,8 @@ var Game = {
 
           Game.handler.players[playerID].x = player.x;
           Game.handler.players[playerID].y = player.y;
+          Game.handler.players[playerID].renderX = player.x + Game.handler.currentLevel.moveX;
+          Game.handler.players[playerID].renderY = player.y + Game.handler.currentLevel.moveY;
           Game.handler.players[playerID].currentSprite = player.currentSprite;
       }
     });
@@ -240,6 +246,8 @@ var Game = {
       if(Game.handler.enemies[enemyData.id]){
         Game.handler.enemies[enemyData.id].x = enemyData.x;
         Game.handler.enemies[enemyData.id].y = enemyData.y;
+        Game.handler.enemies[enemyData.id].renderX = enemyData.x + Game.handler.currentLevel.moveX;
+        Game.handler.enemies[enemyData.id].renderY = enemyData.y + Game.handler.currentLevel.moveY;
         Game.handler.enemies[enemyData.id].currentSprite = enemyData.currentSprite;
       }
 
@@ -254,6 +262,11 @@ var Game = {
         }else if(enemyData[i].type == "hulk"){
           Game.handler.enemies[enemyData[i].id] = new Hulk(enemyData[i].id,enemyData[i].x, enemyData[i].y);
           Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData[i].id]);
+        }
+
+        if(Game.handler.enemies[enemyData[i].id]){
+          Game.handler.enemies[enemyData[i].id].renderX = enemyData.x + Game.handler.currentLevel.moveX;
+          Game.handler.enemies[enemyData[i].id].renderY = enemyData.y + Game.handler.currentLevel.moveY;
         }
       }
     });

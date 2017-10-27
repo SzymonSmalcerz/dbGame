@@ -35,32 +35,7 @@ class Level{
   tick(){
     this.draw(); //first draw then tick !!! otherwise not working
 
-
-
-
-    for(var i=0;i<this.players.length;i++){
-  		this.players[i].tick();
-  	}
-
-  	// for(var i=0;i<this.shoots.length;i++){
-  	// 	this.shoots[i].tick();
-  	// }
-
-  	// for(var i=0;i< this.enemies.length; i++){
-  	// 	this.enemies[i].tick();
-  	// };
-    //
-  	// this.enemies = this.enemies.filter((enemie) => enemie.health>0);
-  	// this.shoots = this.shoots.filter((shoot) => {
-  	// 	if(shoot.detonated){
-  	// 		return shoot.tickCounter < 10;
-  	// 	}else{
-  	// 		return shoot.tickCounter < 45;
-  	// 	}
-  	// });
-
-
-
+    this.handler.character.tick();
   };
 
 
@@ -69,7 +44,7 @@ class Level{
   draw(){
 
 
-
+    this.handler.camera.tick();
   	for(var i = 0;i < this.tiles.length; i++){
   		for(var j = 0;j < this.tiles[i].length; j++){
   			if((j*32 + this.moveX) * this.handler.scale >= -(32*this.handler.scale) && (j*32 + this.moveX) * this.handler.scale <= window.innerWidth + (32*this.handler.scale)
@@ -103,12 +78,12 @@ class Level{
 
 
   	this.sortEntityTable();
-    
+
 
   	for(var i=0;i<this.allEntities.length;i++){
 
-  		if(this.allEntities[i].x>= -(this.allEntities[i].width) && this.allEntities[i].x <= window.innerWidth + this.allEntities[i].width
-  					&& this.allEntities[i].y>= -(this.allEntities[i].height) &&  this.allEntities[i].y<= window.innerHeight + this.allEntities[i].height){
+  		if(this.allEntities[i].renderX>= -(this.allEntities[i].width) && this.allEntities[i].renderX <= window.innerWidth + this.allEntities[i].width
+  					&& this.allEntities[i].renderY>= -(this.allEntities[i].height) &&  this.allEntities[i].renderY<= window.innerHeight + this.allEntities[i].height){
   			this.allEntities[i].draw();
   		}
 

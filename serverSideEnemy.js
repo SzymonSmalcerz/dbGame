@@ -55,7 +55,7 @@ class Enemy{
         if(staticEntity.x + (staticEntity.width - staticEntity.collisionWidth)/2 < this.x + (this.width + this.collisionWidth)/2 &&
            staticEntity.x + (staticEntity.width - staticEntity.collisionWidth)/2 > this.x + (this.width - this.collisionWidth)/2 &&
            Math.abs(ge - gs) + Math.abs(de - ds) < this.collisionHeight + staticEntity.collisionHeight){
-             console.log("RIGHT BLOCK BY: ", staticEntity)
+            //  console.log("RIGHT BLOCK BY: ", staticEntity)
           return true;
         }
       }
@@ -71,7 +71,7 @@ class Enemy{
         if(staticEntity.x + (staticEntity.width + staticEntity.collisionWidth)/2 > this.x + (this.width - this.collisionWidth)/2 &&
            staticEntity.x + (staticEntity.width + staticEntity.collisionWidth)/2 < this.x + (this.width + this.collisionWidth)/2 &&
            Math.abs(ge - gs) + Math.abs(de - ds) < this.collisionHeight + staticEntity.collisionHeight){
-             console.log("LEFT BLOCK BY: ", staticEntity)
+            //  console.log("LEFT BLOCK BY: ", staticEntity)
           return true;
         }
       }
@@ -88,7 +88,7 @@ class Enemy{
         if(this.y + this.height*0.9 > staticEntity.y - staticEntity.height*0.9 + staticEntity.collisionHeight &&
            this.y + this.height*0.9 - this.collisionHeight < staticEntity.y - staticEntity.height*0.9 - staticEntity.collisionHeight &&
            Math.abs(le - ls) + Math.abs(pe - ps) < this.collisionWidth + staticEntity.collisionWidth ){
-             console.log("DOWN BLOCK BY: ", staticEntity)
+            //  console.log("DOWN BLOCK BY: ", staticEntity)
           return true;
         }
       }
@@ -104,7 +104,7 @@ class Enemy{
         if(this.y + this.height*0.9 - this.collisionHeight < staticEntity.y + staticEntity.height*0.9 &&
            this.y + this.height*0.9 > staticEntity.y + staticEntity.height*0.9 &&
            Math.abs(le - ls) + Math.abs(pe - ps) < this.collisionWidth  + staticEntity.collisionWidth ){
-             console.log("UP BLOCK BY: ", staticEntity)
+            //  console.log("UP BLOCK BY: ", staticEntity)
           return true;
         }
       }
