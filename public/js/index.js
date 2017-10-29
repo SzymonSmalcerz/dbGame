@@ -167,13 +167,16 @@ var Game = {
       for (var playerID in playerData) {
           // skip loop if the property is from prototype
           if (!playerData.hasOwnProperty(playerID)) continue;
-
-          if(playerID == Game.handler.character.id) continue;
-
           if(!Game.handler.players[playerID]) continue;
           var player = playerData[playerID];
+
+          Game.handler.players[playerID].health = player.health;
+          Game.handler.players[playerID].mana = player.mana;
+          Game.handler.players[playerID].maxHealth = player.maxHealth;
+          Game.handler.players[playerID].maxMana = player.maxMana;
+          if(playerID == Game.handler.character.id) continue;
           Game.handler.players[playerID].x = player.x;
-          Game.handler.players[playerID].y = player.y
+          Game.handler.players[playerID].y = player.y;
           Game.handler.players[playerID].renderX = player.x + Game.handler.currentLevel.moveX;
           Game.handler.players[playerID].renderY = player.y + Game.handler.currentLevel.moveY;
           Game.handler.players[playerID].currentSprite = player.currentSprite;
@@ -254,6 +257,7 @@ var Game = {
         }
         Game.handler.enemies[enemyData.id].x = enemyData.x;
         Game.handler.enemies[enemyData.id].y = enemyData.y;
+        Game.handler.enemies[enemyData.id].health = enemyData.health;
         Game.handler.enemies[enemyData.id].currentSprite = enemyData.currentSprite;
       }
 
@@ -263,14 +267,22 @@ var Game = {
     socket.on("addEnemies", (enemyData) => {
       for(var i=0;i<enemyData.length;i++){
         if(enemyData[i].type == "hit"){
-          Game.handler.enemies[enemyData[i].id] = new Hit(enemyData[i].id,enemyData[i].x, enemyData[i].y);
+          Game.handler.enemies[(enemyData[i].id)] = new Hit(enemyData[i].id,enemyData[i].x, enemyData[i].y);
           Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData[i].id]);
         }else if(enemyData[i].type == "hulk"){
-          Game.handler.enemies[enemyData[i].id] = new Hulk(enemyData[i].id,enemyData[i].x, enemyData[i].y);
+          Game.handler.enemies[(enemyData[i].id)] = new Hulk(enemyData[i].id,enemyData[i].x, enemyData[i].y);
           Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData[i].id]);
         }
       }
     });
+
+    socket.on("removeEnemy", (data) => {
+
+      delete this.handler.enemies[data.id];
+
+
+    });
+
 
   },
 	drawMenu : function(){

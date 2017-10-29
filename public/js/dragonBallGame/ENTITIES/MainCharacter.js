@@ -7,7 +7,7 @@ class MainCharacter extends Mob{
     [{x:9,y:3},{x:11,y:9},{x:2,y:4},{x:6,y:4},{x:10,y:8},{x:0,y:6},{x:4,y:6}],[{x:14,y:5},{x:3,y:6},{x:13,y:8},{x:14,y:5},{x:12,y:3},{x:1,y:4},{x:5,y:4}],
     [{x:13,y:9},{x:5,y:5},{x:2,y:6},{x:1,y:5}],[{x:12,y:9},{x:4,y:5},{x:1,y:6},{x:0,y:5}],
     [{x:1,y:0}]],100,100);
-    this.speed = 10;
+    this.speed = 7;
     //this.id = //TODO change IT !!!!!!!!
     Game.handler.character = this; //TODO LOOK IF IT WORKS !!!!
     this.renderX = this.x;
@@ -42,7 +42,8 @@ class MainCharacter extends Mob{
         x : this.x,
         y : this.y,
         currentSprite : this.currentSprite,
-        id : this.id
+        id : this.id,
+        health : this.health
       });
 
   }
@@ -72,17 +73,17 @@ class MainCharacter extends Mob{
   			}
   	}else if(y > 0){
   		if(this.handler.collisionCtx.getImageData(this.renderX + (this.width + this.collisionWidth)/2,this.renderY + this.speed + this.height*0.9,1,1).data[0] !== 1 &&
-  		   this.handler.collisionCtx.getImageData(this.renderX + (this.width + this.collisionWidth/2)/2,this.renderY + this.speed + this.height*0.9,1,1).data[0] !== 1 &&
+  		   this.handler.collisionCtx.getImageData(this.renderX + (this.width )/2,this.renderY + this.speed + this.height*0.9,1,1).data[0] !== 1 &&
   		   this.handler.collisionCtx.getImageData(this.renderX + (this.width - this.collisionWidth)/2,this.renderY + this.speed + this.height*0.9,1,1).data[0] !== 1)
   			{
-  				this.y += this.speed;
+          this.y += this.speed;
           this.renderY += this.speed;
   				this.currentSprite = this.down;
   			}
   	}else if(y < 0){
 
   		if(this.handler.collisionCtx.getImageData(this.renderX + (this.width + this.collisionWidth)/2,this.renderY - this.speed + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1 &&
-  		   this.handler.collisionCtx.getImageData(this.renderX + (this.width + this.collisionWidth/2)/2,this.renderY - this.speed + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1 &&
+  		   this.handler.collisionCtx.getImageData(this.renderX + (this.width)/2,this.renderY - this.speed + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1 &&
   		   this.handler.collisionCtx.getImageData(this.renderX + (this.width - this.collisionWidth)/2,this.renderY - this.speed + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1)
   			{
   				this.y -= this.speed;
@@ -102,7 +103,13 @@ class MainCharacter extends Mob{
       collisionWidth : this.collisionWidth,
       collisionHeight : this.collisionHeight,
       width : this.width,
-      height : this.height
+      height : this.height,
+      health : this.health,
+      maxHealth : this.maxHealth,
+      mana : this.mana,
+      maxMana : this.maxMana,
+      healthRegeneration : this.healthRegeneration,
+      manaRegeneration : this.manaRegeneration
     });
 
   	if(this.health < 0){
@@ -149,17 +156,22 @@ class MainCharacter extends Mob{
 
     if(this.isFighting){
 
+      var player = this;
   		var enemies = this.handler.currentLevel.enemies;
   		if(this.currentSprite === this.idleLeft){
   			this.currentSprite = this.left_fight;
 
   			for(var i = 0; i<enemies.length; i++){
-  				if( player.y + player.height *0.9 - 2.0 * player.collisionWidth <= enemies[i].y + enemies[i].height*0.9 - 0.5 * enemies[i].collisionHeight
+  				if( enemies[i] && player.y + player.height *0.9 - 2.0 * player.collisionWidth <= enemies[i].y + enemies[i].height*0.9 - 0.5 * enemies[i].collisionHeight
   				   && player.y + player.height *0.9 + player.collisionWidth >= enemies[i].y + enemies[i].height*0.9 - 0.5 * enemies[i].collisionHeight
   				   && player.x + (player.width - player.collisionWidth)/2 >= enemies[i].x + (enemies[i].width + enemies[i].collisionWidth)/2
   				   && player.x + player.width/2 - 3.0*player.collisionWidth/2 <= enemies[i].x + (enemies[i].width + enemies[i].collisionWidth)/2
   				   ){
-  					enemies[i].getDamage(this.damage);
+
+               socket.emit("damageEnemy", {
+                 idOfEnemy : enemies[i].id,
+                 damage : this.damage
+               });
 
   				};
   			};
@@ -169,12 +181,16 @@ class MainCharacter extends Mob{
   			this.currentSprite = this.right_fight;
 
   			for(var i = 0; i<enemies.length; i++){
-  				if( player.y + player.height *0.9 - 2.0 * player.collisionWidth <= enemies[i].y + enemies[i].height*0.9 - 0.5 * enemies[i].collisionHeight
+  				if(enemies[i] &&  player.y + player.height *0.9 - 2.0 * player.collisionWidth <= enemies[i].y + enemies[i].height*0.9 - 0.5 * enemies[i].collisionHeight
   				   && player.y + player.height *0.9 + player.collisionWidth >= enemies[i].y + enemies[i].height*0.9 - 0.5 * enemies[i].collisionHeight
   				   && player.x + (player.width + player.collisionWidth)/2 <= enemies[i].x + (enemies[i].width - enemies[i].collisionWidth)/2
   				   && player.x + (player.width + 3.0* player.collisionWidth)/2 >= enemies[i].x + (enemies[i].width - enemies[i].collisionWidth)/2
   				   ){
-  					enemies[i].getDamage(this.damage);
+               socket.emit("damageEnemy", {
+                 idOfEnemy : enemies[i].id,
+                 damage : this.damage
+               });
+
 
   				};
 
@@ -187,12 +203,16 @@ class MainCharacter extends Mob{
 
 
   			for(var i = 0; i<enemies.length; i++){
-  				if(this.x + this.width	>= enemies[i].x + enemies[i].width/2
+  				if(enemies[i] && this.x + this.width	>= enemies[i].x + enemies[i].width/2
   				   && this.x <= enemies[i].x + enemies[i].width/2
   				   && player.y + 0.9 * player.height - player.collisionHeight >= enemies[i].y + enemies[i].height * 0.9
   				   && player.y + 0.9 * player.height - 2.0*player.collisionHeight <= enemies[i].y + enemies[i].height * 0.9
   				   ){
-  					enemies[i].getDamage(this.damage);
+               socket.emit("damageEnemy", {
+                 idOfEnemy : enemies[i].id,
+                 damage : this.damage
+               });
+
 
 
   				};
@@ -201,12 +221,16 @@ class MainCharacter extends Mob{
   			this.currentSprite = this.down_fight;
 
   			for(var i = 0; i<enemies.length; i++){
-  				if(this.x + this.width	>= enemies[i].x + enemies[i].width/2
+  				if(enemies[i] && this.x + this.width	>= enemies[i].x + enemies[i].width/2
   				   && this.x <= enemies[i].x + enemies[i].width/2
   				   && player.y + 0.9 * player.height <= enemies[i].y + enemies[i].height * 0.9 - enemies[i].collisionHeight
   				   && player.y + 0.9 * player.height + player.collisionHeight >= enemies[i].y + enemies[i].height * 0.9 - enemies[i].collisionHeight
   				   ){
-  					enemies[i].getDamage(this.damage);
+               socket.emit("damageEnemy", {
+                 idOfEnemy : enemies[i].id,
+                 damage : this.damage
+               });
+
 
   				};
   			};

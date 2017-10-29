@@ -1,47 +1,8 @@
 // const {io} = require("./server");
 
-var {Enemy,Hit, Hulk} = require("./serverSideEnemy");
+var {Enemy,Hit, Hulk, Static} = require("./serverSideEnemy");
 var {io} = require("./server");
 
-Static = {
-  getTreeData : function(x,y){
-    return {
-
-        type : "tree",
-        x : x,
-        y: y,
-        collisionHeight : 64/8,//collision height
-        collisionWidth : 128/3, //collision width
-        width : 128, //width
-        height : 128//height
-
-    }
-  },getHouse1Data : function(x,y){
-    return {
-
-        type : "house1",
-        x : x,
-        y: y,
-        collisionHeight : 128/5,//collision height
-        collisionWidth : 128/1.05, //collision width
-        width : 128, //width
-        height : 128//height
-
-    }
-  },getHouse2Data : function(x,y){
-    return {
-
-        type : "house2",
-        x : x,
-        y: y,
-        collisionHeight : 210/5,//collision height
-        collisionWidth : 128*0.87, //collision width
-        width : 128, //width
-        height : 210//height
-
-    }
-  }
-}
 
 var statics = [Static.getTreeData(600,150),
                Static.getHouse1Data(500,400),
@@ -54,56 +15,82 @@ var connectedPlayersData = {};
 var enemiesData;
 var lastTime = 0;
 var lastTimeForCheckingIfPlayersAreActive = 0;
-var hitsIds = [1,2,3];
-var hulksIds = [101,102,103];
 
-var hit1;
-var hit2;
-var hit3;
-var hulk1;
 
 var entitiesCreated = false;
+var tableOfSockets = {};
+
+var allEnemies = {};
+
 var handleSocketsWork = (socket,io) => {
-
-if(!entitiesCreated){
-  hit1 = new Hit(hitsIds[0],750,100,connectedPlayersData,enemiesData,statics,io);
-  hit2 = new Hit(hitsIds[1],750,190,connectedPlayersData,enemiesData,statics,io);
-  hit3 = new Hit(hitsIds[2],850,130,connectedPlayersData,enemiesData,statics,io);
-  hulk1 = new Hulk(hulksIds[1],150,100,connectedPlayersData,enemiesData,statics,io);
-  entitiesCreated = true;
-  console.log("CREATED ENTITIES");
-}
-var enemies = [hulk1,hit1,hit2,hit3];
-
-
-
-function updateEnemyData(){
-  enemiesData = enemies.map(enemy => {
-    return {
-      x : enemy.x,
-      y : enemy.y,
-      id : enemy.id,
-      type : enemy.type,
-      currentSprite : enemy.currentSprite,
-      collisionWidth : enemy.collisionWidth,
-      collisionHeight : enemy.collisionHeight,
-      width : enemy.width,
-      height : enemy.height
-    };
-  })
-}
-
-updateEnemyData();
-
-
-
 
   socket.on("playerCreation", (playerData) => { //trigered at the client side creation of user
     socket.broadcast.emit("playerCreation",playerData);
     socket.emit("addUsers", connectedPlayersData);
     socket.emit("addStatics", statics);
     socket.emit("addEnemies", enemiesData);
+    connectedPlayersData[playerData.id] = playerData;
+    tableOfSockets[playerData.id] = socket;
   });
+
+
+
+  if(!entitiesCreated){
+    for(var i=0;i<100;i++){
+      allEnemies[i + "a"] = new Hit(i + "a",Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+    }
+    entitiesCreated = true;
+    console.log("CREATED ENTITIES");
+  }
+  var enemies = [];
+  for(var i=0;i<100;i++){
+    enemies[i] = allEnemies[i + "a"];
+  }
+
+
+  socket.on("damageEnemy",(data) => {
+    if(allEnemies[data.idOfEnemy]){
+      allEnemies[data.idOfEnemy].health -= data.damage;
+    }
+  });
+
+
+  function updateEnemyData(){
+    enemies = enemies.filter(enemy => {
+      if(enemy && enemy.health > 0){
+        return true;
+      }else{
+        if(enemy){
+          delete allEnemies[enemy.id];
+
+            io.emit("removeEnemy", {
+              id : enemy.id
+            });
+        }
+        return false;
+      }
+    });
+    enemiesData = enemies.map(enemy => {
+      return {
+        x : enemy.x,
+        y : enemy.y,
+        id : enemy.id,
+        type : enemy.type,
+        currentSprite : enemy.currentSprite,
+        collisionWidth : enemy.collisionWidth,
+        collisionHeight : enemy.collisionHeight,
+        width : enemy.width,
+        height : enemy.height
+      };
+    })
+  }
+
+  updateEnemyData();
+
+
+
+
+
 
 
 
@@ -114,8 +101,10 @@ updateEnemyData();
 
 
   socket.on('userData', (playerData) => {
-    connectedPlayersData[playerData.id] = playerData;
-    connectedPlayersData[playerData.id].active = true;
+    if(connectedPlayersData[playerData.id]){
+      connectedPlayersData[playerData.id] = playerData;
+      connectedPlayersData[playerData.id].active = true;
+    }
   });
 
   socket.on("checkedConnection", (playerData) => {
@@ -131,6 +120,20 @@ updateEnemyData();
     if(time - lastTime > 1000/20){
       updateEnemyData();
       enemies.forEach(enemy => enemy.tick());
+
+      for (var playerID in connectedPlayersData) {
+          // skip loop if the property is from prototype
+        if (!connectedPlayersData.hasOwnProperty(playerID)) continue;
+        var player = connectedPlayersData[playerID];
+
+        if(player.health < player.maxHealth){
+          connectedPlayersData[playerID].health += player.healthRegeneration;
+        }
+
+        if(player.mana < player.maxMana){
+          connectedPlayersData[playerID].mana += player.manaRegeneration;
+        }
+      }
       lastTime = time;
 
       io.emit("playerData", connectedPlayersData);
@@ -169,6 +172,7 @@ updateEnemyData();
               io.emit("removePlayer", {
                 id : playerID
               })
+              delete tableOfSockets[playerID];
               delete connectedPlayersData[playerID];
             }
         }
@@ -203,8 +207,8 @@ updateEnemyData();
 }());
 
 
+
 module.exports = {
   handleSocketsWork,
-  connectedPlayersData,
-  Static
+  connectedPlayersData
 }

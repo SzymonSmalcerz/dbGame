@@ -1,4 +1,42 @@
-var {Static} = require("./sockets");
+var Static = {
+  getTreeData : function(x,y){
+    return {
+
+        type : "tree",
+        x : x,
+        y: y,
+        collisionHeight : 64/8,//collision height
+        collisionWidth : 128/3, //collision width
+        width : 128, //width
+        height : 128//height
+
+    }
+  },getHouse1Data : function(x,y){
+    return {
+
+        type : "house1",
+        x : x,
+        y: y,
+        collisionHeight : 128/5,//collision height
+        collisionWidth : 128/1.05, //collision width
+        width : 128, //width
+        height : 128//height
+
+    }
+  },getHouse2Data : function(x,y){
+    return {
+
+        type : "house2",
+        x : x,
+        y: y,
+        collisionHeight : 210/5,//collision height
+        collisionWidth : 128*0.87, //collision width
+        width : 128, //width
+        height : 210//height
+
+    }
+  }
+}
 
 var playerStatics = {
   width : 32,
@@ -9,7 +47,7 @@ var playerStatics = {
 
 class Enemy{
 
-  constructor(io,connectedPlayersData,enemiesData,statics,id,moveTable,x,y,width,height,collisionHeight,collisionWidth,manaRegeneration,healthRegeneration,health,damage,speed,mana,range){
+  constructor(io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,moveTable,x,y,width,height,collisionHeight,collisionWidth,manaRegeneration,healthRegeneration,health,damage,speed,mana,range){
     this.io = io;
     this.range = range || 400;
     this.id = id || Math.floor((Math.random() * 100000) + 1);
@@ -23,6 +61,7 @@ class Enemy{
 
 
     //OTHER ENTITIES ON MAP
+    this.tableOfSockets = tableOfSockets;
     this.connectedPlayersData = connectedPlayersData;
     this.enemiesData = enemiesData;
     this.statics = statics;
@@ -34,10 +73,10 @@ class Enemy{
   	this.maxMana = mana || 100;
     this.health = health || 1000;
     this.maxHealth = health || 1000;
-    this.damage = damage || 3;
+    this.damage = damage || 5;
     this.speed = speed || 7.5;
   	this.manaRegeneration = manaRegeneration || mana/400 || 2.5;
-    this.healthRegeneration = healthRegeneration || health/400 || 25;
+    this.healthRegeneration = healthRegeneration || health/400 || 10;
 
     this.isFighting = false;
   }
@@ -122,23 +161,26 @@ class Enemy{
 
     	// if(player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 > this.y + this.height*0.9 - 2.0 * playerStatics.collisionHeight - this.speed
     	//    && player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 <= this.y + this.height*0.9 + 1.0* playerStatics.collisionHeight + this.speed)
-      if(player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 >= this.y + this.height*0.9 - this.collisionHeight
-         && player.y + playerStatics.height*0.9- playerStatics.collisionHeight/2 <= this.y + this.height*0.9){
+      if(player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 >= this.y + this.height*0.9 - this.collisionHeight - this.speed
+         && player.y + playerStatics.height*0.9- playerStatics.collisionHeight/2 <= this.y + this.height*0.9  + this.collisionHeight  + this.speed){
 
 
     		if(player.x + (playerStatics.width + playerStatics.collisionWidth)/2 <= this.x + (this.width - this.collisionWidth)/2
-    	       && player.x + (playerStatics.width + playerStatics.collisionWidth)/2 + this.collisionWidth > this.x + (this.width - this.collisionWidth)/2){
+    	       && player.x + (playerStatics.width + playerStatics.collisionWidth)/2 + this.collisionWidth*3/2 > this.x + (this.width - this.collisionWidth)/2){
 
 
-    			//console.log("ENEMY IS ATTACKING LEFT");
+          //this.tableOfSockets[player.id].emit("getDamage", this.damage);
+          player.health -= this.damage;
     			this.currentSprite = this.left_fight;
           this.isFighting = true;
     			//player.getDamage(this.damage);
     			return true;
     		}else if(player.x + (playerStatics.width - playerStatics.collisionWidth)/2 >= this.x + this.width/2
-    	             && player.x + (playerStatics.width - playerStatics.collisionWidth)/2 < this.x + this.width + this.collisionWidth/2){
+    	             && player.x + (playerStatics.width - playerStatics.collisionWidth)/2 < this.x + this.width + this.collisionWidth){
 
     			//console.log("ENEMY IS ATTACKING RIGHT");
+          //this.tableOfSockets[player.id].emit("getDamage", this.damage);
+          player.health -= this.damage;
     			this.currentSprite = this.right_fight;
           this.isFighting = true;
     			//player.getDamage(this.damage);
@@ -152,16 +194,20 @@ class Enemy{
     			 && player.x + playerStatics.width/2 <= this.x + this.width/2 + this.collisionWidth){
 
     		if(player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 <= this.y + this.height*0.9 - this.collisionHeight/2
-    		   && player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 + this.collisionHeight >= this.y + this.height*0.9 - this.collisionHeight/2){
+    		   && player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 + this.collisionHeight*3/2 >= this.y + this.height*0.9 - this.collisionHeight/2){
     			//console.log("ENEMY IS ATTACKING UP");
     			//player.getDamage(this.damage);
+          //this.tableOfSockets[player.id].emit("getDamage", this.damage);
+          player.health -= this.damage;
     			this.currentSprite = this.up_fight;
           this.isFighting = true;
     			return true;
-    		}else if(player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 -this.collisionHeight <= this.y + this.height*0.9 - this.collisionHeight/2
+    		}else if(player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 -this.collisionHeight*3/2 <= this.y + this.height*0.9 - this.collisionHeight/2
     		   && player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 >= this.y + this.height*0.9 - this.collisionHeight/2){
     			//console.log("ENEMY IS ATTACKING DOWN");
     			//player.getDamage(this.damage);
+          //this.tableOfSockets[player.id].emit("getDamage", this.damage);
+          player.health -= this.damage;
     			this.currentSprite = this.down_fight;
           this.isFighting = true;
     			return true;
@@ -239,13 +285,26 @@ class Enemy{
 };
 
   emitTick(){
+    this.handleManaAndHp();
     this.io.emit("enemyTick",{
      id : this.id,
      x : this.x,
      y : this.y,
-     currentSprite : this.currentSprite
+     currentSprite : this.currentSprite,
+     health : this.health,
+     maxHealth : this.maxHealth
    });
-  }
+ };
+
+  handleManaAndHp(){
+    if(this.health < this.maxHealth){
+      this.health += this.healthRegeneration;
+    }
+
+    if(this.mana < this.maxMana){
+      this.mana += this.manaRegeneration;
+    }
+  };
 
   move(x,y){
 
@@ -266,6 +325,7 @@ class Enemy{
 
             if (!this.statics.hasOwnProperty(staticEntity)) continue;
             if(this.checkForCollisionWithStaticEntity(staticEntity,"right")){
+
               return;
             }
           }
@@ -283,12 +343,13 @@ class Enemy{
 
 
         var player = this.connectedPlayersData[playerID];
-
         if(player.x + player.width/2 + player.collisionWidth/2 < this.x - this.speed + this.width/2 - this.collisionWidth/2 ){
+
           for(var staticEntity in this.statics){
 
             if (!this.statics.hasOwnProperty(staticEntity)) continue;
             if(this.checkForCollisionWithStaticEntity(staticEntity,"left")){
+
               return;
             }
           }
@@ -312,6 +373,7 @@ class Enemy{
 
             if (!this.statics.hasOwnProperty(staticEntity)) continue;
             if(this.checkForCollisionWithStaticEntity(staticEntity,"down")){
+
               return;
             }
           }
@@ -335,6 +397,7 @@ class Enemy{
 
             if (!this.statics.hasOwnProperty(staticEntity)) continue;
             if(this.checkForCollisionWithStaticEntity(staticEntity,"up")){
+
               return;
             }
           }
@@ -353,7 +416,7 @@ class Enemy{
 
 class Hit extends Enemy{ // TODO ;_;
 
-	constructor(id,x,y,connectedPlayersData,enemiesData,statics,io){
+	constructor(id,x,y,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
     var id = id;
     var up = [{x:4,y:9},{x:8,y:9}];
     var left = [{x:6,y:9},{x:10,y:9}];
@@ -368,7 +431,7 @@ class Hit extends Enemy{ // TODO ;_;
 
     var idle = [{x:13,y:8},{x:14,y:8},{x:0,y:9},{x:1,y:9}];
 
-    super( io,connectedPlayersData,enemiesData,statics,id,[ up, down, left, right, up_fight, down_fight, left_fight, right_fight, idle],x,y)
+    super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,[ up, down, left, right, up_fight, down_fight, left_fight, right_fight, idle],x,y)
     this.type = "hit";
     this.up = [{x:4,y:9},{x:8,y:9}];
   	this.left = [{x:6,y:9},{x:10,y:9}];
@@ -387,7 +450,7 @@ class Hit extends Enemy{ // TODO ;_;
 }
 
 class Hulk extends Enemy{
-  constructor(id,x,y,connectedPlayersData,enemiesData,statics,io){
+  constructor(id,x,y,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
     var up = [{x:0,y:2},{x:1,y:2},{x:2,y:2},{x:3,y:2},{x:4,y:2},{x:5,y:2}];
   	var left = [{x:0,y:3},{x:1,y:3},{x:2,y:3},{x:3,y:3},{x:4,y:3},{x:5,y:3}];
   	var right = [{x:0,y:2},{x:1,y:2},{x:2,y:2},{x:3,y:2},{x:4,y:2},{x:5,y:2}];
@@ -401,7 +464,7 @@ class Hulk extends Enemy{
 
   	var idle = [{x:3,y:0},{x:3,y:0},{x:3,y:0},{x:3,y:0},{x:4,y:0},{x:4,y:0}];
 
-    super( io,connectedPlayersData,enemiesData,statics,id,[ up, down, left, right, up_fight, down_fight, left_fight, right_fight, idle],x,y,100,100,25)
+    super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,[ up, down, left, right, up_fight, down_fight, left_fight, right_fight, idle],x,y,100,100,25)
     this.type = "hulk";
 
 
@@ -423,8 +486,11 @@ class Hulk extends Enemy{
 
 
 
+
+
 module.exports = {
   Enemy,
   Hit,
-  Hulk
+  Hulk,
+  Static
 }

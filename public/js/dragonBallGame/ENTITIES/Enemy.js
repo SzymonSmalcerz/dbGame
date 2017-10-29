@@ -6,12 +6,6 @@ class Enemy extends Mob{
     this.handler = Game.handler;
   }
 
-
-
-  tick(){
-
-  };
-
 }
 
 

@@ -23,7 +23,8 @@ class Level{
 
   	for(var i =0;i<this.allEntities.length;i++){
   		for(var j=0;j<this.allEntities.length;j++){
-  			if(this.allEntities[i].y + this.allEntities[i].height < this.allEntities[j].y + this.allEntities[j].height){
+        // TODO TODO TODO TODO TODO TODO TODO TODO
+  			if(this.allEntities[i] && this.allEntities[j] && this.allEntities[i].y + this.allEntities[i].height < this.allEntities[j].y + this.allEntities[j].height){
   				temp = this.allEntities[i];
   				this.allEntities[i] = this.allEntities[j];
   				this.allEntities[j] = temp;
@@ -56,8 +57,8 @@ class Level{
 
     this.handleEntities();
   	for(var i=0;i<this.allEntities.length;i++){
-
-  		if(this.allEntities[i].renderX>= -(this.allEntities[i].width) && this.allEntities[i].renderX <= window.innerWidth + this.allEntities[i].width
+      // TODO TODO TODO TODO TODO TODO TODO TODO
+  		if(this.allEntities[i] && this.allEntities[i].renderX>= -(this.allEntities[i].width) && this.allEntities[i].renderX <= window.innerWidth + this.allEntities[i].width
   					&& this.allEntities[i].renderY>= -(this.allEntities[i].height) &&  this.allEntities[i].renderY<= window.innerHeight + this.allEntities[i].height){
   			this.allEntities[i].draw();
   		}
@@ -76,11 +77,19 @@ class Level{
   	for(var i=0;i< this.statics.length; i++){
   		this.allEntities.push(this.statics[i]);
   	}
+    this.enemies = [];
+    for(var enemyID in this.handler.enemies){
 
-  	for(var i=0;i< this.enemies.length; i++){
-  		this.allEntities.push(this.enemies[i]);
-  	}
+      if (!this.handler.enemies.hasOwnProperty(enemyID)) continue;
+      var enemy = this.handler.enemies[enemyID];
 
+      this.enemies.push(enemy);
+
+    }
+
+    for(var i=0;i< this.enemies.length; i++){
+      this.allEntities.push(this.enemies[i]);
+    }
   	for(var i=0;i< this.shoots.length; i++){
   		this.allEntities.push(this.shoots[i]);
   		//console.log(this.shoots[i]);
