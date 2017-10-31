@@ -8,7 +8,7 @@ class Level{
   	this.npcs = npcs || [];
   	this.tiles = tilesTable || [];
   	this.allEntities = [];
-  	this.shoots = [];
+  	this.skillTable = [];
 
   	this.moveX = 0; // this two variables used onlyt to "move" tiles while moving player
   	this.moveY = 0; //
@@ -18,12 +18,9 @@ class Level{
   }
 
   sortEntityTable(){ //sorting for drawing purposes
-
   	var temp;
-
   	for(var i =0;i<this.allEntities.length;i++){
   		for(var j=0;j<this.allEntities.length;j++){
-        // TODO TODO TODO TODO TODO TODO TODO TODO
   			if(this.allEntities[i] && this.allEntities[j] && this.allEntities[i].y + this.allEntities[i].height < this.allEntities[j].y + this.allEntities[j].height){
   				temp = this.allEntities[i];
   				this.allEntities[i] = this.allEntities[j];
@@ -31,7 +28,7 @@ class Level{
   			}
   		}
   	}
-  }
+  };
 
   tick(){
     this.draw(); //first draw then tick !!! otherwise not working
@@ -57,7 +54,6 @@ class Level{
 
     this.handleEntities();
   	for(var i=0;i<this.allEntities.length;i++){
-      // TODO TODO TODO TODO TODO TODO TODO TODO
   		if(this.allEntities[i] && this.allEntities[i].renderX>= -(this.allEntities[i].width) && this.allEntities[i].renderX <= window.innerWidth + this.allEntities[i].width
   					&& this.allEntities[i].renderY>= -(this.allEntities[i].height) &&  this.allEntities[i].renderY<= window.innerHeight + this.allEntities[i].height){
   			this.allEntities[i].draw();
@@ -90,9 +86,18 @@ class Level{
     for(var i=0;i< this.enemies.length; i++){
       this.allEntities.push(this.enemies[i]);
     }
-  	for(var i=0;i< this.shoots.length; i++){
-  		this.allEntities.push(this.shoots[i]);
-  		//console.log(this.shoots[i]);
+
+    this.skillTable = [];
+    for(var skillID in this.handler.skillTable){
+
+      if (!this.handler.skillTable.hasOwnProperty(skillID)) continue;
+      var skill = this.handler.skillTable[skillID];
+
+      this.skillTable.push(skill);
+
+    }
+  	for(var i=0;i< this.skillTable.length; i++){
+  		this.allEntities.push(this.skillTable[i]);
   	}
 
 

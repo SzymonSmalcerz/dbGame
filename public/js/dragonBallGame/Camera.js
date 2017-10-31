@@ -17,8 +17,12 @@ class Camera{
         for(var i=0;i<level.statics.length;i++){
   				level.statics[i].renderX-=player.speed;
   			}
+
         for(var i=0;i<level.players.length;i++){
   				level.players[i].renderX-=player.speed;
+  			}
+        for(var i=0;i<level.skillTable.length;i++){
+  				level.skillTable[i].renderX-=player.speed;
   			}
         for(var i=0;i<level.enemies.length;i++){
   				level.enemies[i].renderX-=player.speed;
@@ -37,6 +41,9 @@ class Camera{
       for(var i=0;i<level.enemies.length;i++){
         level.enemies[i].renderX+=player.speed;
       }
+      for(var i=0;i<level.skillTable.length;i++){
+        level.skillTable[i].renderX+=player.speed;
+      }
     }
   	if(player.renderY + player.height>= window.innerHeight/2){
 
@@ -53,6 +60,9 @@ class Camera{
         for(var i=0;i<level.enemies.length;i++){
           level.enemies[i].renderY-=player.speed;
         }
+        for(var i=0;i<level.skillTable.length;i++){
+  				level.skillTable[i].renderY-=player.speed;
+  			}
 
       }
 
@@ -67,6 +77,9 @@ class Camera{
       }
       for(var i=0;i<level.enemies.length;i++){
         level.enemies[i].renderY+=player.speed;
+      }
+      for(var i=0;i<level.skillTable.length;i++){
+        level.skillTable[i].renderY+=player.speed;
       }
 
     }

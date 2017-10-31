@@ -25,6 +25,7 @@ var Game = {
 		scale : 1.0,
     players : {},
     enemies : {},
+    skillTable : {},
     tiles : {},
     character : undefined,
 
@@ -143,6 +144,10 @@ var Game = {
 															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
 											   ],[], [character]));
     Game.handler.currentLevel = Game.handler.levels[0];
+  },
+
+  addEnemies : function () {
+    socket.emit("addEnemies");
   },
   handleSockets : function() {
 
@@ -280,8 +285,30 @@ var Game = {
 
       delete this.handler.enemies[data.id];
 
+    });
+
+    socket.on("skillData", (skillData) => {
+      if(!this.handler.skillTable[skillData.id]){
+          this.handler.skillTable[skillData.id] = new KamehamehaWave(skillData.x, skillData.y, skillData.turn);
+          this.handler.skillTable[skillData.id].frameTable = skillData.frameTable;
+          this.handler.skillTable[skillData.id].renderX = skillData.x + this.handler.currentLevel.moveX;
+          this.handler.skillTable[skillData.id].renderY = skillData.y + this.handler.currentLevel.moveY;
+      }else{
+          this.handler.skillTable[skillData.id].renderX += skillData.x - this.handler.skillTable[skillData.id].x;
+          this.handler.skillTable[skillData.id].renderY += skillData.y - this.handler.skillTable[skillData.id].y;
+          this.handler.skillTable[skillData.id].x = skillData.x;
+          this.handler.skillTable[skillData.id].y = skillData.y;
+          this.handler.skillTable[skillData.id].frameTable = skillData.frameTable;
+
+      }
 
     });
+
+    socket.on("removeSkill", (skillData) => {
+      if(this.handler.skillTable[skillData.id]){
+        delete this.handler.skillTable[skillData.id];
+      }
+    })
 
 
   },

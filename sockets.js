@@ -2,7 +2,7 @@
 
 var {Enemy,Hit, Hulk, Static} = require("./serverSideEnemy");
 var {io} = require("./server");
-
+var {Skill,KamehamehaWave} = require("./serverSideSkill");
 
 var statics = [Static.getTreeData(600,150),
                Static.getHouse1Data(500,400),
@@ -12,10 +12,11 @@ var statics = [Static.getTreeData(600,150),
                Static.getHouse2Data(300,330)
   ];
 var connectedPlayersData = {};
-var enemiesData;
+var enemiesData = [];
+var skillTable = [];
 var lastTime = 0;
 var lastTimeForCheckingIfPlayersAreActive = 0;
-
+var enemies = [];
 
 var entitiesCreated = false;
 var tableOfSockets = {};
@@ -24,7 +25,7 @@ var allEnemies = {};
 
 var handleSocketsWork = (socket,io) => {
 
-  socket.on("playerCreation", (playerData) => { //trigered at the client side creation of user
+ socket.on("playerCreation", (playerData) => { //trigered at the client side creation of user
     socket.broadcast.emit("playerCreation",playerData);
     socket.emit("addUsers", connectedPlayersData);
     socket.emit("addStatics", statics);
@@ -33,20 +34,42 @@ var handleSocketsWork = (socket,io) => {
     tableOfSockets[playerData.id] = socket;
   });
 
-
+  socket.on("skillCreation", (skillData) => {
+    skillTable.push(new KamehamehaWave(Math.floor(Math.random() * 100000),skillData.x,skillData.y,skillData.turn,skillData.skillName, connectedPlayersData,statics,allEnemies, io))
+  });
 
   if(!entitiesCreated){
-    for(var i=0;i<100;i++){
+    for(var i=0;i<50;i++){
       allEnemies[i + "a"] = new Hit(i + "a",Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+    //  allEnemies[i + "b"] = new Hulk(i + "b",Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
     }
     entitiesCreated = true;
     console.log("CREATED ENTITIES");
-  }
-  var enemies = [];
-  for(var i=0;i<100;i++){
-    enemies[i] = allEnemies[i + "a"];
+    enemies = [];
+    var i =0;
+    for(var enemyID in allEnemies){
+      if(!allEnemies.hasOwnProperty(enemyID)) continue;
+
+      enemies[i] = allEnemies[enemyID];
+
+      i+=1;
+    }
   }
 
+
+  socket.on("addEnemies", () => {
+    for(var i =0;i<10;i++){
+      var temp = Math.floor(Math.random() * 1000);
+      var tempID =  temp + "a";
+
+      allEnemies[tempID] = new Hit(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+      enemies[temp] = allEnemies[tempID];
+
+      updateEnemyData();
+
+      io.emit("addEnemies", enemiesData);
+    }
+  })
 
   socket.on("damageEnemy",(data) => {
     if(allEnemies[data.idOfEnemy]){
@@ -88,18 +111,6 @@ var handleSocketsWork = (socket,io) => {
   updateEnemyData();
 
 
-
-
-
-
-
-
-  // socket.on('disconnect', () => {
-  //   console.log('User was disconnected');
-  // });
-
-
-
   socket.on('userData', (playerData) => {
     if(connectedPlayersData[playerData.id]){
       connectedPlayersData[playerData.id] = playerData;
@@ -118,7 +129,9 @@ var handleSocketsWork = (socket,io) => {
 
 
     if(time - lastTime > 1000/20){
+      updateShootData();
       updateEnemyData();
+      skillTable.forEach(skill => skill.tick());
       enemies.forEach(enemy => enemy.tick());
 
       for (var playerID in connectedPlayersData) {
@@ -141,7 +154,31 @@ var handleSocketsWork = (socket,io) => {
 
 		}
   };
+  var updateShootData = function(){
+    skillTable = skillTable.filter((shoot) => {
+  		if(shoot.detonated){
+        if(shoot.tickCounter < 10){
+          return true;
+        }else {
+          io.emit("removeSkill", {
+            id : shoot.id
+          })
+          return false;
+        }
+  		}else{
+  			if(shoot.tickCounter < 45){
+          return true;
+        }else {
+          io.emit("removeSkill", {
+            id : shoot.id
+          })
+          return false;
+        }
+  		}
+  	})
 
+
+  }
   var checkForConnection = (time) => {
     requestAnimationFrame(checkForConnection);
 

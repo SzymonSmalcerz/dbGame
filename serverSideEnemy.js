@@ -74,7 +74,7 @@ class Enemy{
     this.health = health || 1000;
     this.maxHealth = health || 1000;
     this.damage = damage || 5;
-    this.speed = speed || 7.5;
+    this.speed = speed || 4.5;
   	this.manaRegeneration = manaRegeneration || mana/400 || 2.5;
     this.healthRegeneration = healthRegeneration || health/400 || 10;
 
@@ -124,8 +124,8 @@ class Enemy{
         var ls = staticEntity.x + staticEntity.width/2 - staticEntity.collisionWidth/2;
         var ps = staticEntity.x + staticEntity.width/2 + staticEntity.collisionWidth/2;
         // console.log("___________________________" + "\n" + ps + "\n" + pe + "\n" + ls + "\n" + le)
-        if(this.y + this.height*0.9 > staticEntity.y - staticEntity.height*0.9 + staticEntity.collisionHeight &&
-           this.y + this.height*0.9 - this.collisionHeight < staticEntity.y - staticEntity.height*0.9 - staticEntity.collisionHeight &&
+        if(this.y + this.height*0.9 > staticEntity.y + staticEntity.height*0.9 - staticEntity.collisionHeight &&
+           this.y + this.height*0.9 - this.collisionHeight < staticEntity.y + staticEntity.height*0.9 - staticEntity.collisionHeight &&
            Math.abs(le - ls) + Math.abs(pe - ps) < this.collisionWidth + staticEntity.collisionWidth ){
             //  console.log("DOWN BLOCK BY: ", staticEntity)
           return true;
@@ -190,8 +190,9 @@ class Enemy{
 
     	}
 
-    	if(player.x + playerStatics.width/2 >= this.x + this.width/2 - this.collisionWidth
-    			 && player.x + playerStatics.width/2 <= this.x + this.width/2 + this.collisionWidth){
+    	if(player.x + playerStatics.width/2 >= this.x + this.width/2 - this.collisionWidth*3/2 - this.speed
+    			 && player.x + playerStatics.width/2 <= this.x + this.width/2 + this.collisionWidth*3/2 + this.speed){
+
 
     		if(player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 <= this.y + this.height*0.9 - this.collisionHeight/2
     		   && player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 + this.collisionHeight*3/2 >= this.y + this.height*0.9 - this.collisionHeight/2){
@@ -222,20 +223,7 @@ class Enemy{
 
   tick(){
 
-
-
     this.currentSprite = this.idle;
-    //console.log("TICKKK");
-
-    // for(var enemy in this.enemiesData){
-    //
-    //   if (!this.enemiesData.hasOwnProperty(enemy)) continue;
-    //   if (enemy.id == this.id) continue;
-    //   if(this.checkForCollisionWithEnemy(enemy)){
-    //     return;
-    //   }
-    // }
-
 
 
     for (var playerID in this.connectedPlayersData) {
@@ -276,11 +264,6 @@ class Enemy{
     }
 
     this.emitTick();
-
-
-
-
-
 
 };
 

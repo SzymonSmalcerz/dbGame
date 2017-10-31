@@ -43,11 +43,110 @@ class MainCharacter extends Mob{
         y : this.y,
         currentSprite : this.currentSprite,
         id : this.id,
-        health : this.health
+        health : this.health,
+        collisionHeight : this.collisionHeight,
+        collisionWidth : this.collisionWidth
       });
 
   }
 
+  tick(){
+    //TEMPORARY ADDED BELOW @@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    this.emitDataToOthers();
+
+    this.currentSprite = this.idle;
+
+    if(keyHandler["37"] || keyHandler["38"] || keyHandler["39"] || keyHandler["40"] ){
+  		this.manageKeyPressing();
+  	}
+
+    if(this.isRegeneratingMana ){
+  		this.manageRegenerationMana();
+  		return;
+  	}
+
+    if(this.usingSkill && this.mana >= 3){
+  		this.manageSkills();
+  		return;
+  	}
+
+    if(this.isFighting){
+      this.manageFighting();
+  		return;
+    }
+  }
+
+  manageFighting(){
+    var enemies = this.handler.currentLevel.enemies;
+    if(this.currentSprite == this.idleLeft || this.currentSprite == this.idleRight){
+      for(var i = 0; i<enemies.length; i++){
+        var enemy = enemies[i];
+        var dp = this.y + this.height * 0.9;
+        var gp = dp - this.collisionHeight;
+        var de = enemy.y + enemy.height * 0.9;
+        var ge = de - enemy.collisionHeight;
+        if(Math.abs(ge - gp) + Math.abs(de - dp) <= this.collisionHeight*4 + enemy.collisionHeight){
+
+          if(this.currentSprite == this.idleLeft){//left
+            if(this.x + this.width/2 + this.collisionWidth/2 > enemy.x + enemy.width/2 + enemy.collisionWidth/2 &&
+               this.x + this.width/2 + this.collisionWidth/2 < enemy.x + enemy.width/2 + enemy.collisionWidth/2 + this.collisionWidth*5/2){
+              socket.emit("damageEnemy", {
+                 idOfEnemy : enemy.id,
+                 damage : this.damage
+               });
+            }
+          }else{//right
+            if(this.x + this.width/2 + this.collisionWidth/2 < enemy.x + enemy.width/2 + enemy.collisionWidth/2 &&
+               this.x + this.width/2 + this.collisionWidth/2 + this.collisionWidth*2 > enemy.x + enemy.width/2 - enemy.collisionWidth/2){
+              socket.emit("damageEnemy", {
+                 idOfEnemy : enemy.id,
+                 damage : this.damage
+               });
+            }
+          }
+        }
+      }
+    }else if(this.currentSprite == this.idleDown || this.currentSprite == this.idleUp) {
+      for(var i = 0; i<enemies.length; i++){
+        var enemy = enemies[i];
+        var lp = this.x + this.width/2 - this.collisionWidth/2;
+        var pp = this.x + this.width/2 + this.collisionWidth/2;
+        var le = enemy.x + enemy.width/2 - enemy.collisionWidth/2;
+        var pe = enemy.x + enemy.width/2 + enemy.collisionWidth/2;
+        if(Math.abs(le - lp) + Math.abs(pe - pp) <= this.collisionWidth*4 + enemy.collisionWidth ){
+
+
+          if(this.currentSprite == this.idleDown){//down
+            if(this.y + this.height*0.9 - this.collisionHeight/2 < enemy.y + enemy.height*0.9 - enemy.collisionHeight/2 &&
+               this.y + this.height*0.9 - this.collisionHeight/2 + this.collisionHeight*5/2 > enemy.y + enemy.height*0.9 - enemy.collisionHeight){
+              socket.emit("damageEnemy", {
+                 idOfEnemy : enemy.id,
+                 damage : this.damage
+               });
+            }
+          }else{//up
+            if(this.y + this.height*0.9 - this.collisionHeight/2 > enemy.y + enemy.height*0.9 - enemy.collisionHeight/2 &&
+               this.y + this.height*0.9 - this.collisionHeight/2 < enemy.y + enemy.height*0.9 - enemy.collisionHeight/2 + this.collisionHeight*5/2){
+              socket.emit("damageEnemy", {
+                 idOfEnemy : enemy.id,
+                 damage : this.damage
+               });
+            }
+          }
+        }
+      }
+    }
+
+    if(this.currentSprite == this.idleLeft){
+        this.currentSprite = this.left_fight;
+    }else if (this.currentSprite == this.idleRight){
+        this.currentSprite = this.right_fight;
+    }else if (this.currentSprite == this.idleUp){
+        this.currentSprite = this.up_fight;
+    }else if (this.currentSprite == this.idleDown){
+        this.currentSprite = this.down_fight;
+    }
+  }
   move(x,y){
 
   	this.currentSprite = this.idle;
@@ -93,8 +192,7 @@ class MainCharacter extends Mob{
   	}
   }
 
-  tick(){
-    //TEMPORARY ADDED BELOW @@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  emitDataToOthers(){
     socket.emit('userData',{
       x : this.x,
       y : this.y,
@@ -111,132 +209,94 @@ class MainCharacter extends Mob{
       healthRegeneration : this.healthRegeneration,
       manaRegeneration : this.manaRegeneration
     });
+  }
 
-  	if(this.health < 0){
-  		this.health = 0;
-  	}
+  manageKeyPressing(){
+    if(keyHandler["37"]	){
+      this.idle = this.idleLeft;
+      if(!this.isFighting && !this.isRegeneratingMana){
+        this.move(-1,0);
+      }
+    }else if(keyHandler["38"]	){
+      this.idle = this.idleUp;
+      if(!this.isFighting && !this.isRegeneratingMana)
+        this.move(0,-1);
+    }else if(keyHandler["39"]	){
+      this.idle = this.idleRight;
+      if(!this.isFighting && !this.isRegeneratingMana)
+        this.move(1,0);
+    }else if(keyHandler["40"]	){
+      this.idle = this.idleDown;
+      if(!this.isFighting && !this.isRegeneratingMana)
+        this.move(0,1);
+    }
+  }
+  manageRegenerationMana(){
+    this.currentSprite =	[{x:3,y:10},{x:4,y:10},{x:5,y:10},{x:6,y:10},{x:7,y:10},{x:8,y:10}];
+    if(this.mana + 1.6 < this.maxMana)
+    {
+      this.mana += 1.6;
+    }
+  }
 
-    this.currentSprite = this.idle;
+  manageSkills(){
+    if(this.currentSprite === this.idleLeft){
 
-    if(keyHandler["37"] || keyHandler["38"] || keyHandler["39"] || keyHandler["40"] ){
-
-  		if(keyHandler["37"]	){
-  			this.idle = this.idleLeft;
-  			if(!this.isFighting && !this.isRegeneratingMana){
-  				this.move(-1,0);
-  			}
-  		}else if(keyHandler["38"]	){
-  			this.idle = this.idleUp;
-  			if(!this.isFighting && !this.isRegeneratingMana)
-  				this.move(0,-1);
-  		}else if(keyHandler["39"]	){
-  			this.idle = this.idleRight;
-  			if(!this.isFighting && !this.isRegeneratingMana)
-  				this.move(1,0);
-  		}else if(keyHandler["40"]	){
-  			this.idle = this.idleDown;
-  			if(!this.isFighting && !this.isRegeneratingMana)
-  				this.move(0,1);
-  		}
-
-  	};
-
-    if(this.isRegeneratingMana ){
-
-
-  		this.currentSprite =	[{x:3,y:10},{x:4,y:10},{x:5,y:10},{x:6,y:10},{x:7,y:10},{x:8,y:10}];
-  		if(this.mana + 1.6 < this.maxMana)
-  		{
-  			this.mana += 1.6;
-  		}
-
-  		return;
-
-  	}
-
-    if(this.isFighting){
-
-      var player = this;
-  		var enemies = this.handler.currentLevel.enemies;
-  		if(this.currentSprite === this.idleLeft){
-  			this.currentSprite = this.left_fight;
-
-  			for(var i = 0; i<enemies.length; i++){
-  				if( enemies[i] && player.y + player.height *0.9 - 2.0 * player.collisionWidth <= enemies[i].y + enemies[i].height*0.9 - 0.5 * enemies[i].collisionHeight
-  				   && player.y + player.height *0.9 + player.collisionWidth >= enemies[i].y + enemies[i].height*0.9 - 0.5 * enemies[i].collisionHeight
-  				   && player.x + (player.width - player.collisionWidth)/2 >= enemies[i].x + (enemies[i].width + enemies[i].collisionWidth)/2
-  				   && player.x + player.width/2 - 3.0*player.collisionWidth/2 <= enemies[i].x + (enemies[i].width + enemies[i].collisionWidth)/2
-  				   ){
-
-               socket.emit("damageEnemy", {
-                 idOfEnemy : enemies[i].id,
-                 damage : this.damage
-               });
-
-  				};
-  			};
+        console.log("IM HEEERE ! ");
+      if(keyHandler["50"]){
+        socket.emit("skillCreation", {
+          x : this.x -  SkillStatic.width * 0.8,
+          y : this.y,
+          turn : "left",
+          skillName : "KamehamehaWave",
+          ownerID : this.id
+        })
+        this.currentSprite =	[{x:4,y:8}];
+        this.mana -=0.5;
+      }
+    }else if(this.currentSprite === this.idleRight){
 
 
-  		}else if(this.currentSprite === this.idleRight){
-  			this.currentSprite = this.right_fight;
+      if(keyHandler["50"]){
+        socket.emit("skillCreation", {
+          x : this.x +  SkillStatic.width * 0.8,
+          y : this.y,
+          turn : "right",
+          skillName : "KamehamehaWave",
+          ownerID : this.id
+        })
+        this.currentSprite =	[{x:3,y:8}];
+        this.mana -=0.5;
+      }
 
-  			for(var i = 0; i<enemies.length; i++){
-  				if(enemies[i] &&  player.y + player.height *0.9 - 2.0 * player.collisionWidth <= enemies[i].y + enemies[i].height*0.9 - 0.5 * enemies[i].collisionHeight
-  				   && player.y + player.height *0.9 + player.collisionWidth >= enemies[i].y + enemies[i].height*0.9 - 0.5 * enemies[i].collisionHeight
-  				   && player.x + (player.width + player.collisionWidth)/2 <= enemies[i].x + (enemies[i].width - enemies[i].collisionWidth)/2
-  				   && player.x + (player.width + 3.0* player.collisionWidth)/2 >= enemies[i].x + (enemies[i].width - enemies[i].collisionWidth)/2
-  				   ){
-               socket.emit("damageEnemy", {
-                 idOfEnemy : enemies[i].id,
-                 damage : this.damage
-               });
+    }else if(this.currentSprite === this.idleUp){
 
+      if(keyHandler["50"]){
+        socket.emit("skillCreation", {
+          x : this.x,
+          y : this.y  - SkillStatic.height * 0.4,
+          turn : "up",
+          skillName : "KamehamehaWave",
+          ownerID : this.id
+        })
+        this.currentSprite =	[{x:2,y:8}];
+        this.mana -=0.5;
+      }
 
-  				};
-
-
-
-  			};
-
-  		}else if(this.currentSprite === this.idleUp){
-  			this.currentSprite = this.up_fight;
-
-
-  			for(var i = 0; i<enemies.length; i++){
-  				if(enemies[i] && this.x + this.width	>= enemies[i].x + enemies[i].width/2
-  				   && this.x <= enemies[i].x + enemies[i].width/2
-  				   && player.y + 0.9 * player.height - player.collisionHeight >= enemies[i].y + enemies[i].height * 0.9
-  				   && player.y + 0.9 * player.height - 2.0*player.collisionHeight <= enemies[i].y + enemies[i].height * 0.9
-  				   ){
-               socket.emit("damageEnemy", {
-                 idOfEnemy : enemies[i].id,
-                 damage : this.damage
-               });
+    }else if(this.currentSprite === this.idleDown){
 
 
-
-  				};
-  			};
-  		}else if(this.currentSprite === this.idleDown){
-  			this.currentSprite = this.down_fight;
-
-  			for(var i = 0; i<enemies.length; i++){
-  				if(enemies[i] && this.x + this.width	>= enemies[i].x + enemies[i].width/2
-  				   && this.x <= enemies[i].x + enemies[i].width/2
-  				   && player.y + 0.9 * player.height <= enemies[i].y + enemies[i].height * 0.9 - enemies[i].collisionHeight
-  				   && player.y + 0.9 * player.height + player.collisionHeight >= enemies[i].y + enemies[i].height * 0.9 - enemies[i].collisionHeight
-  				   ){
-               socket.emit("damageEnemy", {
-                 idOfEnemy : enemies[i].id,
-                 damage : this.damage
-               });
-
-
-  				};
-  			};
-  		}
-
-  		return;
+      if(keyHandler["50"]){
+        socket.emit("skillCreation", {
+          x : this.x,
+          y : this.y  + SkillStatic.height * 0.75,
+          turn : "down",
+          skillName : "KamehamehaWave",
+          ownerID : this.id
+        })
+        this.currentSprite =	[{x:1,y:8}];
+        this.mana -=0.5;
+      }
     }
   }
 }
