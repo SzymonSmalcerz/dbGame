@@ -1,6 +1,6 @@
 // const {io} = require("./server");
 
-var {Enemy,Hit, Hulk, Static} = require("./serverSideEnemy");
+var {Enemy,Hit , Hulk, Dragon ,Yeti, Static} = require("./serverSideEnemy");
 var {io} = require("./server");
 var {Skill,KamehamehaWave} = require("./serverSideSkill");
 
@@ -39,36 +39,41 @@ var handleSocketsWork = (socket,io) => {
   });
 
   if(!entitiesCreated){
-    for(var i=0;i<50;i++){
-      allEnemies[i + "a"] = new Hit(i + "a",Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+    for(var i=0;i<10;i++){
+      allEnemies[i + "h"] = new Hit(i + "h",Math.floor(Math.random()*500+ 1500),Math.floor(Math.random()*500),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+      allEnemies[i + "y"] = new Yeti(i + "y",Math.floor(Math.random()*850+ 20),Math.floor(Math.random()*400+ 700 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+      allEnemies[i + "hu"] = new Hulk(i + "hu",Math.floor(Math.random()*1000+ 500),Math.floor(Math.random()*400),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
     //  allEnemies[i + "b"] = new Hulk(i + "b",Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
     }
+
+    for(var i = 0;i < 50;i++){
+      allEnemies[i + "dr"] = new Dragon(i + "dr",Math.floor(Math.random()*1950 + 20),Math.floor(Math.random()*400 + 1000),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+    }
+
     entitiesCreated = true;
     console.log("CREATED ENTITIES");
     enemies = [];
-    var i =0;
-    for(var enemyID in allEnemies){
-      if(!allEnemies.hasOwnProperty(enemyID)) continue;
-
-      enemies[i] = allEnemies[enemyID];
-
-      i+=1;
-    }
+    var i = 0;
   }
 
 
-  socket.on("addEnemies", () => {
-    for(var i =0;i<10;i++){
-      var temp = Math.floor(Math.random() * 1000);
-      var tempID =  temp + "a";
-
-      allEnemies[tempID] = new Hit(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
-      enemies[temp] = allEnemies[tempID];
-
-      updateEnemyData();
-
-      io.emit("addEnemies", enemiesData);
+  socket.on("addEnemies", (data) => {
+    for(var i =0;i<data.numberOfEnemies;i++){
+      var temp = Math.floor(Math.random() * 100000);
+      var tempID =  temp + "e";
+      if(data.type == "hulk"){
+        allEnemies[tempID] = new Hulk(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+      }else if(data.type == "dragon"){
+        allEnemies[tempID] = new Dragon(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+      }else if(data.type == "yeti"){
+        allEnemies[tempID] = new Yeti(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+      }else {
+        allEnemies[tempID] = new Hit(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+      }
     }
+
+    updateEnemyData();
+    io.emit("addEnemies", enemiesData);
   })
 
   socket.on("damageEnemy",(data) => {
@@ -78,37 +83,7 @@ var handleSocketsWork = (socket,io) => {
   });
 
 
-  function updateEnemyData(){
-    enemies = enemies.filter(enemy => {
-      if(enemy && enemy.health > 0){
-        return true;
-      }else{
-        if(enemy){
-          delete allEnemies[enemy.id];
 
-            io.emit("removeEnemy", {
-              id : enemy.id
-            });
-        }
-        return false;
-      }
-    });
-    enemiesData = enemies.map(enemy => {
-      return {
-        x : enemy.x,
-        y : enemy.y,
-        id : enemy.id,
-        type : enemy.type,
-        currentSprite : enemy.currentSprite,
-        collisionWidth : enemy.collisionWidth,
-        collisionHeight : enemy.collisionHeight,
-        width : enemy.width,
-        height : enemy.height
-      };
-    })
-  }
-
-  updateEnemyData();
 
 
   socket.on('userData', (playerData) => {
@@ -153,7 +128,42 @@ var handleSocketsWork = (socket,io) => {
 
 
 		}
-  };
+  }
+
+  function updateEnemyData(){
+    enemies = [];
+    for(var enemyID in allEnemies){
+      if(!allEnemies.hasOwnProperty(enemyID)) continue;
+      var enemy = allEnemies[enemyID];
+      if(enemy){
+
+        if(enemy.health <= 0){
+          io.emit("removeEnemy", {
+            id : enemy.id
+          });
+          delete allEnemies[enemy.id];
+        }else{
+          enemies.push(enemy);
+        }
+      }
+    }
+
+    enemiesData = enemies.map(enemy => {
+      return {
+        x : enemy.x,
+        y : enemy.y,
+        id : enemy.id,
+        type : enemy.type,
+        currentSprite : enemy.currentSprite,
+        collisionWidth : enemy.collisionWidth,
+        collisionHeight : enemy.collisionHeight,
+        width : enemy.width,
+        height : enemy.height
+      };
+    })
+  }
+
+
   var updateShootData = function(){
     skillTable = skillTable.filter((shoot) => {
   		if(shoot.detonated){
@@ -218,7 +228,7 @@ var handleSocketsWork = (socket,io) => {
 
 		}
   };
-
+  updateEnemyData();
   sendToUserData();
   checkForConnection();
 }

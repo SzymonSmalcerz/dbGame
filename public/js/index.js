@@ -101,53 +101,69 @@ var Game = {
   handleTilesLevelsAndOther : function(){
     Game.handler.tiles.G = new Tile(0,0);
     Game.handler.tiles.D = new Tile(1,0);
+    Game.handler.tiles.S = new Tile(5,0);
+    Game.handler.tiles.L = new Tile(6,0);
+    Game.handler.tiles.P = new Tile(7,0);
     var character = new MainCharacter(Math.floor((Math.random() * 100000) + 1));
-    Game.handler.levels.push(new Level(["GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											  			 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											 			 "GGDDDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											   			 "GGDDDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											   			 "GGGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
-											   			 "GGGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
-											   			 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											   			 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-											   			 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-															 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
+    Game.handler.levels.push(new Level([
+                               "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGPPPPPPPPPPPPPPPPPPPPPP",
+											  			 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGPPPPPPPPPPPPPPPPPPPPP",
+											 			   "GGDDDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGPGGGGPPPPPPPPPPPPPPPPPP",
+											   			 "GGDDDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGPGPPPPPPPPPPPPPPP",
+											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGPGGGPPPPPPPPPPPPPPP",
+											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGPPPPPPPPPPPPPPP",
+											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGPPPPPPPPPPPPPPP",
+											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGPPPPPPPPPPPPPPP",
+											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGPPPPPPPPPPPPPPP",
+											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGPPPPPPPPPPPPPPP",
+											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGPPPPPPPPPPPPPPP",
+											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGPPPPPPPPPPPPP",
+											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGPPPPPPPPPPPP",
+											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGPPPPPPP",
+											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGPGGGGPP",
+											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+											   			 "GGGDDGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+											   			 "GGGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDGGGGGGGGGGGGGGG",
+											   			 "GGGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDGGGGGGGGGGGGGGG",
+											   			 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+											   			 "SSSGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+											   			 "SSSSSGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+															 "SSSSSSSGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+                               "SSSSSSSSSGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGLLLLLL",
+                               "SSSSSSSSSGSSGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGLLLLLLLLLL",
+                               "SSSSSSSSSSSSSSSSGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGLLLLLLLLLLLLL",
+                               "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSGGGGGGGGGGGGGGLLLLLLLLLLLLLLLLLL",
+                               "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSGGGGGGLLLLLLLLLLLLLLLLLLLLL",
+                               "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSPGLLLLLLLLLLLLLLLLLLLLL",
+                               "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSPPPPLLLLLLLLLLLLLLLLLLLLL",
+                               "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSPPLLLLLLLLLLLLLLLLLLLLLLL",
+                               "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSPPLLLLLLLLLLLLLLLLLLLLLLL",
+                               "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSLLLLLLLLLLLLLLLLLLLLLLLLLL",
+                               "SSSSSSSSSSSSSSSSSSSSSSPPPSSSSSSSSLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
+                               "SSSSSSSSSSSSSSSSSSSSPPPPPLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
+                               "SSSSSSSSSSSSSSSSPPPPPPLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
+                               "SSSSSSSSSSSSSSPPPPLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
+                               "SSSSSSSSPPPPPPPLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
+                               "SSSSPPPPPPLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
+                               "PPPPPPLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
+                               "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
+                               "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
+                               "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
+                               "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
+                               "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
+                               "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
+
 											   ],[], [character]));
     Game.handler.currentLevel = Game.handler.levels[0];
   },
 
-  addEnemies : function () {
-    socket.emit("addEnemies");
+  addEnemies : function (type,numberOfEnemies) {
+    type = type || "hit",
+    numberOfEnemies = numberOfEnemies || 20;
+    socket.emit("addEnemies", {
+      type,
+      numberOfEnemies
+    });
   },
   handleSockets : function() {
 
@@ -271,12 +287,28 @@ var Game = {
 
     socket.on("addEnemies", (enemyData) => {
       for(var i=0;i<enemyData.length;i++){
-        if(enemyData[i].type == "hit"){
-          Game.handler.enemies[(enemyData[i].id)] = new Hit(enemyData[i].id,enemyData[i].x, enemyData[i].y);
-          Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData[i].id]);
-        }else if(enemyData[i].type == "hulk"){
-          Game.handler.enemies[(enemyData[i].id)] = new Hulk(enemyData[i].id,enemyData[i].x, enemyData[i].y);
-          Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData[i].id]);
+        if(!Game.handler.enemies[(enemyData[i].id)]){
+          if(enemyData[i].type == "hit"){
+            Game.handler.enemies[(enemyData[i].id)] = new Hit(enemyData[i].id,enemyData[i].x, enemyData[i].y);
+            Game.handler.enemies[(enemyData[i].id)].renderX += Game.handler.currentLevel.moveX;
+            Game.handler.enemies[(enemyData[i].id)].renderY += Game.handler.currentLevel.moveY;
+            Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData[i].id]);
+          }else if(enemyData[i].type == "hulk"){
+            Game.handler.enemies[(enemyData[i].id)] = new Hulk(enemyData[i].id,enemyData[i].x, enemyData[i].y);
+            Game.handler.enemies[(enemyData[i].id)].renderX += Game.handler.currentLevel.moveX;
+            Game.handler.enemies[(enemyData[i].id)].renderY += Game.handler.currentLevel.moveY;
+            Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData[i].id]);
+          }else if(enemyData[i].type == "dragon"){
+            Game.handler.enemies[(enemyData[i].id)] = new Dragon(enemyData[i].id,enemyData[i].x, enemyData[i].y);
+            Game.handler.enemies[(enemyData[i].id)].renderX += Game.handler.currentLevel.moveX;
+            Game.handler.enemies[(enemyData[i].id)].renderY += Game.handler.currentLevel.moveY;
+            Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData[i].id]);
+          }else if(enemyData[i].type == "yeti"){
+            Game.handler.enemies[(enemyData[i].id)] = new Yeti(enemyData[i].id,enemyData[i].x, enemyData[i].y);
+            Game.handler.enemies[(enemyData[i].id)].renderX += Game.handler.currentLevel.moveX;
+            Game.handler.enemies[(enemyData[i].id)].renderY += Game.handler.currentLevel.moveY;
+            Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData[i].id]);
+          }
         }
       }
     });

@@ -12,7 +12,7 @@ class Skill{
   	this.x = x;
   	this.y = y;
   	this.turn = turn;
-  	this.damage = damage || 500;
+  	this.damage = damage || 100;
   	this.radius = radius || 30;
   	this.frameTable = frameTable;
   	this.height = 32;

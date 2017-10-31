@@ -241,8 +241,6 @@ class MainCharacter extends Mob{
 
   manageSkills(){
     if(this.currentSprite === this.idleLeft){
-
-        console.log("IM HEEERE ! ");
       if(keyHandler["50"]){
         socket.emit("skillCreation", {
           x : this.x -  SkillStatic.width * 0.8,
