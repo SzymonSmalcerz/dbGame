@@ -12,7 +12,7 @@ class Tile{
     this.width = TileStatic.width;
     this.height = TileStatic.height;
     this.sprite = new Image();
-    this.sprite.src = "./js/dragonBallGame/sprites/spriteTiles.png";
+    this.sprite.src = "dbgame/js/dragonBallGame/sprites/spriteTiles.png";
   }
 
   draw(x,y){

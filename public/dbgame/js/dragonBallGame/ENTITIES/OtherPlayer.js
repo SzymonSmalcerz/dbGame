@@ -1,7 +1,7 @@
 class OtherPlayer extends Mob{
   constructor(id){
 
-    super(id,"./js/dragonBallGame/sprites/spriteGokuSupix.png",[[{x:11,y:11},{x:12,y:7},{x:4,y:2},{x:11,y:1}],[{x:10,y:1},{x:3,y:2}],
+    super(id,"dbgame/js/dragonBallGame/sprites/spriteGokuSupix.png",[[{x:11,y:11},{x:12,y:7},{x:4,y:2},{x:11,y:1}],[{x:10,y:1},{x:3,y:2}],
     [{x:1,y:11},{x:13,y:11},{x:9,y:11},{x:5,y:11}],[{x:0,y:11},{x:12,y:11},{x:8,y:11},{x:4,y:11}],
     [{x:9,y:3},{x:11,y:9},{x:2,y:4},{x:6,y:4},{x:10,y:8},{x:0,y:6},{x:4,y:6}],[{x:14,y:5},{x:3,y:6},{x:13,y:8},{x:14,y:5},{x:12,y:3},{x:1,y:4},{x:5,y:4}],
     [{x:13,y:9},{x:5,y:5},{x:2,y:6},{x:1,y:5}],[{x:12,y:9},{x:4,y:5},{x:1,y:6},{x:0,y:5}],

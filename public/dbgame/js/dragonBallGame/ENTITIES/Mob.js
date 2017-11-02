@@ -60,7 +60,6 @@ class Mob {
   }
 
   draw(){
-
     // this.handleManaAndHp();
     this.handleSpritePath();//TODO should be called only once at creation of mob try to put it in construtor !!!!
     this.handleScale(); //TODO AND HERE WE WILL HANDLE SCALE !!!!!!!!

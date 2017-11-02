@@ -18,7 +18,6 @@ io.on("connection", (socket) => {
   handleSocketsWork(socket, io);
 });
 
-
 app.set("view engine","ejs");
 app.use(methodOverride('_method'))
 app.use(express.static("public"));
@@ -40,7 +39,23 @@ app.use(session({
 var PORT = process.env.PORT || 3000;
 
 app.get("/home",(req,res) => {
-  res.render("home");
+  if(req.session && req.session.jwt){
+    res.redirect("/secret");
+  }else{
+
+    res.render("home");
+  }
+})
+
+app.get("/db", authenticate, (req,res) => {
+  //converting hex to dec
+  var firstHalfOfId = req.user._id.toString().substring(0,12);
+  var secondtHalfOfId = req.user._id.toString().substring(12);
+
+
+  var decIDofPlayerFIRSTHALF = parseInt(firstHalfOfId, 16);
+  var decIDofPlayerSECONDHALF = parseInt(secondtHalfOfId, 16);
+  res.render("dbgame",{id1 : decIDofPlayerFIRSTHALF, id2 : decIDofPlayerSECONDHALF});
 })
 
 
@@ -77,7 +92,10 @@ app.get("/secret2",authenticate,(req,res) => {
 })
 
 app.delete("/logout",authenticate,logoutUser,(req,res) => {
-  console.log("IM HERE");
+  res.redirect("/home");
+})
+
+app.get("*",(req,res) => {
   res.redirect("/home");
 })
 

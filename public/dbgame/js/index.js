@@ -1,10 +1,22 @@
-var socket = io(); //socket and Game our global objects;
+var socket = socket || io();
+console.log(playerID);
 window.onload = function(){
+
   socket.on('connect', function () {
     console.log('Connected to server');
-
-    	Game.init();
-
+    socket.emit("getPlayerID",{
+      id : playerID
+    });
+    socket.on("playerID",(playerData) => {
+      Game.createMainCharacter(playerData.id);
+      Game.init();
+      socket.on("playerID", () => {
+        console.log("DO NOTHING !!!!");
+      })
+    })
+    socket.on("alreadyLoggedIn", (data) => {
+      alert(data.msg);
+    })
   });
 };
 
@@ -44,23 +56,36 @@ var Game = {
 		Game.handler.oldHeightOfMap = null;
 		Game.handler.currentHeightOfMap = window.innerHeight;
 
-    Game.handler.collisionCanvas = document.createElement("canvas");
-		Game.handler.collisionCanvas.width = window.innerWidth;
-		Game.handler.collisionCanvas.height = window.innerHeight;
-		Game.handler.collisionCtx = Game.handler.collisionCanvas.getContext('2d');
-		document.body.appendChild(Game.handler.collisionCanvas);
+
+    Game.handler.collisionCanvas = document.getElementById("ccoll");
+    if(!Game.handler.collisionCanvas){
+      Game.handler.collisionCanvas = document.createElement("canvas");
+      Game.handler.collisionCanvas.setAttribute("id", "ccoll");
+    }
+
+    Game.handler.collisionCtx = Game.handler.collisionCanvas.getContext('2d');
+
+    Game.handler.collisionCanvas.width = window.innerWidth;
+    Game.handler.collisionCanvas.height = window.innerHeight;
+    document.body.appendChild(Game.handler.collisionCanvas);
 
 
 
+    Game.handler.canvas = document.getElementById("cnorm");
+    if(!Game.handler.canvas){
 
-		Game.handler.canvas = document.createElement("canvas");
-		Game.handler.canvas.width = window.innerWidth;
-		Game.handler.canvas.height = window.innerHeight;
-		Game.handler.ctx = Game.handler.canvas.getContext('2d');
-		Game.handler.ctx.imageSmoothingEnabled = false;
-		Game.handler.ctx.oImageSmoothingEnabled = false;
-		Game.handler.ctx.webkitImageSmoothingEnabled = false;
-		document.body.appendChild(Game.handler.canvas);
+  		Game.handler.canvas = document.createElement("canvas");
+      Game.handler.canvas.setAttribute("id", "cnorm");
+    }
+
+    Game.handler.ctx = Game.handler.canvas.getContext('2d');
+    Game.handler.ctx.imageSmoothingEnabled = false;
+    Game.handler.ctx.oImageSmoothingEnabled = false;
+    Game.handler.ctx.webkitImageSmoothingEnabled = false;
+
+    Game.handler.canvas.width = window.innerWidth;
+    Game.handler.canvas.height = window.innerHeight;
+    document.body.appendChild(Game.handler.canvas);
 
     // Game.handler.collisionCanvas = document.createElement("canvas");
 		// Game.handler.collisionCanvas.width = window.innerWidth;
@@ -98,13 +123,16 @@ var Game = {
 
 		}
 	},
+  createMainCharacter : function(id) {
+    this.handler.character = new MainCharacter(id);
+  },
   handleTilesLevelsAndOther : function(){
     Game.handler.tiles.G = new Tile(0,0);
     Game.handler.tiles.D = new Tile(1,0);
     Game.handler.tiles.S = new Tile(5,0);
     Game.handler.tiles.L = new Tile(6,0);
     Game.handler.tiles.P = new Tile(7,0);
-    var character = new MainCharacter(Math.floor((Math.random() * 100000) + 1));
+    var character = Game.handler.character;
     Game.handler.levels.push(new Level([
                                "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGPPPPPPPPPPPPPPPPPPPPPP",
 											  			 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGPPPPPPPPPPPPPPPPPPPPP",

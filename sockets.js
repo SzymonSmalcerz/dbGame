@@ -25,6 +25,23 @@ var allEnemies = {};
 
 var handleSocketsWork = (socket,io) => {
 
+
+
+
+socket.on("getPlayerID", (data) => {
+  if(connectedPlayersData[data.id]){
+    socket.emit("alreadyLoggedIn", {
+      msg : "You are already logged in !"
+    })
+  }else{
+    socket.emit("playerID", {
+      id : data.id
+    })
+  }
+
+
+});
+
  socket.on("playerCreation", (playerData) => { //trigered at the client side creation of user
     socket.broadcast.emit("playerCreation",playerData);
     socket.emit("addUsers", connectedPlayersData);

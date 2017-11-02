@@ -27,7 +27,7 @@ class Hit extends Enemy{ // TODO ;_;
     var idle = [{x:13,y:8},{x:14,y:8},{x:0,y:9},{x:1,y:9}];
 
 
-    super(id,"./js/dragonBallGame/sprites/hitSprite.png",[ up, down, left, right, up_fight, down_fight, left_fight, right_fight, idle],x,y);
+    super(id,"dbgame/js/dragonBallGame/sprites/hitSprite.png",[ up, down, left, right, up_fight, down_fight, left_fight, right_fight, idle],x,y);
     this.up = [{x:4,y:9},{x:8,y:9}];
   	this.left = [{x:6,y:9},{x:10,y:9}];
   	this.right = [{x:5,y:9},{x:9,y:9}];
@@ -60,7 +60,7 @@ class Hulk extends Enemy{
 
     var idle = [{x:3,y:0},{x:3,y:0},{x:3,y:0},{x:3,y:0},{x:4,y:0},{x:4,y:0}];
 
-    super(id,"./js/dragonBallGame/sprites/hulkSprite.png",[ up, down, left, right, up_fight, down_fight, left_fight, right_fight, idle],x,y,100,100,25);
+    super(id,"dbgame/js/dragonBallGame/sprites/hulkSprite.png",[ up, down, left, right, up_fight, down_fight, left_fight, right_fight, idle],x,y,100,100,25);
 
     this.up = [{x:0,y:2},{x:1,y:2},{x:2,y:2},{x:3,y:2},{x:4,y:2},{x:5,y:2}];
   	this.left = [{x:0,y:3},{x:1,y:3},{x:2,y:3},{x:3,y:3},{x:4,y:3},{x:5,y:3}];
@@ -93,7 +93,7 @@ class Dragon extends Enemy{
 
   	var idle = [{x:1,y:0}];
 
-    super(id,"./js/dragonBallGame/sprites/dragonSprite.png",[ up, down, left, right, up_fight, down_fight, left_fight, right_fight, idle],x,y,50,50);
+    super(id,"dbgame/js/dragonBallGame/sprites/dragonSprite.png",[ up, down, left, right, up_fight, down_fight, left_fight, right_fight, idle],x,y,50,50);
 
     this.up = [{x:0,y:3},{x:1,y:3},{x:2,y:3}];
   	this.left = [{x:0,y:1},{x:1,y:1},{x:2,y:1}];
@@ -125,7 +125,7 @@ class Yeti extends Enemy{
 
   	var idle = [{x:3,y:0},{x:4,y:0}]
 
-    super(id,"./js/dragonBallGame/sprites/yetiSprite.png",[ up, down, left, right, up_fight, down_fight, left_fight, right_fight, idle],x,y,80,80);
+    super(id,"dbgame/js/dragonBallGame/sprites/yetiSprite.png",[ up, down, left, right, up_fight, down_fight, left_fight, right_fight, idle],x,y,80,80);
 
     this.up = [{x:0,y:6},{x:1,y:6},{x:2,y:6},{x:3,y:6},{x:4,y:6}];
   	this.left = [{x:0,y:2},{x:1,y:2},{x:2,y:2},{x:3,y:2},{x:4,y:2}];

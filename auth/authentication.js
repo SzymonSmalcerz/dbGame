@@ -50,6 +50,7 @@ var authenticate = async (req,res,next) => {
     //console.log(JSON.stringify(req.headers));
     if(req.session && req.session.jwt){
       var user = await User.findByToken(req.session.jwt);
+      req.user = user;
       if(user){
         next();
       }else{

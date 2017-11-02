@@ -9,7 +9,7 @@ class StaticEntity{
   	this.yPositionInImage = spriteY;
 
     this.sprite = new Image();                           //TODO
-    this.sprite.src = "./js/dragonBallGame/sprites/spriteStaticEntities.png";//TODO
+    this.sprite.src = "dbgame/js/dragonBallGame/sprites/spriteStaticEntities.png";//TODO
 
   	this.x = x;
   	this.renderX = x;

@@ -7,7 +7,7 @@ var SkillStatic = {
 class Skill{
   constructor(x,y,turn,frameTable, speed, attackTable){
     SkillStatic.sprite = new Image();
-    SkillStatic.sprite.src = "./js/dragonBallGame/sprites/shootSprite.png";
+    SkillStatic.sprite.src = "dbgame/js/dragonBallGame/sprites/shootSprite.png";
   	this.x = x;
   	this.y = y;
   	this.renderX = x;

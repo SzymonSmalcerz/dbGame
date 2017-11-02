@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>DB GAME</title>
+    <link rel="stylesheet" href="./css/app.css">
+    <style type="text/css">
+  		body{
+  				margin:0;
+  				padding: 0;
+  				overflow: hidden;
+  				background-color: black;
+  			}
+  			canvas{
+  				position: absolute;
+  				top:0;
+  				left:0;
+  			}
+  	</style>
+  </head>
+  <body>
+
+    <script src="/socket.io/socket.io.js"></script>
+      <script>
+        var socket = io(); //socket and Game our global objects
+        var ide1 = <%= id1 %>;
+        var ide2 = <%= id2 %>;
+
+        var playerID = ide1.toString(16) + ide2.toString(16);
+        socket.emit("HEHE", {
+          idd : playerID
+        });
+
+      </script>
+    <script src="dbgame/js/index.js"></script>
+    <script src="dbgame/js/dragonBallGame/Tiles.js"></script>
+    <script src="dbgame/js/dragonBallGame/Camera.js"></script>
+    <script src="dbgame/js/dragonBallGame/ENTITIES/Mob.js"></script>
+    <script src="dbgame/js/dragonBallGame/ENTITIES/Enemy.js"></script>
+    <script src="dbgame/js/dragonBallGame/ENTITIES/MainCharacter.js"></script>
+    <script src="dbgame/js/dragonBallGame/ENTITIES/OtherPlayer.js"></script>
+    <script src="dbgame/js/dragonBallGame/LEVELS/Level.js"></script>
+    <script src="dbgame/js/dragonBallGame/SKILS/Skill.js"></script>
+    <script src="dbgame/js/dragonBallGame/ENTITIES/statics/StaticEntity.js"></script>
+
+
+  </body>
+</html>
