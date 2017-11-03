@@ -8,7 +8,7 @@ window.onload = function(){
       id : playerID
     });
     socket.on("playerID",(playerData) => {
-      Game.createMainCharacter(playerData.id);
+      Game.createMainCharacter(playerData);
       Game.init();
       socket.on("playerID", () => {
         console.log("DO NOTHING !!!!");
@@ -98,6 +98,7 @@ const Game = {
 		Game.handler.menu.headImage.src = "dbgame/js/dragonBallGame/sprites/gokuHead.png";
     Game.handleSockets();
     Game.handleTilesLevelsAndOther();
+    Game.handleMoveXandMoveY();
     Game.mainLoop();
   },
   mainLoop : function(time){
@@ -148,16 +149,23 @@ const Game = {
 			Game.handler.ctx.fillStyle = "rgb(0," + (manaColor - 150) + "," + manaColor + ")";
 			Game.handler.ctx.fillRect(140  ,window.innerHeight - 48 , window.innerWidth/10 * player.mana/player.maxMana,	Math.min(7,Math.max(Math.floor(player.height/3),3)));
 
-			//Game.handler.ctx.fillRect(player.scaledX ,player.Y - player.height/8, player.width * player.health/player.maxHealth,	Math.min(4,Math.max(Math.floor(player.height/15),1)));
-			// Game.handler.ctx.drawImage(StaticEntity.sprite,																	// imagesource
-			// 				   this.xPositionInImage*StaticEntity.width,this.yPositionInImage*StaticEntity.height,	// x and y position of particular image in sprite
-			// 				   StaticEntity.width,StaticEntity.height,												// width and height of particular image in sprite
-			// 				   this.scaledX,this.scaledY,											// x and y on the screen
-			// 				   this.width,this.height);		// width and height of the particular image on the screen
 
 	},
-  createMainCharacter : function(id) {
-    this.handler.character = new MainCharacter(id);
+  createMainCharacter : function(playerData) {
+    this.handler.character = new MainCharacter(playerData);
+  },
+  handleMoveXandMoveY(){
+    var player = this.handler.character;
+    var level  = this.handler.currentLevel;
+    while(player.renderY + player.height >= window.innerHeight/2){
+      level.moveY -= player.speed;
+      player.renderY -= player.speed;
+  	}
+
+    while(player.renderX + player.width/2 >= window.innerWidth/2 ){
+      level.moveX -= player.speed;
+      player.renderX -= player.speed;
+  	}
   },
   handleTilesLevelsAndOther : function(){
     Game.handler.tiles.G = new Tile(0,0);
@@ -229,13 +237,14 @@ const Game = {
   handleSockets : function() {
 
     socket.on("playerCreation", (newPlayerData) => {
-      if(!Game.handler.players[newPlayerData.id]){
+      var playerID = newPlayerData.id;
+      if(!Game.handler.players[playerID]){
         console.log("NEW PLAYER HAS BEEN CREATED");
-        Game.handler.players[newPlayerData.id] = new OtherPlayer(newPlayerData.id);//adding player to player list
-        Game.handler.players[newPlayerData.id].x = newPlayerData.x;
-        Game.handler.players[newPlayerData.id].y = newPlayerData.y;
-        Game.handler.players[newPlayerData.id].currentSprite = newPlayerData.currentSprite;
-        Game.handler.currentLevel.players.push(Game.handler.players[newPlayerData.id]);
+        Game.handler.players[playerID] = new OtherPlayer(playerID);//adding player to player list
+        Game.handler.players[playerID].x = newPlayerData.x;
+        Game.handler.players[playerID].y = newPlayerData.y;
+        Game.handler.players[playerID].currentSprite = newPlayerData.currentSprite;
+        Game.handler.currentLevel.players.push(Game.handler.players[playerID]);
 
         console.log("ALL PLAYERS: ");
         console.log(Game.handler.players);
@@ -250,7 +259,7 @@ const Game = {
           // skip loop if the property is from prototype
           if (!playerData.hasOwnProperty(playerID)) continue;
           if(!Game.handler.players[playerID]) continue;
-          var player = playerData[playerID];
+          var player = playerData[playerID].gameData;
 
           Game.handler.players[playerID].health = player.health;
           Game.handler.players[playerID].mana = player.mana;
@@ -278,7 +287,7 @@ const Game = {
           if (!playerData.hasOwnProperty(playerID)) continue;
 
           if(playerID == Game.handler.character.id) continue;
-          var player = playerData[playerID];
+          var player = playerData[playerID].gameData;
           if(!Game.handler.players[playerID]){
             console.log("NEW PLAYER HAS BEEN ADDED");
             Game.handler.players[playerID] = new OtherPlayer(player.id);//adding player to player list
@@ -321,13 +330,20 @@ const Game = {
     socket.on("addStatics", (staticData) => {
 
       for(var i=0;i<staticData.length;i++){
+        var staticEntity;
         if(staticData[i].type == "tree"){
-          Game.handler.currentLevel.statics.push(new Tree(staticData[i].x, staticData[i].y));
+          staticEntity = new Tree(staticData[i].x, staticData[i].y);
         }else if(staticData[i].type == "house1"){
-          Game.handler.currentLevel.statics.push(new House1(staticData[i].x, staticData[i].y));
+          staticEntity = new House1(staticData[i].x, staticData[i].y);
         }else if(staticData[i].type == "house2"){
-          Game.handler.currentLevel.statics.push(new House2(staticData[i].x, staticData[i].y));
+          staticEntity = new House2(staticData[i].x, staticData[i].y);
+        }else{
+          continue;
         }
+
+        staticEntity.renderX += Game.handler.currentLevel.moveX;
+        staticEntity.renderY += Game.handler.currentLevel.moveY;
+        Game.handler.currentLevel.statics.push(staticEntity);
       }
    });
 

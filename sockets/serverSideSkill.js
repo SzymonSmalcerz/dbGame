@@ -83,7 +83,7 @@ class Skill{
   	if(!this.detonated ){
       for (var playerID in this.connectedPlayersData) {
         if (!this.connectedPlayersData.hasOwnProperty(playerID)) continue;
-        var player = this.connectedPlayersData[playerID];
+        var player = this.connectedPlayersData[playerID].gameData;
         if((Math.sqrt(Math.pow(player.collisionWidth/2,2) + Math.pow(player.collisionHeight/2,2))) +
          (Math.sqrt(Math.pow(this.width/2,2) + Math.pow(this.height/2,2))) >= (Math.sqrt(Math.pow((player.x + player.width/2) - (this.x + this.width/2),2) +
          Math.pow((player.y + player.height * 0.9 - player.collisionHeight/2) - (this.y + this.height/2),2)))){

@@ -153,6 +153,7 @@ class Enemy{
   checkForCollisionWithPlayer(player){
 
 
+
     	  if(player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 >= this.y + this.height*0.9 - this.collisionHeight - this.speed
          && player.y + playerStatics.height*0.9- playerStatics.collisionHeight/2 <= this.y + this.height*0.9  + this.collisionHeight  + this.speed){
 
@@ -210,7 +211,7 @@ class Enemy{
       if (!this.connectedPlayersData.hasOwnProperty(playerID)) continue;
 
 
-      var player = this.connectedPlayersData[playerID];
+      var player = this.connectedPlayersData[playerID].gameData;
 
     	if(!this.checkForCollisionWithPlayer(player)){
 
@@ -251,7 +252,7 @@ class Enemy{
     for(var playerID in this.connectedPlayersData){
       if(!this.connectedPlayersData.hasOwnProperty(playerID)) continue;
 
-      var player = this.connectedPlayersData[playerID];
+      var player = this.connectedPlayersData[playerID].gameData;
 
       var realRangeWidth;
       var realRangeHeight;
@@ -288,7 +289,7 @@ class Enemy{
         up = 0 - this.width;
         dp = 2*player.rangeOfSeeingHeight + this.height;
       }
-
+      
       if(this.x >= lp && this.x <= rp && this.y <= dp && this.y >= up){
         this.tableOfSockets[player.id].emit("enemyTick",{
          id : this.id,
@@ -333,7 +334,7 @@ class Enemy{
         if (!this.connectedPlayersData.hasOwnProperty(playerID)) continue;
 
 
-        var player = this.connectedPlayersData[playerID];
+        var player = this.connectedPlayersData[playerID].gameData;
         if(player.x + player.width/2 - player.collisionWidth/2 > this.x + this.speed + this.width/2 + this.collisionWidth/2 ){
 
           for(var staticEntity in this.statics){
@@ -357,7 +358,7 @@ class Enemy{
         if (!this.connectedPlayersData.hasOwnProperty(playerID)) continue;
 
 
-        var player = this.connectedPlayersData[playerID];
+        var player = this.connectedPlayersData[playerID].gameData;
         if(player.x + player.width/2 + player.collisionWidth/2 < this.x - this.speed + this.width/2 - this.collisionWidth/2 ){
 
           for(var staticEntity in this.statics){
@@ -381,7 +382,7 @@ class Enemy{
         if (!this.connectedPlayersData.hasOwnProperty(playerID)) continue;
 
 
-        var player = this.connectedPlayersData[playerID];
+        var player = this.connectedPlayersData[playerID].gameData;
 
         if(player.y + player.height * 0.9 - player.collisionHeight > this.y + this.speed - this.height * 0.9){
           for(var staticEntity in this.statics){
@@ -405,7 +406,7 @@ class Enemy{
         if (!this.connectedPlayersData.hasOwnProperty(playerID)) continue;
 
 
-        var player = this.connectedPlayersData[playerID];
+        var player = this.connectedPlayersData[playerID].gameData;
 
         if(player.y - player.height * 0.9 < this.y - this.speed + this.height * 0.9 - this.collisionHeight){
           for(var staticEntity in this.statics){

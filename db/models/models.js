@@ -30,7 +30,55 @@ var userSchema = new mongoose.Schema({
       type : String,
       required : true
     }
-  }]
+  }],
+  level : {
+    type : Number,
+    default : 1
+  },
+  experience : {
+    type : Number,
+    default : 0
+  },
+  maxHealth : {
+    type : Number,
+    default : 1000
+  },
+  maxMana : {
+    type : Number,
+    default : 300
+  },
+  width : {
+    type : Number,
+    default : 32
+  },
+  height : {
+    type : Number,
+    default : 32
+  },
+  collisionWidth : {
+    type : Number,
+    default : 11
+  },
+  collisionHeight : {
+    type : Number,
+    default : 11
+  },
+  manaRegeneration : {
+    type : Number,
+    default : 2
+  },
+  healthRegeneration : {
+    type : Number,
+    default : 5
+  },
+  x : {
+    type : Number,
+    default : 100
+  },
+  y : {
+    type : Number,
+    default : 100
+  }
 });
 
 userSchema.statics.findByToken = (token) => {

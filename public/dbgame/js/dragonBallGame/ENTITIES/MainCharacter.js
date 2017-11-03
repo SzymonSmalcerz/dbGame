@@ -1,16 +1,14 @@
 
-
-
-
 class MainCharacter extends Mob{
-  constructor(id){
+
+  constructor(playerData){
     const spritePlayer = new Image();
     spritePlayer.src = "dbgame/js/dragonBallGame/sprites/spriteGokuSupix.png";
-    super(id,spritePlayer,100,100);
-    //this.id = //TODO change IT !!!!!!!!
-    //Game.handler.character = this; //TODO LOOK IF IT WORKS !!!!
-    this.renderX = this.x;
-    this.renderY = this.y;
+    super(playerData.id,spritePlayer,playerData.x,playerData.y);
+
+    this.renderX = this.x;//must be that way !!
+    this.renderY = this.y;//must be that way !!
+
     Game.handler.players[this.id] = this;
       this.up = [{x:11,y:11},{x:12,y:7},{x:4,y:2},{x:11,y:1}];
     	this.left = [{x:1,y:11},{x:13,y:11},{x:9,y:11},{x:5,y:11}];
@@ -42,8 +40,8 @@ class MainCharacter extends Mob{
       this.health = 1000;
       this.maxHealth = 1000;
       this.damage = 100;
-    	this.manaRegeneration = this.mana/800 || 4;
-      this.healthRegeneration = this.health/800 || 4;
+    	this.manaRegeneration =  4;
+      this.healthRegeneration =  4;
 
       this.width = 32;
       this.height = 32;
@@ -57,15 +55,7 @@ class MainCharacter extends Mob{
       [{x:1,y:0}]];
 
       socket.emit('message',"user " + this.id + " has been created");
-      socket.emit('playerCreation',{
-        x : this.x,
-        y : this.y,
-        currentSprite : this.currentSprite,
-        id : this.id,
-        health : this.health,
-        collisionHeight : this.collisionHeight,
-        collisionWidth : this.collisionWidth
-      });
+      socket.emit("playerCreated");//and now add enemies statics etc.
 
   }
 
@@ -213,23 +203,12 @@ class MainCharacter extends Mob{
 
   emitDataToOthers(){
     socket.emit('userData',{
+      id : this.id,
       x : this.x,
       y : this.y,
       currentSprite : this.currentSprite,
-      id : this.id,
-      collisionWidth : this.collisionWidth,
-      collisionHeight : this.collisionHeight,
-      width : this.width,
-      height : this.height,
-      health : this.health,
-      maxHealth : this.maxHealth,
-      mana : this.mana,
-      maxMana : this.maxMana,
-      healthRegeneration : this.healthRegeneration,
-      manaRegeneration : this.manaRegeneration,
       rangeOfSeeingWidth : window.innerWidth/2,
-      rangeOfSeeingHeight : window.innerHeight/2,
-      speed : this.speed
+      rangeOfSeeingHeight : window.innerHeight/2
     });
   }
 

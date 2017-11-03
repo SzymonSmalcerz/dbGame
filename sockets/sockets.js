@@ -1,5 +1,5 @@
 // const {io} = require("./server");
-
+var {User} = require("../db/models/models");
 var {Enemy,Hit , Hulk, Dragon ,Yeti, Static} = require("./serverSideEnemy");
 var {io} = require("../server");
 var {Skill,KamehamehaWave} = require("./serverSideSkill");
@@ -26,32 +26,75 @@ var handleSocketsWork = (socket,io) => {
 
 
 
-socket.on("getPlayerID", (data) => {
-  // if(connectedPlayersData[data.id]){
-  //   socket.emit("alreadyLoggedIn", {
-  //     msg : "You are already logged in !"
-  //   })
-  // }else{
-  //   socket.emit("playerID", {
-  //     id : data.id
-  //   })
-  // }
+socket.on("getPlayerID",async (data) => {
 
-  socket.emit("playerID", {
-    id : Math.floor(Math.random() * 100000)
+  if(connectedPlayersData[data.id]){
+    socket.emit("alreadyLoggedIn", {
+      msg : "You are already logged in !"
+    })
+  }else{
+
+    try {
+
+      var playerData;
+      var user = await User.findById(data.id);
+      playerData = {
+        x : user.x,
+        y : user.y,
+        id : data.id,
+        collisionHeight : user.collisionHeight,
+        collisionWidth : user.collisionWidth,
+        width : user.width,
+        height : user.height,
+        currentSprite : [{x:1,y:0}],
+        health : user.maxHealth,
+        maxHealth : user.maxHealth,
+        healthRegeneration : user.healthRegeneration,
+        mana : user.maxMana,
+        maxMana : user.maxMana,
+        manaRegeneration : user.manaRegeneration,
+        speed : 7
+      }
+      socket.emit("playerID", playerData)
+
+      socket.broadcast.emit("playerCreation",playerData);
+      connectedPlayersData[playerData.id] = {};
+      connectedPlayersData[playerData.id].gameData = playerData;
+      tableOfSockets[playerData.id] = socket;
+    }catch(e){
+      console.log("\n\n ERROR IN PLAYER CREATION !!!! \n\n" + e);
+      socket.emit("alreadyLoggedIn", {
+        msg : e
+      })
+    }
+
+  }
+
+  socket.on("playerCreated", () => {
+    socket.emit("addUsers", connectedPlayersData);
+    socket.emit("addStatics", statics);
+    socket.emit("addEnemies", enemiesData);
   })
+
+  // socket.emit("playerID", {
+  //   id : "59fc4d9ab36b8311c9217051"
+  // })
 
 
 });
 
- socket.on("playerCreation", (playerData) => { //trigered at the client side creation of user
-    socket.broadcast.emit("playerCreation",playerData);
-    socket.emit("addUsers", connectedPlayersData);
-    socket.emit("addStatics", statics);
-    socket.emit("addEnemies", enemiesData);
-    connectedPlayersData[playerData.id] = playerData;
-    tableOfSockets[playerData.id] = socket;
-  });
+ // socket.on("playerCreation", (playerData) => { //trigered at the client side creation of user
+ //    socket.broadcast.emit("playerCreation",playerData);
+ //    socket.emit("addUsers", connectedPlayersData);
+ //    socket.emit("addStatics", statics);
+ //    socket.emit("addEnemies", enemiesData);
+ //    console.log(typeof playerData.id);
+ //    console.log(playerData.id);
+ //    connectedPlayersData[playerData.id] = {};// TODO DELETE THIS
+ //
+ //    connectedPlayersData[playerData.id].gameData = playerData;
+ //    tableOfSockets[playerData.id] = socket;
+ //  });
 
   socket.on("skillCreation", (skillData) => {
     skillTable.push(new KamehamehaWave(Math.floor(Math.random() * 100000),skillData.x,skillData.y,skillData.turn,skillData.skillName, connectedPlayersData,statics,allEnemies, io))
@@ -106,8 +149,16 @@ socket.on("getPlayerID", (data) => {
 
 
   socket.on('userData', (playerData) => {
+    // console.log(playerData.health);
+
+  //  console.log("PLAYER X FROM userData: " + playerData.x);
     if(connectedPlayersData[playerData.id]){
-      connectedPlayersData[playerData.id] = playerData;
+
+      connectedPlayersData[playerData.id].gameData.x = playerData.x;
+      connectedPlayersData[playerData.id].gameData.y = playerData.y;
+      connectedPlayersData[playerData.id].gameData.currentSprite = playerData.currentSprite;
+      connectedPlayersData[playerData.id].gameData.rangeOfSeeingWidth = playerData.rangeOfSeeingWidth;
+      connectedPlayersData[playerData.id].gameData.rangeOfSeeingHeight = playerData.rangeOfSeeingHeight;
       connectedPlayersData[playerData.id].active = true;
     }
   });
@@ -131,15 +182,16 @@ socket.on("getPlayerID", (data) => {
       for (var playerID in connectedPlayersData) {
           // skip loop if the property is from prototype
         if (!connectedPlayersData.hasOwnProperty(playerID)) continue;
-        var player = connectedPlayersData[playerID];
-
+        var player = connectedPlayersData[playerID].gameData;
+        //console.log(player.mana);
         if(player.health < player.maxHealth){
-          connectedPlayersData[playerID].health += player.healthRegeneration;
+          player.health += player.healthRegeneration;
         }
 
         if(player.mana < player.maxMana){
-          connectedPlayersData[playerID].mana += player.manaRegeneration;
+          player.mana += player.manaRegeneration;
         }
+        //console.log(player.mana);
       }
       lastTime = time;
 
@@ -225,7 +277,7 @@ socket.on("getPlayerID", (data) => {
           connectedPlayersData[playerID].active = false;
       }
       io.emit("checkForConnection");
-      setTimeout(function(){
+      setTimeout(async function(){
         for (var playerID in connectedPlayersData) {
             // skip loop if the property is from prototype
             if (!connectedPlayersData.hasOwnProperty(playerID)) continue;
@@ -234,10 +286,25 @@ socket.on("getPlayerID", (data) => {
 
             if(!connectedPlayersData[playerID]) continue;
             var player = connectedPlayersData[playerID];
+
             if(!connectedPlayersData[playerID].active){
               io.emit("removePlayer", {
                 id : playerID
               })
+
+              try {
+                var user = await User.findById(playerID);
+                user.x = connectedPlayersData[playerID].gameData.x;
+                user.y = connectedPlayersData[playerID].gameData.y;
+                await user.save();
+
+                console.log("saved statis of :", user._id);
+              }catch(e){
+                console.log(e);
+              }
+              // user.level = connectedPlayersData[playerID].gameData.level;
+              // user.experience = connectedPlayersData[playerID].gameData.experience;
+
               delete tableOfSockets[playerID];
               delete connectedPlayersData[playerID];
             }
