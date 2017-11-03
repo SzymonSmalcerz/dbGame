@@ -16,10 +16,10 @@ var checkIfNickIsAvaliable = async (req,res,next) => {
         await newUser.save();
         next();
       }else{
-        res.send("nick already taken");
+        res.render("home",{message: "nick already taken"});
       }
     }else{
-      res.send("email already taken");
+      res.render("home",{message: "email already taken"});
     }
   }catch(e){
     console.log(e);
@@ -38,14 +38,13 @@ var loginMiddleware = async (req,res,next) => {
       req.user = user;
       next();
     }else{
-      res.send("bad password or login");
+      res.render("home",{message : "bad password or login"});
     }
   }catch(e){
-    res.send(e);
+    res.render("home",{message : "bad password or login"});
   }
 }
 var authenticate = async (req,res,next) => {
-  console.log("IM HERE authenticate");
   try {
     //console.log(JSON.stringify(req.headers));
     if(req.session && req.session.jwt){
@@ -54,10 +53,10 @@ var authenticate = async (req,res,next) => {
       if(user){
         next();
       }else{
-        res.send("you have to log in to get to this page");
+        res.render("home",{message : "you have to log in to get to this page"});
       }
     }else{
-      res.send("you have to log in to get to this page");
+      res.render("home",{message : "you have to log in to get to this page"});
     }
   }catch(e){
     res.send(e);
@@ -65,7 +64,6 @@ var authenticate = async (req,res,next) => {
 }
 
 var logoutUser = async (req,res,next) => {
-  console.log("IM HERE logout");
   try {
     if(req.session && req.session.jwt){
       var user = await User.findByToken(req.session.jwt);
@@ -73,13 +71,12 @@ var logoutUser = async (req,res,next) => {
         await user.deleteToken(req.session.jwt);
         //await User.deleteToken(req.session.jwt);
         req.session.reset();
-        console.log("IM HERE");
         next();
       }else{
-        res.send("you have to log in to get to this page");
+        res.render("home",{message : "you have to log in to get to this page"});
       }
     }else{
-      res.send("you have to log in to get to this page");
+      res.render("home",{message : "you have to log in to get to this page"});
     }
   }catch(e){
     res.send(e);

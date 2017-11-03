@@ -1,13 +1,12 @@
 
+
+
+
 class MainCharacter extends Mob{
   constructor(id){
-
-    super(id,"dbgame/js/dragonBallGame/sprites/spriteGokuSupix.png",[[{x:11,y:11},{x:12,y:7},{x:4,y:2},{x:11,y:1}],[{x:10,y:1},{x:3,y:2}],
-    [{x:1,y:11},{x:13,y:11},{x:9,y:11},{x:5,y:11}],[{x:0,y:11},{x:12,y:11},{x:8,y:11},{x:4,y:11}],
-    [{x:9,y:3},{x:11,y:9},{x:2,y:4},{x:6,y:4},{x:10,y:8},{x:0,y:6},{x:4,y:6}],[{x:14,y:5},{x:3,y:6},{x:13,y:8},{x:14,y:5},{x:12,y:3},{x:1,y:4},{x:5,y:4}],
-    [{x:13,y:9},{x:5,y:5},{x:2,y:6},{x:1,y:5}],[{x:12,y:9},{x:4,y:5},{x:1,y:6},{x:0,y:5}],
-    [{x:1,y:0}]],100,100);
-    this.speed = 7;
+    const spritePlayer = new Image();
+    spritePlayer.src = "dbgame/js/dragonBallGame/sprites/spriteGokuSupix.png";
+    super(id,spritePlayer,100,100);
     //this.id = //TODO change IT !!!!!!!!
     //Game.handler.character = this; //TODO LOOK IF IT WORKS !!!!
     this.renderX = this.x;
@@ -37,6 +36,26 @@ class MainCharacter extends Mob{
     	this.usingSkill = false;
 
 
+      this.speed = 7;
+      this.mana = 100;
+    	this.maxMana = 100;
+      this.health = 1000;
+      this.maxHealth = 1000;
+      this.damage = 100;
+    	this.manaRegeneration = this.mana/800 || 4;
+      this.healthRegeneration = this.health/800 || 4;
+
+      this.width = 32;
+      this.height = 32;
+      this.collisionHeight = this.height/3;
+    	this.collisionWidth = this.width/3 ;
+
+      this.moveTable = [[{x:11,y:11},{x:12,y:7},{x:4,y:2},{x:11,y:1}],[{x:10,y:1},{x:3,y:2}],
+      [{x:1,y:11},{x:13,y:11},{x:9,y:11},{x:5,y:11}],[{x:0,y:11},{x:12,y:11},{x:8,y:11},{x:4,y:11}],
+      [{x:9,y:3},{x:11,y:9},{x:2,y:4},{x:6,y:4},{x:10,y:8},{x:0,y:6},{x:4,y:6}],[{x:14,y:5},{x:3,y:6},{x:13,y:8},{x:14,y:5},{x:12,y:3},{x:1,y:4},{x:5,y:4}],
+      [{x:13,y:9},{x:5,y:5},{x:2,y:6},{x:1,y:5}],[{x:12,y:9},{x:4,y:5},{x:1,y:6},{x:0,y:5}],
+      [{x:1,y:0}]];
+
       socket.emit('message',"user " + this.id + " has been created");
       socket.emit('playerCreation',{
         x : this.x,
@@ -50,11 +69,6 @@ class MainCharacter extends Mob{
 
   }
 
-  draw() {
-
-      // console.log("IM HERE !!!");
-      super.draw();
-  }
   tick(){
     //TEMPORARY ADDED BELOW @@@@@@@@@@@@@@@@@@@@@@@@@@@@
     this.emitDataToOthers();
@@ -212,7 +226,10 @@ class MainCharacter extends Mob{
       mana : this.mana,
       maxMana : this.maxMana,
       healthRegeneration : this.healthRegeneration,
-      manaRegeneration : this.manaRegeneration
+      manaRegeneration : this.manaRegeneration,
+      rangeOfSeeingWidth : window.innerWidth/2,
+      rangeOfSeeingHeight : window.innerHeight/2,
+      speed : this.speed
     });
   }
 

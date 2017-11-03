@@ -24,7 +24,7 @@ window.onload = function(){
 
 
 
-var Game = {
+const Game = {
   handler : {
 		canvas : undefined,
 		ctx : undefined,
@@ -94,6 +94,8 @@ var Game = {
 		// document.body.appendChild(Game.handler.collisionCanvas);
 
     Game.handler.camera = new Camera();
+    Game.handler.menu.headImage = new Image();
+		Game.handler.menu.headImage.src = "dbgame/js/dragonBallGame/sprites/gokuHead.png";
     Game.handleSockets();
     Game.handleTilesLevelsAndOther();
     Game.mainLoop();
@@ -122,6 +124,37 @@ var Game = {
       //console.log(Game.handler.globalTickCounter);
 
 		}
+	},
+  drawMenu : function(){
+
+			var player = Game.handler.character;
+
+			Game.handler.ctx.drawImage(Game.handler.menu.headImage,0,0,256,256,window.innerWidth/100,window.innerHeight - 150 ,128 ,128 );
+
+			Game.handler.ctx.fillStyle = "rgb(90,0,0)";
+			Game.handler.ctx.fillRect(140  ,window.innerHeight - 64 , window.innerWidth/6,	Math.min(10,Math.max(Math.floor(player.height/2),7)));
+
+			Game.handler.ctx.fillStyle = "rgb(255,0,0)";
+			Game.handler.ctx.fillRect(140  ,window.innerHeight - 64 , window.innerWidth/6 * player.health/player.maxHealth,	Math.min(7,Math.max(Math.floor(player.height/2),5)));
+
+
+			Game.handler.ctx.fillStyle = "rgb(0,0,20)";
+			Game.handler.ctx.fillRect(140  ,window.innerHeight - 48 , window.innerWidth/10,	Math.min(10,Math.max(Math.floor(player.height/2),4)));
+
+			var manaColor = 150;
+			if( player.isRegeneratingMana){
+				manaColor = Math.floor(Math.random()*(255-225) + 225);
+			}
+			Game.handler.ctx.fillStyle = "rgb(0," + (manaColor - 150) + "," + manaColor + ")";
+			Game.handler.ctx.fillRect(140  ,window.innerHeight - 48 , window.innerWidth/10 * player.mana/player.maxMana,	Math.min(7,Math.max(Math.floor(player.height/3),3)));
+
+			//Game.handler.ctx.fillRect(player.scaledX ,player.Y - player.height/8, player.width * player.health/player.maxHealth,	Math.min(4,Math.max(Math.floor(player.height/15),1)));
+			// Game.handler.ctx.drawImage(StaticEntity.sprite,																	// imagesource
+			// 				   this.xPositionInImage*StaticEntity.width,this.yPositionInImage*StaticEntity.height,	// x and y position of particular image in sprite
+			// 				   StaticEntity.width,StaticEntity.height,												// width and height of particular image in sprite
+			// 				   this.scaledX,this.scaledY,											// x and y on the screen
+			// 				   this.width,this.height);		// width and height of the particular image on the screen
+
 	},
   createMainCharacter : function(id) {
     this.handler.character = new MainCharacter(id);
@@ -223,6 +256,12 @@ var Game = {
           Game.handler.players[playerID].mana = player.mana;
           Game.handler.players[playerID].maxHealth = player.maxHealth;
           Game.handler.players[playerID].maxMana = player.maxMana;
+
+          Game.handler.players[playerID].width = player.width;
+          Game.handler.players[playerID].height = player.height;
+          Game.handler.players[playerID].collisionWidth = player.collisionWidth;
+          Game.handler.players[playerID].collisionHeight = player.collisionHeight;
+
           if(playerID == Game.handler.character.id) continue;
           Game.handler.players[playerID].x = player.x;
           Game.handler.players[playerID].y = player.y;
@@ -296,7 +335,6 @@ var Game = {
 
 
       if(Game.handler.enemies[enemyData.id]){
-
         if(Game.handler.enemies[enemyData.id].renderX){
           Game.handler.enemies[enemyData.id].renderX += enemyData.x - Game.handler.enemies[enemyData.id].x;
           Game.handler.enemies[enemyData.id].renderY += enemyData.y - Game.handler.enemies[enemyData.id].y;
@@ -304,9 +342,18 @@ var Game = {
           Game.handler.enemies[enemyData.id].renderX = enemyData.x + Game.handler.currentLevel.moveX;
           Game.handler.enemies[enemyData.id].renderY = enemyData.y + Game.handler.currentLevel.moveY;
         }
+
         Game.handler.enemies[enemyData.id].x = enemyData.x;
         Game.handler.enemies[enemyData.id].y = enemyData.y;
         Game.handler.enemies[enemyData.id].health = enemyData.health;
+        Game.handler.enemies[enemyData.id].maxHealth = enemyData.maxHealth;
+        Game.handler.enemies[enemyData.id].mana = enemyData.mana;
+        Game.handler.enemies[enemyData.id].maxMana = enemyData.maxMana;
+        Game.handler.enemies[enemyData.id].speed = enemyData.speed;
+        Game.handler.enemies[enemyData.id].width = enemyData.width;
+        Game.handler.enemies[enemyData.id].height = enemyData.height;
+        Game.handler.enemies[enemyData.id].collisionHeight = enemyData.collisionHeight;
+        Game.handler.enemies[enemyData.id].collisionWidth = enemyData.collisionWidth;
         Game.handler.enemies[enemyData.id].currentSprite = enemyData.currentSprite;
       }
 
@@ -371,9 +418,5 @@ var Game = {
     })
 
 
-  },
-	drawMenu : function(){
-
-
-	}
+  }
 }

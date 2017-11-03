@@ -1,4 +1,4 @@
-var Static = {
+const Static = {
   getTreeData : function(x,y){
     return {
 
@@ -38,7 +38,7 @@ var Static = {
   }
 }
 
-var playerStatics = {
+const playerStatics = {
   width : 32,
   height : 32,
   collisionWidth : 32/3,
@@ -77,8 +77,6 @@ class Enemy{
     this.speed = speed || 4.5;
   	this.manaRegeneration = manaRegeneration || mana/400 || 2.5;
     this.healthRegeneration = healthRegeneration || health/400 || 10;
-
-    this.isFighting = false;
   }
 
   checkForCollisionWithStaticEntity(staticEntity,directionOfThisEnemyMovement){
@@ -155,13 +153,7 @@ class Enemy{
   checkForCollisionWithPlayer(player){
 
 
-      this.isFighting = false;
-
-    	//console.log("inside checkForCollisionWithPlayer");
-
-    	// if(player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 > this.y + this.height*0.9 - 2.0 * playerStatics.collisionHeight - this.speed
-    	//    && player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 <= this.y + this.height*0.9 + 1.0* playerStatics.collisionHeight + this.speed)
-      if(player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 >= this.y + this.height*0.9 - this.collisionHeight - this.speed
+    	  if(player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 >= this.y + this.height*0.9 - this.collisionHeight - this.speed
          && player.y + playerStatics.height*0.9- playerStatics.collisionHeight/2 <= this.y + this.height*0.9  + this.collisionHeight  + this.speed){
 
 
@@ -169,21 +161,14 @@ class Enemy{
     	       && player.x + (playerStatics.width + playerStatics.collisionWidth)/2 + this.collisionWidth*3/2 > this.x + (this.width - this.collisionWidth)/2){
 
 
-          //this.tableOfSockets[player.id].emit("getDamage", this.damage);
           player.health -= this.damage;
     			this.currentSprite = this.left_fight;
-          this.isFighting = true;
-    			//player.getDamage(this.damage);
     			return true;
     		}else if(player.x + (playerStatics.width - playerStatics.collisionWidth)/2 >= this.x + this.width/2
     	             && player.x + (playerStatics.width - playerStatics.collisionWidth)/2 < this.x + this.width + this.collisionWidth){
 
-    			//console.log("ENEMY IS ATTACKING RIGHT");
-          //this.tableOfSockets[player.id].emit("getDamage", this.damage);
           player.health -= this.damage;
     			this.currentSprite = this.right_fight;
-          this.isFighting = true;
-    			//player.getDamage(this.damage);
     			return true;
     		}
 
@@ -196,21 +181,15 @@ class Enemy{
 
     		if(player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 <= this.y + this.height*0.9 - this.collisionHeight/2
     		   && player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 + this.collisionHeight*3/2 >= this.y + this.height*0.9 - this.collisionHeight/2){
-    			//console.log("ENEMY IS ATTACKING UP");
-    			//player.getDamage(this.damage);
-          //this.tableOfSockets[player.id].emit("getDamage", this.damage);
+
           player.health -= this.damage;
     			this.currentSprite = this.up_fight;
-          this.isFighting = true;
     			return true;
     		}else if(player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 -this.collisionHeight*3/2 <= this.y + this.height*0.9 - this.collisionHeight/2
     		   && player.y + playerStatics.height*0.9 - playerStatics.collisionHeight/2 >= this.y + this.height*0.9 - this.collisionHeight/2){
-    			//console.log("ENEMY IS ATTACKING DOWN");
-    			//player.getDamage(this.damage);
-          //this.tableOfSockets[player.id].emit("getDamage", this.damage);
+
           player.health -= this.damage;
     			this.currentSprite = this.down_fight;
-          this.isFighting = true;
     			return true;
     		}
 
@@ -269,14 +248,67 @@ class Enemy{
 
   emitTick(){
     this.handleManaAndHp();
-    this.io.emit("enemyTick",{
-     id : this.id,
-     x : this.x,
-     y : this.y,
-     currentSprite : this.currentSprite,
-     health : this.health,
-     maxHealth : this.maxHealth
-   });
+    for(var playerID in this.connectedPlayersData){
+      if(!this.connectedPlayersData.hasOwnProperty(playerID)) continue;
+
+      var player = this.connectedPlayersData[playerID];
+
+      var realRangeWidth;
+      var realRangeHeight;
+
+      var dp; //down corner of player
+      var up; //up corner ..
+      var lp; //left corner ..
+      var rp; //right corenr ..
+
+      if(player.x + player.width + player.speed >= player.rangeOfSeeingWidth){
+
+        if(player.x  >= player.rangeOfSeeingWidth){
+          lp = player.x - player.rangeOfSeeingWidth*2 - this.width;
+        }else{
+          lp = player.x - player.rangeOfSeeingWidth - this.width;
+        }
+
+        rp = player.x + player.rangeOfSeeingWidth + this.width;
+      }else{
+        lp = 0 - this.width;
+        rp = 2*player.rangeOfSeeingWidth + this.width;
+      }
+
+      if(player.y + player.height + player.speed >= player.rangeOfSeeingHeight){
+        if(player.y >= player.rangeOfSeeingHeight){
+          up = player.y - player.rangeOfSeeingHeight*2 - this.height;
+        }else{
+          up = player.y - player.rangeOfSeeingHeight - this.height;
+        }
+
+        dp = player.y + player.rangeOfSeeingHeight + this.height + player.height;
+
+      }else{
+        up = 0 - this.width;
+        dp = 2*player.rangeOfSeeingHeight + this.height;
+      }
+
+      if(this.x >= lp && this.x <= rp && this.y <= dp && this.y >= up){
+        this.tableOfSockets[player.id].emit("enemyTick",{
+         id : this.id,
+         x : this.x,
+         y : this.y,
+         currentSprite : this.currentSprite,
+         health : this.health,
+         maxHealth : this.maxHealth,
+         mana : this.mana,
+         maxMana : this.maxMana,
+         width : this.width,
+         height : this.height,
+         collisionWidth : this.collisionWidth,
+         collisionHeight : this.collisionHeight,
+         speed : this.speed
+       });
+      }
+
+    }
+
  };
 
   handleManaAndHp(){

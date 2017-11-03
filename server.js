@@ -13,7 +13,7 @@ const http = require("http");
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
-const {handleSocketsWork} = require("./sockets");
+const {handleSocketsWork} = require("./sockets/sockets");
 io.on("connection", (socket) => {
   handleSocketsWork(socket, io);
 });
@@ -62,9 +62,6 @@ app.get("/db", authenticate, (req,res) => {
 app.get("/login",(req,res) => {
   res.render("login");
 })
-
-
-
 
 app.post("/login",loginMiddleware,(req,res) => {
   res.render("loggedInPage");

@@ -1,7 +1,7 @@
 // const {io} = require("./server");
 
 var {Enemy,Hit , Hulk, Dragon ,Yeti, Static} = require("./serverSideEnemy");
-var {io} = require("./server");
+var {io} = require("../server");
 var {Skill,KamehamehaWave} = require("./serverSideSkill");
 
 var statics = [Static.getTreeData(600,150),
@@ -17,10 +17,8 @@ var skillTable = [];
 var lastTime = 0;
 var lastTimeForCheckingIfPlayersAreActive = 0;
 var enemies = [];
-
 var entitiesCreated = false;
 var tableOfSockets = {};
-
 var allEnemies = {};
 
 var handleSocketsWork = (socket,io) => {
@@ -29,15 +27,19 @@ var handleSocketsWork = (socket,io) => {
 
 
 socket.on("getPlayerID", (data) => {
-  if(connectedPlayersData[data.id]){
-    socket.emit("alreadyLoggedIn", {
-      msg : "You are already logged in !"
-    })
-  }else{
-    socket.emit("playerID", {
-      id : data.id
-    })
-  }
+  // if(connectedPlayersData[data.id]){
+  //   socket.emit("alreadyLoggedIn", {
+  //     msg : "You are already logged in !"
+  //   })
+  // }else{
+  //   socket.emit("playerID", {
+  //     id : data.id
+  //   })
+  // }
+
+  socket.emit("playerID", {
+    id : Math.floor(Math.random() * 100000)
+  })
 
 
 });
