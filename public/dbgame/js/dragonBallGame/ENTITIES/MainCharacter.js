@@ -6,6 +6,9 @@ class MainCharacter extends Mob{
     spritePlayer.src = "dbgame/js/dragonBallGame/sprites/spriteGokuSupix.png";
     super(playerData.id,spritePlayer,playerData.x,playerData.y);
 
+    this.level = playerData.level;
+    this.experience = playerData.experience;
+
     this.renderX = this.x;//must be that way !!
     this.renderY = this.y;//must be that way !!
 
@@ -101,16 +104,18 @@ class MainCharacter extends Mob{
                this.x + this.width/2 + this.collisionWidth/2 < enemy.x + enemy.width/2 + enemy.collisionWidth/2 + this.collisionWidth*5/2){
               socket.emit("damageEnemy", {
                  idOfEnemy : enemy.id,
-                 damage : this.damage
+                 damage : this.damage,
+                 idOfPlayer : this.id
                });
             }
           }else{//right
             if(this.x + this.width/2 + this.collisionWidth/2 < enemy.x + enemy.width/2 + enemy.collisionWidth/2 &&
                this.x + this.width/2 + this.collisionWidth/2 + this.collisionWidth*2 > enemy.x + enemy.width/2 - enemy.collisionWidth/2){
-              socket.emit("damageEnemy", {
-                 idOfEnemy : enemy.id,
-                 damage : this.damage
-               });
+                 socket.emit("damageEnemy", {
+                    idOfEnemy : enemy.id,
+                    damage : this.damage,
+                    idOfPlayer : this.id
+                  });
             }
           }
         }
@@ -128,18 +133,20 @@ class MainCharacter extends Mob{
           if(this.currentSprite == this.idleDown){//down
             if(this.y + this.height*0.9 - this.collisionHeight/2 < enemy.y + enemy.height*0.9 - enemy.collisionHeight/2 &&
                this.y + this.height*0.9 - this.collisionHeight/2 + this.collisionHeight*5/2 > enemy.y + enemy.height*0.9 - enemy.collisionHeight){
-              socket.emit("damageEnemy", {
-                 idOfEnemy : enemy.id,
-                 damage : this.damage
-               });
+                 socket.emit("damageEnemy", {
+                    idOfEnemy : enemy.id,
+                    damage : this.damage,
+                    idOfPlayer : this.id
+                  });
             }
           }else{//up
             if(this.y + this.height*0.9 - this.collisionHeight/2 > enemy.y + enemy.height*0.9 - enemy.collisionHeight/2 &&
                this.y + this.height*0.9 - this.collisionHeight/2 < enemy.y + enemy.height*0.9 - enemy.collisionHeight/2 + this.collisionHeight*5/2){
-              socket.emit("damageEnemy", {
-                 idOfEnemy : enemy.id,
-                 damage : this.damage
-               });
+                 socket.emit("damageEnemy", {
+                    idOfEnemy : enemy.id,
+                    damage : this.damage,
+                    idOfPlayer : this.id
+                  });
             }
           }
         }
@@ -234,10 +241,6 @@ class MainCharacter extends Mob{
   }
   manageRegenerationMana(){
     this.currentSprite =	[{x:3,y:10},{x:4,y:10},{x:5,y:10},{x:6,y:10},{x:7,y:10},{x:8,y:10}];
-    if(this.mana + 1.6 < this.maxMana)
-    {
-      this.mana += 1.6;
-    }
   }
 
   manageSkills(){
@@ -251,7 +254,6 @@ class MainCharacter extends Mob{
           ownerID : this.id
         })
         this.currentSprite =	[{x:4,y:8}];
-        this.mana -=0.5;
       }
     }else if(this.currentSprite === this.idleRight){
 
@@ -265,7 +267,6 @@ class MainCharacter extends Mob{
           ownerID : this.id
         })
         this.currentSprite =	[{x:3,y:8}];
-        this.mana -=0.5;
       }
 
     }else if(this.currentSprite === this.idleUp){
@@ -279,7 +280,6 @@ class MainCharacter extends Mob{
           ownerID : this.id
         })
         this.currentSprite =	[{x:2,y:8}];
-        this.mana -=0.5;
       }
 
     }else if(this.currentSprite === this.idleDown){
@@ -294,7 +294,6 @@ class MainCharacter extends Mob{
           ownerID : this.id
         })
         this.currentSprite =	[{x:1,y:8}];
-        this.mana -=0.5;
       }
     }
   }

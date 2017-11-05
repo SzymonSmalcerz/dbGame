@@ -130,27 +130,48 @@ const Game = {
 
 			var player = Game.handler.character;
 
+      //draw image
 			Game.handler.ctx.drawImage(Game.handler.menu.headImage,0,0,256,256,window.innerWidth/100,window.innerHeight - 150 ,128 ,128 );
 
+
+      //draw player health
 			Game.handler.ctx.fillStyle = "rgb(90,0,0)";
 			Game.handler.ctx.fillRect(140  ,window.innerHeight - 64 , window.innerWidth/6,	Math.min(10,Math.max(Math.floor(player.height/2),7)));
-
 			Game.handler.ctx.fillStyle = "rgb(255,0,0)";
-			Game.handler.ctx.fillRect(140  ,window.innerHeight - 64 , window.innerWidth/6 * player.health/player.maxHealth,	Math.min(7,Math.max(Math.floor(player.height/2),5)));
+			Game.handler.ctx.fillRect(140  ,window.innerHeight - 64 , window.innerWidth/6 * player.health/player.maxHealth,	Math.min(8,Math.max(Math.floor(player.height/2),5)));
 
 
-			Game.handler.ctx.fillStyle = "rgb(0,0,20)";
+      //draw player mana
+      Game.handler.ctx.fillStyle = "rgb(0,0,20)";
 			Game.handler.ctx.fillRect(140  ,window.innerHeight - 48 , window.innerWidth/10,	Math.min(10,Math.max(Math.floor(player.height/2),4)));
-
 			var manaColor = 150;
 			if( player.isRegeneratingMana){
 				manaColor = Math.floor(Math.random()*(255-225) + 225);
 			}
 			Game.handler.ctx.fillStyle = "rgb(0," + (manaColor - 150) + "," + manaColor + ")";
-			Game.handler.ctx.fillRect(140  ,window.innerHeight - 48 , window.innerWidth/10 * player.mana/player.maxMana,	Math.min(7,Math.max(Math.floor(player.height/3),3)));
+			Game.handler.ctx.fillRect(140  ,window.innerHeight - 48 , window.innerWidth/10 * player.mana/player.maxMana,	Math.min(8,Math.max(Math.floor(player.height/3),3)));
+
+      //draw player experience
+			Game.handler.ctx.fillStyle = "rgb(125,125,50)";
+			Game.handler.ctx.fillRect(140  ,window.innerHeight - 80 , window.innerWidth/6,	Math.min(10,Math.max(Math.floor(player.height/2),7)));
+			Game.handler.ctx.fillStyle = "rgb(250,250,100)";
+			Game.handler.ctx.fillRect(140  ,window.innerHeight - 80 , window.innerWidth/6 * (player.experience/(Math.pow(2,player.level) * 100)),	Math.min(8,Math.max(Math.floor(player.height/2),5)));
+
+      //fonts etc TODO !!!! zrob to duuzo ladniej ! za duzo liczenia w tym momencie :C
+      Game.handler.ctx.font = Math.min(10,Math.max(Math.floor(player.height/2),7)) + "px Arial";
+      Game.handler.ctx.fillStyle = "rgb(0,0,0)";
+
+      Game.handler.ctx.fillText("exp : " + player.experience + "/" + (Math.pow(2,player.level) * 100),150,window.innerHeight - 80 + Math.min(7,Math.max(Math.floor(player.height/2),5)) );
+
+      Game.handler.ctx.fillText("hp  : " + Math.floor(player.health) + "/" + player.maxHealth,150,window.innerHeight - 64 + Math.min(7,Math.max(Math.floor(player.height/2),5)) );
+
+      Game.handler.ctx.fillText("mana: " + Math.floor(player.mana) + "/" + player.maxMana,150,window.innerHeight - 48 + Math.min(7,Math.max(Math.floor(player.height/2),5)) );
 
 
-	},
+      Game.handler.ctx.font = "20px Arial";
+      Game.handler.ctx.fillText("lv: " + player.level,150,window.innerHeight - 100 + Math.min(7,Math.max(Math.floor(player.height/2),5)) );
+
+  },
   createMainCharacter : function(playerData) {
     this.handler.character = new MainCharacter(playerData);
   },
@@ -270,8 +291,12 @@ const Game = {
           Game.handler.players[playerID].height = player.height;
           Game.handler.players[playerID].collisionWidth = player.collisionWidth;
           Game.handler.players[playerID].collisionHeight = player.collisionHeight;
+          Game.handler.players[playerID].level = player.level;
 
-          if(playerID == Game.handler.character.id) continue;
+          if(playerID == Game.handler.character.id){
+            Game.handler.players[playerID].experience = player.experience;
+             continue;
+          }
           Game.handler.players[playerID].x = player.x;
           Game.handler.players[playerID].y = player.y;
           Game.handler.players[playerID].renderX = player.x + Game.handler.currentLevel.moveX;
@@ -293,6 +318,7 @@ const Game = {
             Game.handler.players[playerID] = new OtherPlayer(player.id);//adding player to player list
             Game.handler.players[playerID].x = player.x;
             Game.handler.players[playerID].y = player.y;
+            Game.handler.players[playerID].level = player.level;
             Game.handler.players[playerID].renderX = player.x + Game.handler.currentLevel.moveX;
             Game.handler.players[playerID].renderY = player.y + Game.handler.currentLevel.moveY;
             Game.handler.players[playerID].currentSprite = player.currentSprite;

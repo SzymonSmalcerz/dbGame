@@ -38,6 +38,7 @@ socket.on("getPlayerID",async (data) => {
 
       var playerData;
       var user = await User.findById(data.id);
+    //  data.id = Math.floor(Math.random() * 100000000) + "abcdefghi";
       playerData = {
         x : user.x,
         y : user.y,
@@ -47,13 +48,15 @@ socket.on("getPlayerID",async (data) => {
         width : user.width,
         height : user.height,
         currentSprite : [{x:1,y:0}],
-        health : user.maxHealth,
-        maxHealth : user.maxHealth,
-        healthRegeneration : user.healthRegeneration,
-        mana : user.maxMana,
-        maxMana : user.maxMana,
-        manaRegeneration : user.manaRegeneration,
-        speed : 7
+        health : user.maxHealth * (user.level/10 + 1),
+        maxHealth : user.maxHealth * (user.level/10 + 1),
+        healthRegeneration : user.healthRegeneration * (user.level/10 + 1),
+        mana : user.maxMana * (user.level/10 + 1),
+        maxMana : user.maxMana * (user.level/10 + 1),
+        manaRegeneration : user.manaRegeneration * (user.level/10 + 1) * 2,
+        speed : 7,
+        level : user.level,
+        experience : user.experience
       }
       socket.emit("playerID", playerData)
 
@@ -76,28 +79,13 @@ socket.on("getPlayerID",async (data) => {
     socket.emit("addEnemies", enemiesData);
   })
 
-  // socket.emit("playerID", {
-  //   id : "59fc4d9ab36b8311c9217051"
-  // })
-
-
 });
 
- // socket.on("playerCreation", (playerData) => { //trigered at the client side creation of user
- //    socket.broadcast.emit("playerCreation",playerData);
- //    socket.emit("addUsers", connectedPlayersData);
- //    socket.emit("addStatics", statics);
- //    socket.emit("addEnemies", enemiesData);
- //    console.log(typeof playerData.id);
- //    console.log(playerData.id);
- //    connectedPlayersData[playerData.id] = {};// TODO DELETE THIS
- //
- //    connectedPlayersData[playerData.id].gameData = playerData;
- //    tableOfSockets[playerData.id] = socket;
- //  });
-
   socket.on("skillCreation", (skillData) => {
-    skillTable.push(new KamehamehaWave(Math.floor(Math.random() * 100000),skillData.x,skillData.y,skillData.turn,skillData.skillName, connectedPlayersData,statics,allEnemies, io))
+    if(connectedPlayersData[skillData.ownerID].gameData.mana >= 10){
+      connectedPlayersData[skillData.ownerID].gameData.mana -= 10;
+      skillTable.push(new KamehamehaWave(Math.floor(Math.random() * 100000),skillData.x,skillData.y,skillData.turn,skillData.skillName,skillData.ownerID, connectedPlayersData,statics,allEnemies, io));
+    }
   });
 
   if(!entitiesCreated){
@@ -105,7 +93,6 @@ socket.on("getPlayerID",async (data) => {
       allEnemies[i + "h"] = new Hit(i + "h",Math.floor(Math.random()*500+ 1500),Math.floor(Math.random()*500),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
       allEnemies[i + "y"] = new Yeti(i + "y",Math.floor(Math.random()*850+ 20),Math.floor(Math.random()*400+ 700 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
       allEnemies[i + "hu"] = new Hulk(i + "hu",Math.floor(Math.random()*1000+ 500),Math.floor(Math.random()*400),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
-    //  allEnemies[i + "b"] = new Hulk(i + "b",Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
     }
 
     for(var i = 0;i < 50;i++){
@@ -141,6 +128,16 @@ socket.on("getPlayerID",async (data) => {
   socket.on("damageEnemy",(data) => {
     if(allEnemies[data.idOfEnemy]){
       allEnemies[data.idOfEnemy].health -= data.damage;
+      if(allEnemies[data.idOfEnemy].health<=0){
+        connectedPlayersData[data.idOfPlayer].gameData.experience += allEnemies[data.idOfEnemy].experience;
+        if(connectedPlayersData[data.idOfPlayer].gameData.experience >= Math.pow(2,connectedPlayersData[data.idOfPlayer].gameData.level) * 100 ){
+          connectedPlayersData[data.idOfPlayer].gameData.experience = 0;
+          connectedPlayersData[data.idOfPlayer].gameData.level += 1;
+          connectedPlayersData[data.idOfPlayer].gameData.maxHealth += 100;
+          connectedPlayersData[data.idOfPlayer].gameData.healthRegeneration = connectedPlayersData[data.idOfPlayer].gameData.healthRegeneration * (connectedPlayersData[data.idOfPlayer].gameData.level/10 + 1);
+          connectedPlayersData[data.idOfPlayer].gameData.manaRegeneration = connectedPlayersData[data.idOfPlayer].gameData.manaRegeneration * (connectedPlayersData[data.idOfPlayer].gameData.level/10 + 1);
+        }
+      }
     }
   });
 
@@ -186,6 +183,10 @@ socket.on("getPlayerID",async (data) => {
         //console.log(player.mana);
         if(player.health < player.maxHealth){
           player.health += player.healthRegeneration;
+        }
+
+        if(player.health < 0){
+          player.health = 0;
         }
 
         if(player.mana < player.maxMana){
@@ -296,14 +297,14 @@ socket.on("getPlayerID",async (data) => {
                 var user = await User.findById(playerID);
                 user.x = connectedPlayersData[playerID].gameData.x;
                 user.y = connectedPlayersData[playerID].gameData.y;
+                user.level = connectedPlayersData[playerID].gameData.level;
+                user.experience = connectedPlayersData[playerID].gameData.experience;
                 await user.save();
 
                 console.log("saved statis of :", user._id);
               }catch(e){
                 console.log(e);
               }
-              // user.level = connectedPlayersData[playerID].gameData.level;
-              // user.experience = connectedPlayersData[playerID].gameData.experience;
 
               delete tableOfSockets[playerID];
               delete connectedPlayersData[playerID];

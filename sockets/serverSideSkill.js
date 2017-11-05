@@ -4,8 +4,9 @@ var SkillStatic = {
 }
 
 class Skill{
-  constructor(id,x,y,turn,damage,radius, frameTable, speed, attackTable,skillName, players,statics,enemies, io){
+  constructor(id,x,y,turn,damage,radius, frameTable, speed, attackTable,skillName,ownerID, players,statics,enemies, io){
 
+    this.ownerID = ownerID;
     this.id = id;
     this.tickCounter = 0;
   	this.speed = speed|| 15;
@@ -99,7 +100,19 @@ class Skill{
          (Math.sqrt(Math.pow(this.width/2,2) + Math.pow(this.height/2,2))) >= (Math.sqrt(Math.pow((enemy.x + enemy.width/2) - (this.x + this.width/2),2) +
          Math.pow((enemy.y + enemy.height * 0.9 - enemy.collisionHeight/2) - (this.y + this.height/2),2)))){
            this.detonated = true;
+
            enemy.health = enemy.health - this.damage;
+           if(enemy.health <= 0){
+             this.connectedPlayersData[this.ownerID].gameData.experience += enemy.experience;
+
+             if(this.connectedPlayersData[this.ownerID].gameData.experience >= Math.pow(2,this.connectedPlayersData[this.ownerID].gameData.level) * 100 ){
+               this.connectedPlayersData[this.ownerID].gameData.experience = 0;
+               this.connectedPlayersData[this.ownerID].gameData.level += 1;
+               this.connectedPlayersData[this.ownerID].gameData.maxHealth += 100;
+               this.connectedPlayersData[this.ownerID].gameData.healthRegeneration = this.connectedPlayersData[this.ownerID].gameData.healthRegeneration * (this.connectedPlayersData[this.ownerID].gameData.level/10 + 1);
+               this.connectedPlayersData[this.ownerID].gameData.manaRegeneration = this.connectedPlayersData[this.ownerID].gameData.manaRegeneration * (this.connectedPlayersData[this.ownerID].gameData.level/10 + 1);
+             }
+           }
          }
       }
 
@@ -120,8 +133,8 @@ class Skill{
 }
 
 class KamehamehaWave extends Skill{
-  constructor(id,x,y,turn,skillName, players,statics,enemies, io){
-    super(id,x,y,turn,null,25,null,15,[[{x:0,y:2}],[{x:1,y:2}],[{x:2,y:2}],[{x:3,y:2}]],skillName, players,statics,enemies, io);
+  constructor(id,x,y,turn,skillName,ownerID,players,statics,enemies, io){
+    super(id,x,y,turn,null,25,null,15,[[{x:0,y:2}],[{x:1,y:2}],[{x:2,y:2}],[{x:3,y:2}]],skillName,ownerID, players,statics,enemies, io);
   }
 }
 

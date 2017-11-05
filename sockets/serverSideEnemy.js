@@ -1,3 +1,5 @@
+const {EnemySprites} = require("./Sprites");
+
 const Static = {
   getTreeData : function(x,y){
     return {
@@ -47,16 +49,26 @@ const playerStatics = {
 
 class Enemy{
 
-  constructor(io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,moveTable,x,y,width,height,collisionHeight,collisionWidth,manaRegeneration,healthRegeneration,health,damage,speed,mana,range){
-    this.io = io;
+  constructor(io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,moveSprite,x,y,width,height,collisionHeight,collisionWidth,manaRegeneration,healthRegeneration,health,damage,speed,mana,range){
+
     this.range = range || 400;
     this.id = id || Math.floor((Math.random() * 100000) + 1);
-    this.moveTable = moveTable;
     this.width = width || 32;
     this.height = height || 32;
     this.collisionHeight = collisionHeight || this.height/3;
   	this.collisionWidth = collisionWidth || this.width/3 ;
     this.tickCounter = 0;
+
+    //SPRITES
+    this.up = moveSprite.up;
+  	this.left = moveSprite.left;
+  	this.right = moveSprite.right;
+  	this.down = moveSprite.down;
+  	this.up_fight = moveSprite.up_fight;
+  	this.down_fight = moveSprite.down_fight;
+  	this.left_fight = moveSprite.left_fight;
+  	this.right_fight = moveSprite.right_fight;
+  	this.idle = moveSprite.idle;
     this.currentSprite = this.idle;
 
 
@@ -75,8 +87,14 @@ class Enemy{
     this.maxHealth = health || 1000;
     this.damage = damage || 5;
     this.speed = speed || 4.5;
-  	this.manaRegeneration = manaRegeneration || mana/400 || 2.5;
+    this.manaRegeneration = manaRegeneration || mana/400 || 2.5;
     this.healthRegeneration = healthRegeneration || health/400 || 10;
+    this.experience = 10;
+
+    this.io = io;
+
+
+
   }
 
   checkForCollisionWithStaticEntity(staticEntity,directionOfThisEnemyMovement){
@@ -289,7 +307,7 @@ class Enemy{
         up = 0 - this.width;
         dp = 2*player.rangeOfSeeingHeight + this.height;
       }
-      
+
       if(this.x >= lp && this.x <= rp && this.y <= dp && this.y >= up){
         this.tableOfSockets[player.id].emit("enemyTick",{
          id : this.id,
@@ -370,6 +388,7 @@ class Enemy{
             }
           }
           this.x -= this.speed;
+
   				this.currentSprite = this.left;
           break;
         }
@@ -430,144 +449,50 @@ class Enemy{
 
 
 
-class Hit extends Enemy{ // TODO ;_;
+class Hit extends Enemy{
 
 	constructor(id,x,y,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
-    var id = id;
-    var up = [{x:4,y:9},{x:8,y:9}];
-    var left = [{x:6,y:9},{x:10,y:9}];
-    var right = [{x:5,y:9},{x:9,y:9}];
-    var down = [{x:3,y:9},{x:7,y:9}];
-
-
-    var up_fight = [{x:0,y:5},{x:1,y:5},{x:2,y:5},{x:3,y:5},{x:4,y:5}];
-    var down_fight = [{x:0,y:5},{x:1,y:5},{x:2,y:5},{x:3,y:5},{x:4,y:5}];
-    var left_fight = [{x:0,y:5},{x:1,y:5},{x:2,y:5},{x:3,y:5},{x:4,y:5}];
-    var right_fight = [{x:0,y:4},{x:1,y:4},{x:2,y:4},{x:3,y:4},{x:4,y:4}];
-
-    var idle = [{x:13,y:8},{x:14,y:8},{x:0,y:9},{x:1,y:9}];
-
-    super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,[ up, down, left, right, up_fight, down_fight, left_fight, right_fight, idle],x,y)
+    super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.hit,x,y)
     this.type = "hit";
-    this.up = [{x:4,y:9},{x:8,y:9}];
-  	this.left = [{x:6,y:9},{x:10,y:9}];
-  	this.right = [{x:5,y:9},{x:9,y:9}];
-  	this.down = [{x:3,y:9},{x:7,y:9}];
-
-
-  	this.up_fight = [{x:0,y:5},{x:1,y:5},{x:2,y:5},{x:3,y:5},{x:4,y:5}];
-  	this.down_fight = [{x:0,y:5},{x:1,y:5},{x:2,y:5},{x:3,y:5},{x:4,y:5}];
-  	this.left_fight = [{x:0,y:5},{x:1,y:5},{x:2,y:5},{x:3,y:5},{x:4,y:5}];
-  	this.right_fight = [{x:0,y:4},{x:1,y:4},{x:2,y:4},{x:3,y:4},{x:4,y:4}];
-
-  	this.idle = [{x:13,y:8},{x:14,y:8},{x:0,y:9},{x:1,y:9}];
+    this.experience = 50;
+    this.health = 1500;
+    this.maxHealth = 1500;
+    this.damage = 5;
   }
 
 }
 
 class Hulk extends Enemy{
   constructor(id,x,y,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
-    var up = [{x:0,y:2},{x:1,y:2},{x:2,y:2},{x:3,y:2},{x:4,y:2},{x:5,y:2}];
-  	var left = [{x:0,y:3},{x:1,y:3},{x:2,y:3},{x:3,y:3},{x:4,y:3},{x:5,y:3}];
-  	var right = [{x:0,y:2},{x:1,y:2},{x:2,y:2},{x:3,y:2},{x:4,y:2},{x:5,y:2}];
-  	var down = [{x:0,y:2},{x:1,y:2},{x:2,y:2},{x:3,y:2},{x:4,y:2},{x:5,y:2}];
-
-
-  	var up_fight = [{x:0,y:5},{x:1,y:5},{x:2,y:5},{x:3,y:5},{x:4,y:5}];
-  	var down_fight = [{x:0,y:4},{x:1,y:4},{x:2,y:4},{x:3,y:4},{x:4,y:4}];
-  	var left_fight = [{x:0,y:5},{x:1,y:5},{x:2,y:5},{x:3,y:5},{x:4,y:5}];
-  	var right_fight = [{x:0,y:4},{x:1,y:4},{x:2,y:4},{x:3,y:4},{x:4,y:4}];
-
-  	var idle = [{x:3,y:0},{x:3,y:0},{x:3,y:0},{x:3,y:0},{x:4,y:0},{x:4,y:0}];
-
-    super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,[ up, down, left, right, up_fight, down_fight, left_fight, right_fight, idle],x,y,100,100,25)
+    super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.hulk,x,y,100,100,25)
     this.type = "hulk";
-
-
-
-    this.up = [{x:0,y:2},{x:1,y:2},{x:2,y:2},{x:3,y:2},{x:4,y:2},{x:5,y:2}];
-  	this.left = [{x:0,y:3},{x:1,y:3},{x:2,y:3},{x:3,y:3},{x:4,y:3},{x:5,y:3}];
-  	this.right = [{x:0,y:2},{x:1,y:2},{x:2,y:2},{x:3,y:2},{x:4,y:2},{x:5,y:2}];
-  	this.down = [{x:0,y:2},{x:1,y:2},{x:2,y:2},{x:3,y:2},{x:4,y:2},{x:5,y:2}];
-
-
-  	this.up_fight = [{x:0,y:5},{x:1,y:5},{x:2,y:5},{x:3,y:5},{x:4,y:5}];
-  	this.down_fight = [{x:0,y:4},{x:1,y:4},{x:2,y:4},{x:3,y:4},{x:4,y:4}];
-  	this.left_fight = [{x:0,y:5},{x:1,y:5},{x:2,y:5},{x:3,y:5},{x:4,y:5}];
-  	this.right_fight = [{x:0,y:4},{x:1,y:4},{x:2,y:4},{x:3,y:4},{x:4,y:4}];
-
-  	this.idle = [{x:3,y:0},{x:3,y:0},{x:3,y:0},{x:3,y:0},{x:4,y:0},{x:4,y:0}];
+    this.experience = 100;
+    this.health = 3000;
+    this.maxHealth = 3000;
+    this.damage = 15;
   }
 }
 
 class Dragon extends Enemy{
   constructor(id,x,y,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
-    var up = [{x:0,y:3},{x:1,y:3},{x:2,y:3}];
-  	var left = [{x:0,y:1},{x:1,y:1},{x:2,y:1}];
-  	var right = [{x:0,y:2},{x:1,y:2},{x:2,y:2}];
-  	var down = [{x:0,y:0},{x:1,y:0},{x:2,y:0}];
-
-
-  	var up_fight = [{x:0,y:4},{x:1,y:4},{x:2,y:4},{x:3,y:4},{x:4,y:4},{x:5,y:4}];
-  	var down_fight = [{x:0,y:5},{x:1,y:5},{x:2,y:5},{x:3,y:5},{x:4,y:5},{x:5,y:5}];
-  	var left_fight = [{x:0,y:7},{x:1,y:7},{x:2,y:7},{x:3,y:7},{x:4,y:7},{x:5,y:7}];
-  	var right_fight = [{x:0,y:6},{x:1,y:6},{x:2,y:6},{x:3,y:6},{x:4,y:6},{x:5,y:6}];
-
-  	var idle = [{x:1,y:0}];
-
-    super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,[ up, down, left, right, up_fight, down_fight, left_fight, right_fight, idle],x,y,50,50);
+    super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.dragon,x,y,50,50);
     this.type = "dragon";
-
-
-
-    this.up = [{x:0,y:3},{x:1,y:3},{x:2,y:3}];
-  	this.left = [{x:0,y:1},{x:1,y:1},{x:2,y:1}];
-  	this.right = [{x:0,y:2},{x:1,y:2},{x:2,y:2}];
-  	this.down = [{x:0,y:0},{x:1,y:0},{x:2,y:0}];
-
-
-  	this.up_fight = [{x:0,y:4},{x:1,y:4},{x:2,y:4},{x:3,y:4},{x:4,y:4},{x:5,y:4}];
-  	this.down_fight = [{x:0,y:5},{x:1,y:5},{x:2,y:5},{x:3,y:5},{x:4,y:5},{x:5,y:5}];
-  	this.left_fight = [{x:0,y:7},{x:1,y:7},{x:2,y:7},{x:3,y:7},{x:4,y:7},{x:5,y:7}];
-  	this.right_fight = [{x:0,y:6},{x:1,y:6},{x:2,y:6},{x:3,y:6},{x:4,y:6},{x:5,y:6}];
-
-  	this.idle = [{x:1,y:0}];
+    this.experience = 30;
+    this.health = 700;
+    this.maxHealth = 700;
+    this.damage = 5;
   }
 }
 
 
 class Yeti extends Enemy{
   constructor(id,x,y,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
-    var up = [{x:0,y:6},{x:1,y:6},{x:2,y:6},{x:3,y:6},{x:4,y:6}];
-  	var left = [{x:0,y:2},{x:1,y:2},{x:2,y:2},{x:3,y:2},{x:4,y:2}];
-  	var right = [{x:0,y:4},{x:1,y:4},{x:2,y:4},{x:3,y:4},{x:4,y:4}];
-  	var down = [{x:0,y:0},{x:1,y:0},{x:2,y:0},{x:3,y:0},{x:4,y:0}];
-
-
-  	var up_fight = [{x:0,y:7},{x:1,y:7},{x:2,y:7},{x:3,y:7}];
-  	var down_fight = [{x:0,y:1},{x:1,y:1},{x:2,y:1},{x:3,y:1}];
-  	var left_fight = [{x:0,y:3},{x:1,y:3},{x:2,y:3},{x:3,y:3}];
-  	var right_fight = [{x:0,y:5},{x:1,y:5},{x:2,y:5},{x:3,y:5}];
-
-  	var idle = [{x:3,y:0},{x:4,y:0}]
-
-    super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,[ up, down, left, right, up_fight, down_fight, left_fight, right_fight, idle],x,y,80,80);
+    super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.yeti,x,y,80,80);
     this.type = "yeti";
-
-
-
-    this.up = [{x:0,y:6},{x:1,y:6},{x:2,y:6},{x:3,y:6},{x:4,y:6}];
-  	this.left = [{x:0,y:2},{x:1,y:2},{x:2,y:2},{x:3,y:2},{x:4,y:2}];
-  	this.right = [{x:0,y:4},{x:1,y:4},{x:2,y:4},{x:3,y:4},{x:4,y:4}];
-  	this.down = [{x:0,y:0},{x:1,y:0},{x:2,y:0},{x:3,y:0},{x:4,y:0}];
-
-
-  	this.up_fight = [{x:0,y:7},{x:1,y:7},{x:2,y:7},{x:3,y:7}];
-  	this.down_fight = [{x:0,y:1},{x:1,y:1},{x:2,y:1},{x:3,y:1}];
-  	this.left_fight = [{x:0,y:3},{x:1,y:3},{x:2,y:3},{x:3,y:3}];
-  	this.right_fight = [{x:0,y:5},{x:1,y:5},{x:2,y:5},{x:3,y:5}];
-
-  	this.idle = [{x:3,y:0},{x:4,y:0}];
+    this.experience = 20;
+    this.health = 500;
+    this.maxHealth = 500;
+    this.damage = 3;
   }
 }
 
