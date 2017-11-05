@@ -4,15 +4,15 @@ var SkillStatic = {
 }
 
 class Skill{
-  constructor(id,x,y,turn,damage,radius, frameTable, speed, attackTable,skillName,ownerID, players,statics,enemies, io){
+  constructor(id,skillData,damage,radius, frameTable, speed, attackTable, players,statics,enemies, io, tableOfSockets){
 
-    this.ownerID = ownerID;
+    this.ownerID = skillData.ownerID;
     this.id = id;
     this.tickCounter = 0;
   	this.speed = speed|| 15;
-  	this.x = x;
-  	this.y = y;
-  	this.turn = turn;
+  	this.x = skillData.x;
+  	this.y = skillData.y;
+  	this.turn = skillData.turn;
   	this.damage = damage || 100;
   	this.radius = radius || 30;
   	this.frameTable = frameTable;
@@ -21,11 +21,12 @@ class Skill{
   	this.detonated = false;
   	this.attackTable = attackTable;
 
-    this.skillName = skillName;
+    this.skillName = skillData.skillName;
     this.connectedPlayersData = players;
     this.statics = statics;
     this.enemies = enemies;
     this.io = io;
+    this.tableOfSockets = tableOfSockets;
 
   }
 
@@ -61,14 +62,61 @@ class Skill{
   }
 
   emitData(){
-    this.io.emit("skillData", {
-      x : this.x,
-      y : this.y,
-      skillName : this.skillName,
-      turn : this.turn,
-      frameTable : this.frameTable,
-      id : this.id
-    })
+
+
+    for(var playerID in this.connectedPlayersData){
+      if(!this.connectedPlayersData.hasOwnProperty(playerID)) continue;
+
+      var player = this.connectedPlayersData[playerID].gameData;
+
+      var realRangeWidth;
+      var realRangeHeight;
+
+      var dp; //down corner of player
+      var up; //up corner ..
+      var lp; //left corner ..
+      var rp; //right corenr ..
+
+      if(player.x + player.width + player.speed >= player.rangeOfSeeingWidth){
+
+        if(player.x  >= player.rangeOfSeeingWidth){
+          lp = player.x - player.rangeOfSeeingWidth*2 - this.width;
+        }else{
+          lp = player.x - player.rangeOfSeeingWidth - this.width;
+        }
+
+        rp = player.x + player.rangeOfSeeingWidth + this.width;
+      }else{
+        lp = 0 - this.width;
+        rp = 2*player.rangeOfSeeingWidth + this.width;
+      }
+
+      if(player.y + player.height + player.speed >= player.rangeOfSeeingHeight){
+        if(player.y >= player.rangeOfSeeingHeight){
+          up = player.y - player.rangeOfSeeingHeight*2 - this.height;
+        }else{
+          up = player.y - player.rangeOfSeeingHeight - this.height;
+        }
+
+        dp = player.y + player.rangeOfSeeingHeight + this.height + player.height;
+
+      }else{
+        up = 0 - this.width;
+        dp = 2*player.rangeOfSeeingHeight + this.height;
+      }
+
+      if(this.x >= lp && this.x <= rp && this.y <= dp && this.y >= up){
+       this.tableOfSockets[player.id].emit("skillData", {
+         x : this.x,
+         y : this.y,
+         skillName : this.skillName,
+         turn : this.turn,
+         frameTable : this.frameTable,
+         id : this.id
+       })
+      }
+
+    }
   }
 
   handleDetonation(){
@@ -101,17 +149,21 @@ class Skill{
          Math.pow((enemy.y + enemy.height * 0.9 - enemy.collisionHeight/2) - (this.y + this.height/2),2)))){
            this.detonated = true;
 
-           enemy.health = enemy.health - this.damage;
+           enemy.health = enemy.health - this.connectedPlayersData[this.ownerID].gameData.damage * 3;
            if(enemy.health <= 0){
              this.connectedPlayersData[this.ownerID].gameData.experience += enemy.experience;
 
-             if(this.connectedPlayersData[this.ownerID].gameData.experience >= Math.pow(2,this.connectedPlayersData[this.ownerID].gameData.level) * 100 ){
+             if(this.connectedPlayersData[this.ownerID].gameData.experience >= this.connectedPlayersData[this.ownerID].gameData.requiredExperience){
                this.connectedPlayersData[this.ownerID].gameData.experience = 0;
                this.connectedPlayersData[this.ownerID].gameData.level += 1;
                this.connectedPlayersData[this.ownerID].gameData.maxHealth += 100;
-               this.connectedPlayersData[this.ownerID].gameData.healthRegeneration = this.connectedPlayersData[this.ownerID].gameData.healthRegeneration * (this.connectedPlayersData[this.ownerID].gameData.level/10 + 1);
-               this.connectedPlayersData[this.ownerID].gameData.manaRegeneration = this.connectedPlayersData[this.ownerID].gameData.manaRegeneration * (this.connectedPlayersData[this.ownerID].gameData.level/10 + 1);
-             }
+               this.connectedPlayersData[this.ownerID].gameData.maxMana += 50;
+               this.connectedPlayersData[this.ownerID].gameData.healthRegeneration = this.connectedPlayersData[this.ownerID].gameData.maxHealth/100 ;
+               this.connectedPlayersData[this.ownerID].gameData.manaRegeneration = this.connectedPlayersData[this.ownerID].gameData.maxMana/100;
+               this.connectedPlayersData[this.ownerID].gameData.speed = Math.min(Math.floor(7 + this.connectedPlayersData[this.ownerID].gameData.level/4),10);
+               this.connectedPlayersData[this.ownerID].gameData.damage = 30 + 3*this.connectedPlayersData[this.ownerID].gameData.level;
+               this.connectedPlayersData[this.ownerID].gameData.requiredExperience = this.connectedPlayersData[this.ownerID].gameData.level * 2 * 500;
+            }
            }
          }
       }
@@ -133,8 +185,8 @@ class Skill{
 }
 
 class KamehamehaWave extends Skill{
-  constructor(id,x,y,turn,skillName,ownerID,players,statics,enemies, io){
-    super(id,x,y,turn,null,25,null,15,[[{x:0,y:2}],[{x:1,y:2}],[{x:2,y:2}],[{x:3,y:2}]],skillName,ownerID, players,statics,enemies, io);
+  constructor(id,skillData,players,statics,enemies, io, tableOfSockets){
+    super(id,skillData,null,25,null,15,[[{x:0,y:2}],[{x:1,y:2}],[{x:2,y:2}],[{x:3,y:2}]], players,statics,enemies, io, tableOfSockets);
   }
 }
 

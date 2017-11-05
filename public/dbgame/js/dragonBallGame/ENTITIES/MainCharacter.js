@@ -13,52 +13,27 @@ class MainCharacter extends Mob{
     this.renderY = this.y;//must be that way !!
 
     Game.handler.players[this.id] = this;
-      this.up = [{x:11,y:11},{x:12,y:7},{x:4,y:2},{x:11,y:1}];
-    	this.left = [{x:1,y:11},{x:13,y:11},{x:9,y:11},{x:5,y:11}];
-    	this.right = [{x:0,y:11},{x:12,y:11},{x:8,y:11},{x:4,y:11}];
-    	this.down = [{x:10,y:1},{x:3,y:2}];
 
+    this.setSprites();
 
-    	this.up_fight = [{x:9,y:3},{x:11,y:9},{x:2,y:4},{x:6,y:4},{x:10,y:8},{x:0,y:6},{x:4,y:6}];
-    	this.down_fight = [{x:14,y:5},{x:3,y:6},{x:13,y:8},{x:14,y:5},{x:12,y:3},{x:1,y:4},{x:5,y:4}];
-    	this.left_fight = [{x:13,y:9},{x:5,y:5},{x:2,y:6},{x:1,y:5}];
-    	this.right_fight = [{x:12,y:9},{x:4,y:5},{x:1,y:6},{x:0,y:5}];
+    this.isFighting = false;
+    this.usingSkill = false;
 
+    this.requiredExperience = playerData.requiredExperience;
+    this.speed = playerData.speed;
+    this.mana = playerData.mana;
+    this.maxMana = playerData.maxMana;
+    this.health = playerData.health;
+    this.maxHealth = playerData.maxHealth;
+    this.manaRegeneration =  playerData.manaRegeneration;
+    this.healthRegeneration =  playerData.healthRegeneration;
+    this.width = playerData.width;
+    this.height = playerData.height;
+    this.collisionHeight = playerData.collisionHeight;
+    this.collisionWidth = playerData.collisionWidth ;
 
-
-    	this.idleDown = [{x:1,y:0}];
-    	this.idleRight = [{x:1,y:2}];
-    	this.idleLeft = [{x:2,y:2}];
-    	this.idleUp = [{x:0,y:2}];
-
-    	this.idle = this.idleDown;
-
-    	this.isFighting = false;
-    	this.usingSkill = false;
-
-
-      this.speed = 7;
-      this.mana = 100;
-    	this.maxMana = 100;
-      this.health = 1000;
-      this.maxHealth = 1000;
-      this.damage = 100;
-    	this.manaRegeneration =  4;
-      this.healthRegeneration =  4;
-
-      this.width = 32;
-      this.height = 32;
-      this.collisionHeight = this.height/3;
-    	this.collisionWidth = this.width/3 ;
-
-      this.moveTable = [[{x:11,y:11},{x:12,y:7},{x:4,y:2},{x:11,y:1}],[{x:10,y:1},{x:3,y:2}],
-      [{x:1,y:11},{x:13,y:11},{x:9,y:11},{x:5,y:11}],[{x:0,y:11},{x:12,y:11},{x:8,y:11},{x:4,y:11}],
-      [{x:9,y:3},{x:11,y:9},{x:2,y:4},{x:6,y:4},{x:10,y:8},{x:0,y:6},{x:4,y:6}],[{x:14,y:5},{x:3,y:6},{x:13,y:8},{x:14,y:5},{x:12,y:3},{x:1,y:4},{x:5,y:4}],
-      [{x:13,y:9},{x:5,y:5},{x:2,y:6},{x:1,y:5}],[{x:12,y:9},{x:4,y:5},{x:1,y:6},{x:0,y:5}],
-      [{x:1,y:0}]];
-
-      socket.emit('message',"user " + this.id + " has been created");
-      socket.emit("playerCreated");//and now add enemies statics etc.
+    socket.emit('message',"user " + this.id + " has been created");
+    socket.emit("playerCreated");//and now add enemies statics etc.
 
   }
 
@@ -104,7 +79,6 @@ class MainCharacter extends Mob{
                this.x + this.width/2 + this.collisionWidth/2 < enemy.x + enemy.width/2 + enemy.collisionWidth/2 + this.collisionWidth*5/2){
               socket.emit("damageEnemy", {
                  idOfEnemy : enemy.id,
-                 damage : this.damage,
                  idOfPlayer : this.id
                });
             }
@@ -113,7 +87,6 @@ class MainCharacter extends Mob{
                this.x + this.width/2 + this.collisionWidth/2 + this.collisionWidth*2 > enemy.x + enemy.width/2 - enemy.collisionWidth/2){
                  socket.emit("damageEnemy", {
                     idOfEnemy : enemy.id,
-                    damage : this.damage,
                     idOfPlayer : this.id
                   });
             }
@@ -135,7 +108,6 @@ class MainCharacter extends Mob{
                this.y + this.height*0.9 - this.collisionHeight/2 + this.collisionHeight*5/2 > enemy.y + enemy.height*0.9 - enemy.collisionHeight){
                  socket.emit("damageEnemy", {
                     idOfEnemy : enemy.id,
-                    damage : this.damage,
                     idOfPlayer : this.id
                   });
             }
@@ -144,7 +116,6 @@ class MainCharacter extends Mob{
                this.y + this.height*0.9 - this.collisionHeight/2 < enemy.y + enemy.height*0.9 - enemy.collisionHeight/2 + this.collisionHeight*5/2){
                  socket.emit("damageEnemy", {
                     idOfEnemy : enemy.id,
-                    damage : this.damage,
                     idOfPlayer : this.id
                   });
             }
@@ -217,6 +188,22 @@ class MainCharacter extends Mob{
       rangeOfSeeingWidth : window.innerWidth/2,
       rangeOfSeeingHeight : window.innerHeight/2
     });
+  }
+
+  setSprites(){
+    this.up = [{x:11,y:11},{x:12,y:7},{x:4,y:2},{x:11,y:1}];
+    this.left = [{x:1,y:11},{x:13,y:11},{x:9,y:11},{x:5,y:11}];
+    this.right = [{x:0,y:11},{x:12,y:11},{x:8,y:11},{x:4,y:11}];
+    this.down = [{x:10,y:1},{x:3,y:2}];
+    this.up_fight = [{x:9,y:3},{x:11,y:9},{x:2,y:4},{x:6,y:4},{x:10,y:8},{x:0,y:6},{x:4,y:6}];
+    this.down_fight = [{x:14,y:5},{x:3,y:6},{x:13,y:8},{x:14,y:5},{x:12,y:3},{x:1,y:4},{x:5,y:4}];
+    this.left_fight = [{x:13,y:9},{x:5,y:5},{x:2,y:6},{x:1,y:5}];
+    this.right_fight = [{x:12,y:9},{x:4,y:5},{x:1,y:6},{x:0,y:5}];
+    this.idleDown = [{x:1,y:0}];
+    this.idleRight = [{x:1,y:2}];
+    this.idleLeft = [{x:2,y:2}];
+    this.idleUp = [{x:0,y:2}];
+    this.idle = this.idleDown;
   }
 
   manageKeyPressing(){

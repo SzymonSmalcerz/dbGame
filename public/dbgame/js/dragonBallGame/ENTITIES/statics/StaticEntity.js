@@ -1,6 +1,6 @@
 
 
-
+const staticSprite =  new Image();
 class StaticEntity{
 
   constructor(spriteX, spriteY,x ,y,collisionHeight,scale,collisionWidth,widthInImage ,heightInImage ){
@@ -8,9 +8,9 @@ class StaticEntity{
     this.xPositionInImage = spriteX;
   	this.yPositionInImage = spriteY;
 
-    this.sprite = new Image();                           //TODO
-    this.sprite.src = "dbgame/js/dragonBallGame/sprites/spriteStaticEntities.png";//TODO
-
+    this.sprite = staticSprite;
+    staticSprite.src = "dbgame/js/dragonBallGame/sprites/spriteStaticEntities.png";
+    
   	this.x = x;
   	this.renderX = x;
   	this.y = y;

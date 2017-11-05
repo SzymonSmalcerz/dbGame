@@ -54,9 +54,11 @@ socket.on("getPlayerID",async (data) => {
         mana : user.maxMana * (user.level/10 + 1),
         maxMana : user.maxMana * (user.level/10 + 1),
         manaRegeneration : user.manaRegeneration * (user.level/10 + 1) * 2,
-        speed : 7,
+        speed : Math.min(Math.floor(7 + user.level/4),10),
         level : user.level,
-        experience : user.experience
+        experience : user.experience,
+        requiredExperience : user.level * 2 * 500,
+        damage : 30 + 3*user.level
       }
       socket.emit("playerID", playerData)
 
@@ -84,7 +86,7 @@ socket.on("getPlayerID",async (data) => {
   socket.on("skillCreation", (skillData) => {
     if(connectedPlayersData[skillData.ownerID].gameData.mana >= 10){
       connectedPlayersData[skillData.ownerID].gameData.mana -= 10;
-      skillTable.push(new KamehamehaWave(Math.floor(Math.random() * 100000),skillData.x,skillData.y,skillData.turn,skillData.skillName,skillData.ownerID, connectedPlayersData,statics,allEnemies, io));
+      skillTable.push(new KamehamehaWave(Math.floor(Math.random() * 100000),skillData, connectedPlayersData,statics,allEnemies, io, tableOfSockets));
     }
   });
 
@@ -127,15 +129,19 @@ socket.on("getPlayerID",async (data) => {
 
   socket.on("damageEnemy",(data) => {
     if(allEnemies[data.idOfEnemy]){
-      allEnemies[data.idOfEnemy].health -= data.damage;
+      allEnemies[data.idOfEnemy].health -= connectedPlayersData[data.idOfPlayer].gameData.damage;
       if(allEnemies[data.idOfEnemy].health<=0){
         connectedPlayersData[data.idOfPlayer].gameData.experience += allEnemies[data.idOfEnemy].experience;
-        if(connectedPlayersData[data.idOfPlayer].gameData.experience >= Math.pow(2,connectedPlayersData[data.idOfPlayer].gameData.level) * 100 ){
+        if(connectedPlayersData[data.idOfPlayer].gameData.experience >= connectedPlayersData[data.idOfPlayer].gameData.requiredExperience ){
           connectedPlayersData[data.idOfPlayer].gameData.experience = 0;
           connectedPlayersData[data.idOfPlayer].gameData.level += 1;
           connectedPlayersData[data.idOfPlayer].gameData.maxHealth += 100;
-          connectedPlayersData[data.idOfPlayer].gameData.healthRegeneration = connectedPlayersData[data.idOfPlayer].gameData.healthRegeneration * (connectedPlayersData[data.idOfPlayer].gameData.level/10 + 1);
-          connectedPlayersData[data.idOfPlayer].gameData.manaRegeneration = connectedPlayersData[data.idOfPlayer].gameData.manaRegeneration * (connectedPlayersData[data.idOfPlayer].gameData.level/10 + 1);
+          connectedPlayersData[data.idOfPlayer].gameData.maxMana += 100;
+          connectedPlayersData[data.idOfPlayer].gameData.healthRegeneration = connectedPlayersData[data.idOfPlayer].gameData.maxHealth/100;
+          connectedPlayersData[data.idOfPlayer].gameData.manaRegeneration = connectedPlayersData[data.idOfPlayer].gameData.maxMana/100;
+          connectedPlayersData[data.idOfPlayer].gameData.speed = Math.min(Math.floor(7 + connectedPlayersData[data.idOfPlayer].gameData.level/4),10);
+          connectedPlayersData[data.idOfPlayer].gameData.damage = 30 + 3*connectedPlayersData[data.idOfPlayer].gameData.level;
+          connectedPlayersData[data.idOfPlayer].gameData.requiredExperience = connectedPlayersData[data.idOfPlayer].gameData.level * 2 * 500;
         }
       }
     }

@@ -110,19 +110,12 @@ const Game = {
 
       Game.handler.collisionCtx.fillStyle = "rgba(0,120,120,1.0)";
       Game.handler.collisionCtx.fillRect(0,0,Game.handler.collisionCanvas.width,Game.handler.collisionCanvas.height);
-
-
       Game.handler.collisionCtx.fillStyle = "rgba(1,0,0,0.2)";
-      // Game.handler.ctx.fillStyle ="rgba(1,0,0)";
-      // Game.handler.ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
       Game.handler.lastTime = time;
       Game.handler.currentLevel.tick();
 
       Game.handler.globalTickCounter += 1;
 			Game.drawMenu();
-
-
-      //console.log(Game.handler.globalTickCounter);
 
 		}
 	},
@@ -155,13 +148,13 @@ const Game = {
 			Game.handler.ctx.fillStyle = "rgb(125,125,50)";
 			Game.handler.ctx.fillRect(140  ,window.innerHeight - 80 , window.innerWidth/6,	Math.min(10,Math.max(Math.floor(player.height/2),7)));
 			Game.handler.ctx.fillStyle = "rgb(250,250,100)";
-			Game.handler.ctx.fillRect(140  ,window.innerHeight - 80 , window.innerWidth/6 * (player.experience/(Math.pow(2,player.level) * 100)),	Math.min(8,Math.max(Math.floor(player.height/2),5)));
+			Game.handler.ctx.fillRect(140  ,window.innerHeight - 80 , window.innerWidth/6 * (player.experience/player.requiredExperience),	Math.min(8,Math.max(Math.floor(player.height/2),5)));
 
       //fonts etc TODO !!!! zrob to duuzo ladniej ! za duzo liczenia w tym momencie :C
       Game.handler.ctx.font = Math.min(10,Math.max(Math.floor(player.height/2),7)) + "px Arial";
       Game.handler.ctx.fillStyle = "rgb(0,0,0)";
 
-      Game.handler.ctx.fillText("exp : " + player.experience + "/" + (Math.pow(2,player.level) * 100),150,window.innerHeight - 80 + Math.min(7,Math.max(Math.floor(player.height/2),5)) );
+      Game.handler.ctx.fillText("exp : " + player.experience + "/" + player.requiredExperience,150,window.innerHeight - 80 + Math.min(7,Math.max(Math.floor(player.height/2),5)) );
 
       Game.handler.ctx.fillText("hp  : " + Math.floor(player.health) + "/" + player.maxHealth,150,window.innerHeight - 64 + Math.min(7,Math.max(Math.floor(player.height/2),5)) );
 
@@ -178,12 +171,24 @@ const Game = {
   handleMoveXandMoveY(){
     var player = this.handler.character;
     var level  = this.handler.currentLevel;
-    while(player.renderY + player.height >= window.innerHeight/2){
+    while(player.renderY + player.height >= window.innerHeight/2 ){
+      if(player.y + window.innerHeight/2 + player.height >= level.heightOfMap *  TileStatic.height && player.renderY + player.height <= window.innerHeight){
+        level.moveY -= level.heightOfMap *  TileStatic.height - (player.y + player.height);
+        player.renderY -= level.heightOfMap *  TileStatic.height - (player.y + player.height);
+        console.log("break1!");
+        break;
+      }
       level.moveY -= player.speed;
       player.renderY -= player.speed;
   	}
 
     while(player.renderX + player.width/2 >= window.innerWidth/2 ){
+      if(player.x + window.innerWidth/2 + player.width >= level.widthOfMap *  TileStatic.width &&player.renderX + player.width <= window.innerWidth){
+        level.moveX -= level.widthOfMap *  TileStatic.width - (player.x + player.width);
+        player.renderX -= level.widthOfMap *  TileStatic.width - (player.x + player.width);
+        console.log("break2!");
+        break;
+      }
       level.moveX -= player.speed;
       player.renderX -= player.speed;
   	}
@@ -295,6 +300,8 @@ const Game = {
 
           if(playerID == Game.handler.character.id){
             Game.handler.players[playerID].experience = player.experience;
+            Game.handler.players[playerID].requiredExperience = player.requiredExperience;
+            Game.handler.players[playerID].speed = player.speed;
              continue;
           }
           Game.handler.players[playerID].x = player.x;

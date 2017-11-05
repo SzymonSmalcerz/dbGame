@@ -454,7 +454,7 @@ class Hit extends Enemy{
 	constructor(id,x,y,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
     super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.hit,x,y)
     this.type = "hit";
-    this.experience = 50;
+    this.experience = 2000;
     this.health = 1500;
     this.maxHealth = 1500;
     this.damage = 5;
@@ -466,7 +466,7 @@ class Hulk extends Enemy{
   constructor(id,x,y,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
     super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.hulk,x,y,100,100,25)
     this.type = "hulk";
-    this.experience = 100;
+    this.experience = 3000;
     this.health = 3000;
     this.maxHealth = 3000;
     this.damage = 15;
@@ -477,7 +477,7 @@ class Dragon extends Enemy{
   constructor(id,x,y,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
     super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.dragon,x,y,50,50);
     this.type = "dragon";
-    this.experience = 30;
+    this.experience = 2000;
     this.health = 700;
     this.maxHealth = 700;
     this.damage = 5;
@@ -489,7 +489,7 @@ class Yeti extends Enemy{
   constructor(id,x,y,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
     super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.yeti,x,y,80,80);
     this.type = "yeti";
-    this.experience = 20;
+    this.experience = 1500;
     this.health = 500;
     this.maxHealth = 500;
     this.damage = 3;
