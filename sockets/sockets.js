@@ -3,7 +3,7 @@ var {User} = require("../db/models/models");
 var {Enemy,Hit , Hulk, Dragon ,Yeti, Static} = require("./serverSideEnemy");
 var {io} = require("../server");
 var {Skill,KamehamehaWave} = require("./serverSideSkill");
-
+var {levelTiles, Level} = require("./serverSideLevel");
 var statics = [Static.getTreeData(600,150),
                Static.getHouse1Data(500,400),
                Static.getHouse1Data(650,400),
@@ -11,7 +11,12 @@ var statics = [Static.getTreeData(600,150),
                Static.getHouse1Data(950,400),
                Static.getHouse2Data(300,330)
   ];
+
+var connectedPlayersInLevel = {};
+    connectedPlayersInLevel["firstMap"] = {};
+    connectedPlayersInLevel["secondMap"] = {};
 var connectedPlayersData = {};
+
 var enemiesData = [];
 var skillTable = [];
 var lastTime = 0;
@@ -20,6 +25,7 @@ var enemies = [];
 var entitiesCreated = false;
 var tableOfSockets = {};
 var allEnemies = {};
+
 
 var handleSocketsWork = (socket,io) => {
 
@@ -58,13 +64,17 @@ socket.on("getPlayerID",async (data) => {
         level : user.level,
         experience : user.experience,
         requiredExperience : user.level * 2 * 500,
-        damage : 30 + 3*user.level
+        damage : 30 + 3*user.level,
+        currentLevelMap : "firstMap",
+        currentMapLevelTable : levelTiles["firstMap"]
       }
       socket.emit("playerID", playerData)
 
       socket.broadcast.emit("playerCreation",playerData);
+
       connectedPlayersData[playerData.id] = {};
       connectedPlayersData[playerData.id].gameData = playerData;
+      connectedPlayersInLevel[playerData.currentLevelMap][playerData.id] = playerData.id;
       tableOfSockets[playerData.id] = socket;
     }catch(e){
       console.log("\n\n ERROR IN PLAYER CREATION !!!! \n\n" + e);
@@ -74,11 +84,14 @@ socket.on("getPlayerID",async (data) => {
     }
 
   }
-
   socket.on("playerCreated", () => {
+    // socket.emit("setLevel",{
+    //     tableOfTiles : level1Table
+    // });
     socket.emit("addUsers", connectedPlayersData);
     socket.emit("addStatics", statics);
     socket.emit("addEnemies", enemiesData);
+    socket.emit("permissionToLoop");
   })
 
 });
@@ -92,13 +105,13 @@ socket.on("getPlayerID",async (data) => {
 
   if(!entitiesCreated){
     for(var i=0;i<10;i++){
-      allEnemies[i + "h"] = new Hit(i + "h",Math.floor(Math.random()*500+ 1500),Math.floor(Math.random()*500),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
-      allEnemies[i + "y"] = new Yeti(i + "y",Math.floor(Math.random()*850+ 20),Math.floor(Math.random()*400+ 700 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
-      allEnemies[i + "hu"] = new Hulk(i + "hu",Math.floor(Math.random()*1000+ 500),Math.floor(Math.random()*400),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+      allEnemies[i + "h"] = new Hit(i + "h",Math.floor(Math.random()*500+ 1500),Math.floor(Math.random()*500),connectedPlayersInLevel["secondMap"],connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+      allEnemies[i + "y"] = new Yeti(i + "y",Math.floor(Math.random()*850+ 20),Math.floor(Math.random()*400+ 700 ),connectedPlayersInLevel["secondMap"],connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+      allEnemies[i + "hu"] = new Hulk(i + "hu",Math.floor(Math.random()*1000+ 500),Math.floor(Math.random()*400),connectedPlayersInLevel["secondMap"],connectedPlayersData,enemiesData,tableOfSockets,statics,io);
     }
 
     for(var i = 0;i < 50;i++){
-      allEnemies[i + "dr"] = new Dragon(i + "dr",Math.floor(Math.random()*1950 + 20),Math.floor(Math.random()*400 + 1000),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+      allEnemies[i + "dr"] = new Dragon(i + "dr",Math.floor(Math.random()*1950 + 20),Math.floor(Math.random()*400 + 1000),connectedPlayersInLevel["secondMap"],connectedPlayersData,enemiesData,tableOfSockets,statics,io);
     }
 
     entitiesCreated = true;
@@ -113,13 +126,13 @@ socket.on("getPlayerID",async (data) => {
       var temp = Math.floor(Math.random() * 100000);
       var tempID =  temp + "e";
       if(data.type == "hulk"){
-        allEnemies[tempID] = new Hulk(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+        allEnemies[tempID] = new Hulk(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersInLevel["firstMap"],connectedPlayersData,enemiesData,tableOfSockets,statics,io);
       }else if(data.type == "dragon"){
-        allEnemies[tempID] = new Dragon(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+        allEnemies[tempID] = new Dragon(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersInLevel["firstMap"],connectedPlayersData,enemiesData,tableOfSockets,statics,io);
       }else if(data.type == "yeti"){
-        allEnemies[tempID] = new Yeti(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+        allEnemies[tempID] = new Yeti(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersInLevel["firstMap"],connectedPlayersData,enemiesData,tableOfSockets,statics,io);
       }else {
-        allEnemies[tempID] = new Hit(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersData,enemiesData,tableOfSockets,statics,io);
+        allEnemies[tempID] = new Hit(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersInLevel["firstMap"],connectedPlayersData,enemiesData,tableOfSockets,statics,io);
       }
     }
 
@@ -313,7 +326,9 @@ socket.on("getPlayerID",async (data) => {
               }
 
               delete tableOfSockets[playerID];
+              delete connectedPlayersInLevel[connectedPlayersData[playerID].gameData.currentLevelMap][playerID];
               delete connectedPlayersData[playerID];
+
             }
         }
       }, 5000);

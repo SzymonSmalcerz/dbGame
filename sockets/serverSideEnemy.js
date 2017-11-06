@@ -49,7 +49,7 @@ const playerStatics = {
 
 class Enemy{
 
-  constructor(io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,moveSprite,x,y,width,height,collisionHeight,collisionWidth,manaRegeneration,healthRegeneration,health,damage,speed,mana,range){
+  constructor(io,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,id,moveSprite,x,y,width,height,collisionHeight,collisionWidth,manaRegeneration,healthRegeneration,health,damage,speed,mana,range){
 
     this.range = range || 400;
     this.id = id || Math.floor((Math.random() * 100000) + 1);
@@ -74,10 +74,10 @@ class Enemy{
 
     //OTHER ENTITIES ON MAP
     this.tableOfSockets = tableOfSockets;
-    this.connectedPlayersData = connectedPlayersData;
+    this.playersInMap = playersInMap;
     this.enemiesData = enemiesData;
     this.statics = statics;
-
+    this.connectedPlayersData = connectedPlayersData;
     //PHYSICS AND LOGIC THINGS BELOW
     this.x = x;
     this.y = y;
@@ -224,10 +224,9 @@ class Enemy{
     this.currentSprite = this.idle;
 
 
-    for (var playerID in this.connectedPlayersData) {
+    for (var playerID in this.playersInMap) {
         // skip loop if the property is from prototype
-      if (!this.connectedPlayersData.hasOwnProperty(playerID)) continue;
-
+      if (!this.playersInMap.hasOwnProperty(playerID)) continue;
 
       var player = this.connectedPlayersData[playerID].gameData;
 
@@ -267,8 +266,8 @@ class Enemy{
 
   emitTick(){
     this.handleManaAndHp();
-    for(var playerID in this.connectedPlayersData){
-      if(!this.connectedPlayersData.hasOwnProperty(playerID)) continue;
+    for(var playerID in this.playersInMap){
+      if(!this.playersInMap.hasOwnProperty(playerID)) continue;
 
       var player = this.connectedPlayersData[playerID].gameData;
 
@@ -347,9 +346,9 @@ class Enemy{
     this.currentSprite = this.idle;
   	if(x > 0){
 
-      for (var playerID in this.connectedPlayersData) {
+      for (var playerID in this.playersInMap) {
           // skip loop if the property is from prototype
-        if (!this.connectedPlayersData.hasOwnProperty(playerID)) continue;
+        if (!this.playersInMap.hasOwnProperty(playerID)) continue;
 
 
         var player = this.connectedPlayersData[playerID].gameData;
@@ -371,9 +370,9 @@ class Enemy{
       }
   	}else if(x < 0){
 
-      for (var playerID in this.connectedPlayersData) {
+      for (var playerID in this.playersInMap) {
           // skip loop if the property is from prototype
-        if (!this.connectedPlayersData.hasOwnProperty(playerID)) continue;
+        if (!this.playersInMap.hasOwnProperty(playerID)) continue;
 
 
         var player = this.connectedPlayersData[playerID].gameData;
@@ -396,9 +395,9 @@ class Enemy{
       }
     }else if(y > 0){
 
-      for (var playerID in this.connectedPlayersData) {
+      for (var playerID in this.playersInMap) {
           // skip loop if the property is from prototype
-        if (!this.connectedPlayersData.hasOwnProperty(playerID)) continue;
+        if (!this.playersInMap.hasOwnProperty(playerID)) continue;
 
 
         var player = this.connectedPlayersData[playerID].gameData;
@@ -420,9 +419,9 @@ class Enemy{
       }
   	}else if(y < 0){
 
-      for (var playerID in this.connectedPlayersData) {
+      for (var playerID in this.playersInMap) {
           // skip loop if the property is from prototype
-        if (!this.connectedPlayersData.hasOwnProperty(playerID)) continue;
+        if (!this.playersInMap.hasOwnProperty(playerID)) continue;
 
 
         var player = this.connectedPlayersData[playerID].gameData;
@@ -451,8 +450,8 @@ class Enemy{
 
 class Hit extends Enemy{
 
-	constructor(id,x,y,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
-    super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.hit,x,y)
+	constructor(id,x,y,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
+    super( io,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.hit,x,y)
     this.type = "hit";
     this.experience = 2000;
     this.health = 1500;
@@ -463,8 +462,8 @@ class Hit extends Enemy{
 }
 
 class Hulk extends Enemy{
-  constructor(id,x,y,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
-    super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.hulk,x,y,100,100,25)
+  constructor(id,x,y,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
+    super( io,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.hulk,x,y,100,100,25)
     this.type = "hulk";
     this.experience = 3000;
     this.health = 3000;
@@ -474,8 +473,8 @@ class Hulk extends Enemy{
 }
 
 class Dragon extends Enemy{
-  constructor(id,x,y,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
-    super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.dragon,x,y,50,50);
+  constructor(id,x,y,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
+    super( io,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.dragon,x,y,50,50);
     this.type = "dragon";
     this.experience = 2000;
     this.health = 700;
@@ -486,8 +485,8 @@ class Dragon extends Enemy{
 
 
 class Yeti extends Enemy{
-  constructor(id,x,y,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
-    super( io,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.yeti,x,y,80,80);
+  constructor(id,x,y,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
+    super( io,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.yeti,x,y,80,80);
     this.type = "yeti";
     this.experience = 1500;
     this.health = 500;

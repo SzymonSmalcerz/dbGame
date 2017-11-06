@@ -22,7 +22,7 @@ class Skill{
   	this.attackTable = attackTable;
 
     this.skillName = skillData.skillName;
-    this.connectedPlayersData = players;
+    this.playersInMap = players;
     this.statics = statics;
     this.enemies = enemies;
     this.io = io;
@@ -64,10 +64,10 @@ class Skill{
   emitData(){
 
 
-    for(var playerID in this.connectedPlayersData){
-      if(!this.connectedPlayersData.hasOwnProperty(playerID)) continue;
+    for(var playerID in this.playersInMap){
+      if(!this.playersInMap.hasOwnProperty(playerID)) continue;
 
-      var player = this.connectedPlayersData[playerID].gameData;
+      var player = this.playersInMap[playerID].gameData;
 
       var realRangeWidth;
       var realRangeHeight;
@@ -130,9 +130,9 @@ class Skill{
   checkForCollisionWithEntity(){
 
   	if(!this.detonated ){
-      for (var playerID in this.connectedPlayersData) {
-        if (!this.connectedPlayersData.hasOwnProperty(playerID)) continue;
-        var player = this.connectedPlayersData[playerID].gameData;
+      for (var playerID in this.playersInMap) {
+        if (!this.playersInMap.hasOwnProperty(playerID)) continue;
+        var player = this.playersInMap[playerID].gameData;
         if((Math.sqrt(Math.pow(player.collisionWidth/2,2) + Math.pow(player.collisionHeight/2,2))) +
          (Math.sqrt(Math.pow(this.width/2,2) + Math.pow(this.height/2,2))) >= (Math.sqrt(Math.pow((player.x + player.width/2) - (this.x + this.width/2),2) +
          Math.pow((player.y + player.height * 0.9 - player.collisionHeight/2) - (this.y + this.height/2),2)))){
@@ -149,20 +149,20 @@ class Skill{
          Math.pow((enemy.y + enemy.height * 0.9 - enemy.collisionHeight/2) - (this.y + this.height/2),2)))){
            this.detonated = true;
 
-           enemy.health = enemy.health - this.connectedPlayersData[this.ownerID].gameData.damage * 3;
+           enemy.health = enemy.health - this.playersInMap[this.ownerID].gameData.damage * 3;
            if(enemy.health <= 0){
-             this.connectedPlayersData[this.ownerID].gameData.experience += enemy.experience;
+             this.playersInMap[this.ownerID].gameData.experience += enemy.experience;
 
-             if(this.connectedPlayersData[this.ownerID].gameData.experience >= this.connectedPlayersData[this.ownerID].gameData.requiredExperience){
-               this.connectedPlayersData[this.ownerID].gameData.experience = 0;
-               this.connectedPlayersData[this.ownerID].gameData.level += 1;
-               this.connectedPlayersData[this.ownerID].gameData.maxHealth += 100;
-               this.connectedPlayersData[this.ownerID].gameData.maxMana += 50;
-               this.connectedPlayersData[this.ownerID].gameData.healthRegeneration = this.connectedPlayersData[this.ownerID].gameData.maxHealth/100 ;
-               this.connectedPlayersData[this.ownerID].gameData.manaRegeneration = this.connectedPlayersData[this.ownerID].gameData.maxMana/100;
-               this.connectedPlayersData[this.ownerID].gameData.speed = Math.min(Math.floor(7 + this.connectedPlayersData[this.ownerID].gameData.level/4),10);
-               this.connectedPlayersData[this.ownerID].gameData.damage = 30 + 3*this.connectedPlayersData[this.ownerID].gameData.level;
-               this.connectedPlayersData[this.ownerID].gameData.requiredExperience = this.connectedPlayersData[this.ownerID].gameData.level * 2 * 500;
+             if(this.playersInMap[this.ownerID].gameData.experience >= this.playersInMap[this.ownerID].gameData.requiredExperience){
+               this.playersInMap[this.ownerID].gameData.experience = 0;
+               this.playersInMap[this.ownerID].gameData.level += 1;
+               this.playersInMap[this.ownerID].gameData.maxHealth += 100;
+               this.playersInMap[this.ownerID].gameData.maxMana += 50;
+               this.playersInMap[this.ownerID].gameData.healthRegeneration = this.playersInMap[this.ownerID].gameData.maxHealth/100 ;
+               this.playersInMap[this.ownerID].gameData.manaRegeneration = this.playersInMap[this.ownerID].gameData.maxMana/100;
+               this.playersInMap[this.ownerID].gameData.speed = Math.min(Math.floor(7 + this.playersInMap[this.ownerID].gameData.level/4),10);
+               this.playersInMap[this.ownerID].gameData.damage = 30 + 3*this.playersInMap[this.ownerID].gameData.level;
+               this.playersInMap[this.ownerID].gameData.requiredExperience = this.playersInMap[this.ownerID].gameData.level * 2 * 500;
             }
            }
          }

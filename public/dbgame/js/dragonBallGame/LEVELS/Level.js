@@ -1,11 +1,10 @@
 class Level{
-  constructor(tilesTable,statics,players,enemies,npcs,maxNumOfEnemies){
+  constructor(tilesTable,maxNumOfEnemies){
     this.handler = Game.handler;
-  	this.players = players || [];
-  	this.enemies = enemies || [];
-    this.maxNumOfEnemies = maxNumOfEnemies;
-  	this.statics = statics || [];
-  	this.npcs = npcs || [];
+  	this.players = [Game.handler.character];
+  	this.enemies = [];
+    this.maxNumOfEnemies = maxNumOfEnemies || 50;
+  	this.statics = [];
   	this.tiles = tilesTable || [];
   	this.allEntities = [];
   	this.skillTable = [];
@@ -32,7 +31,6 @@ class Level{
 
   tick(){
     this.draw(); //first draw then tick !!! otherwise not working
-
     this.handler.character.tick();
   };
 
@@ -65,6 +63,7 @@ class Level{
 
   handleEntities(){
     this.allEntities = [];
+
 
     for(var i=0;i< this.players.length; i++){
   		this.allEntities.push(this.players[i]);
