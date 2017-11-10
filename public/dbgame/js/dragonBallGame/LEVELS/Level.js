@@ -1,19 +1,43 @@
 class Level{
-  constructor(tilesTable,maxNumOfEnemies){
+  //constructor(tilesTable,teleportsCoords,maxNumOfEnemies){
+  constructor(dataFromServer){
     this.handler = Game.handler;
   	this.players = [Game.handler.character];
   	this.enemies = [];
-    this.maxNumOfEnemies = maxNumOfEnemies || 50;
+
   	this.statics = [];
-  	this.tiles = tilesTable || [];
   	this.allEntities = [];
   	this.skillTable = [];
+
+    Object.defineProperty(this, "tiles", {
+      value : dataFromServer.table,
+      writable : false,
+      enumerable : true,
+      configurable : false
+    })
+    Object.freeze(this.tiles);
+
+    Object.defineProperty(this, "maxNumOfEnemies", {
+      value : dataFromServer.maxNumOfEnemies || 50,
+      writable : false,
+      enumerable : true,
+      configurable : false
+    })
+    Object.freeze(this.maxNumOfEnemies);
+
+    Object.defineProperty(this, "teleportsTable", {
+      value : dataFromServer.teleportsTable,
+      writable : false,
+      enumerable : true,
+      configurable : false
+    })
+    Object.freeze(this.teleportsTable);
 
   	this.moveX = 0; // this two variables used onlyt to "move" tiles while moving player
   	this.moveY = 0; //
 
-  	this.widthOfMap = tilesTable[0].length;	//not scaled !!!!
-  	this.heightOfMap = tilesTable.length;
+  	this.widthOfMap = this.tiles[0].length;	//not scaled !!!!
+  	this.heightOfMap = this.tiles.length;
   }
 
   sortEntityTable(){ //sorting for drawing purposes
@@ -32,6 +56,13 @@ class Level{
   tick(){
     this.draw(); //first draw then tick !!! otherwise not working
     this.handler.character.tick();
+    for(var i =0;i<this.teleportsTable.length;i++){
+
+      if(this.handler.character.x >= this.teleportsTable[i].xl && this.handler.character.x <= this.teleportsTable[i].xr){
+        if(this.handler.character.y >= this.teleportsTable[i].yu && this.handler.character.y <= this.teleportsTable[i].yd)
+          socket.emit("changeLevel", { idOfPlayer : this.handler.character.id});
+      }
+    }
   };
 
 
@@ -45,6 +76,7 @@ class Level{
   			if((j*32 + this.moveX) * this.handler.scale >= -(32*this.handler.scale) && (j*32 + this.moveX) * this.handler.scale <= window.innerWidth + (32*this.handler.scale)
   				&& ( i*32 + this.moveY) * this.handler.scale >= -(32*this.handler.scale) &&  (i*32 + this.moveY) * this.handler.scale <= window.innerHeight + (32*this.handler.scale)){
   				this.handler.tiles[this.tiles[i][j]].draw(j*32 + this.moveX, i*32 + this.moveY);
+          
   			}
 
   		}

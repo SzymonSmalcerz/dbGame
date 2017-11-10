@@ -9,7 +9,7 @@ window.onload = function(){
     });
     socket.on("playerID",(playerData) => {
       Game.createMainCharacter(playerData);
-      Game.handler.currentLevel = new Level(playerData.currentMapLevelTable);
+      Game.handler.currentLevel = new Level(playerData.currentMapLevel);
       Game.init();
       socket.on("playerID", () => {
         console.log("DO NOTHING !!!!");
@@ -220,6 +220,7 @@ const Game = {
   handleSockets : function() {
 
     socket.on("playerCreation", (newPlayerData) => {
+      
       var playerID = newPlayerData.id;
       if(!Game.handler.players[playerID]){
         console.log("NEW PLAYER HAS BEEN CREATED");
@@ -270,7 +271,8 @@ const Game = {
     });
 
     socket.on("addUsers", (playerData) => {
-
+      Game.handler.players = {};
+      Game.handler.players[Game.handler.character.id] = Game.handler.character;
       for (var playerID in playerData) {
           // skip loop if the property is from prototype
           if (!playerData.hasOwnProperty(playerID)) continue;
@@ -366,7 +368,35 @@ const Game = {
 
     });
 
+    socket.on("pushNewEnemy", (enemyData) => {
+      if(!Game.handler.enemies[(enemyData.id)]){
+        if(enemyData.type == "hit"){
+          Game.handler.enemies[(enemyData.id)] = new Hit(enemyData.id,enemyData.x, enemyData.y);
+          Game.handler.enemies[(enemyData.id)].renderX += Game.handler.currentLevel.moveX;
+          Game.handler.enemies[(enemyData.id)].renderY += Game.handler.currentLevel.moveY;
+          Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData.id]);
+        }else if(enemyData.type == "hulk"){
+          Game.handler.enemies[(enemyData.id)] = new Hulk(enemyData.id,enemyData.x, enemyData.y);
+          Game.handler.enemies[(enemyData.id)].renderX += Game.handler.currentLevel.moveX;
+          Game.handler.enemies[(enemyData.id)].renderY += Game.handler.currentLevel.moveY;
+          Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData.id]);
+        }else if(enemyData.type == "dragon"){
+          Game.handler.enemies[(enemyData.id)] = new Dragon(enemyData.id,enemyData.x, enemyData.y);
+          Game.handler.enemies[(enemyData.id)].renderX += Game.handler.currentLevel.moveX;
+          Game.handler.enemies[(enemyData.id)].renderY += Game.handler.currentLevel.moveY;
+          Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData.id]);
+        }else if(enemyData.type == "yeti"){
+          Game.handler.enemies[(enemyData.id)] = new Yeti(enemyData.id,enemyData.x, enemyData.y);
+          Game.handler.enemies[(enemyData.id)].renderX += Game.handler.currentLevel.moveX;
+          Game.handler.enemies[(enemyData.id)].renderY += Game.handler.currentLevel.moveY;
+          Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData.id]);
+        }
+      }
+    })
+
     socket.on("addEnemies", (enemyData) => {
+      delete Game.handler.enemies;
+      Game.handler.enemies = {};
       for(var i=0;i<enemyData.length;i++){
         if(!Game.handler.enemies[(enemyData[i].id)]){
           if(enemyData[i].type == "hit"){
@@ -415,15 +445,28 @@ const Game = {
 
       }
 
-      socket.on("setLevel", (levelData) => {
-        this.handler.currentLevel = new Level(levelData.tableOfTiles);
-      })
+
     });
 
     socket.on("removeSkill", (skillData) => {
       if(this.handler.skillTable[skillData.id]){
         delete this.handler.skillTable[skillData.id];
       }
+    });
+
+    socket.on("changeMapLevel", (data) => {
+      delete this.handler.currentLevel;
+      this.handler.currentLevel = new Level(data.levelData);
+
+      this.handler.currentLevel.moveX = data.moveX;
+      this.handler.currentLevel.moveY = data.moveY;
+      this.handler.character.x = data.playerNewX;
+      this.handler.character.y = data.playerNewY;
+      this.handler.character.renderX = data.playerNewX;
+      this.handler.character.renderY = data.playerNewY;
+
+
+      this.handleMoveXandMoveY();
     })
 
 

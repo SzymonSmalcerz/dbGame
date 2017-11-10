@@ -1,40 +1,101 @@
 // const {io} = require("./server");
 var {User} = require("../db/models/models");
-var {Enemy,Hit , Hulk, Dragon ,Yeti, Static} = require("./serverSideEnemy");
+var {Enemy,Hit , Hulk, Dragon ,Yeti} = require("./serverSideEnemy");
 var {io} = require("../server");
 var {Skill,KamehamehaWave} = require("./serverSideSkill");
-var {levelTiles, Level} = require("./serverSideLevel");
-var statics = [Static.getTreeData(600,150),
-               Static.getHouse1Data(500,400),
-               Static.getHouse1Data(650,400),
-               Static.getHouse1Data(800,400),
-               Static.getHouse1Data(950,400),
-               Static.getHouse2Data(300,330)
-  ];
+var Level = require("./serverSideLevel");
 
-var connectedPlayersInLevel = {};
-    connectedPlayersInLevel["firstMap"] = {};
-    connectedPlayersInLevel["secondMap"] = {};
-var connectedPlayersData = {};
 
-var enemiesData = [];
-var skillTable = [];
+
+
 var lastTime = 0;
 var lastTimeForCheckingIfPlayersAreActive = 0;
-var enemies = [];
-var entitiesCreated = false;
 var tableOfSockets = {};
-var allEnemies = {};
-
-
+var levels = {};
+var level1 = new Level.LevelFirst(tableOfSockets);
+var level2 = new Level.LevelSecond(tableOfSockets);
+levels[level1.name] = level1;
+levels[level2.name] = level2;
+var allPlayers = {};
+var serverStarted = false;
+var findMapNameByPlayerId = {};
 var handleSocketsWork = (socket,io) => {
 
 
+socket.on("changeLevel", (data) => {
 
+
+
+
+  var oldMapName = findMapNameByPlayerId[data.idOfPlayer];
+  var player = levels[oldMapName].players[data.idOfPlayer].gameData;
+  if(allPlayers[player.id].lastTime + 5000 > new Date().getTime()){
+    console.log("____________________________")
+    console.log(allPlayers[player.id].lastTime + 5000 - new Date().getTime());
+    console.log("____________________________")
+    return;
+  }
+  
+  allPlayers[player.id].lastTime = new Date().getTime();
+  console.log(allPlayers[player.id].lastTime + 5000 + "vs" + new Date().getTime());
+  if(!levels[oldMapName]){
+    console.log("LEVELS NIE ISTNIEJE ! ");
+    return;
+  }
+  var nextLevelData = levels[oldMapName].getNextLevelData(player.id);
+
+  if(nextLevelData.error) {
+    console.log(nextLevelData.error);
+    return;
+  }
+
+  if(!nextLevelData.nextMapName || !levels[nextLevelData.nextMapName]){
+    console.log("map name nof found");
+    return;
+  }
+
+
+  io.emit("removePlayer", {
+    id : data.idOfPlayer
+  })
+  player.x = nextLevelData.playerNewX;
+  player.y = nextLevelData.playerNewY;
+  player.currentLevelMapName = nextLevelData.nextMapName;
+  player.currentMapLevel = levels[nextLevelData.nextMapName].tilesAndTeleportCoords;
+  tableOfSockets[data.idOfPlayer].emit("changeMapLevel",{
+    levelData : player.currentMapLevel,
+    playerNewX : nextLevelData.playerNewX,
+    playerNewY : nextLevelData.playerNewY,
+    moveX : 0,
+    moveY : 0
+  });
+  levels[nextLevelData.nextMapName].players[data.idOfPlayer] = levels[oldMapName].players[data.idOfPlayer];
+
+  socket.emit("addUsers", levels[nextLevelData.nextMapName].players);
+  socket.emit("addStatics", levels[nextLevelData.nextMapName].statics);
+  socket.emit("addEnemies", levels[nextLevelData.nextMapName].enemyData);
+
+  delete levels[oldMapName].players[data.idOfPlayer];
+  findMapNameByPlayerId[data.idOfPlayer] = nextLevelData.nextMapName;
+
+  //TODO
+
+  for(var playerID in levels[nextLevelData.nextMapName].players){
+
+    if(!levels[nextLevelData.nextMapName].players.hasOwnProperty(playerID)) continue;
+
+
+
+    tableOfSockets[playerID].emit("playerCreation", player);
+  }
+
+  //END TODO
+
+})
 
 socket.on("getPlayerID",async (data) => {
 
-  if(connectedPlayersData[data.id]){
+  if(allPlayers[data.id]){
     socket.emit("alreadyLoggedIn", {
       msg : "You are already logged in !"
     })
@@ -65,16 +126,18 @@ socket.on("getPlayerID",async (data) => {
         experience : user.experience,
         requiredExperience : user.level * 2 * 500,
         damage : 30 + 3*user.level,
-        currentLevelMap : "firstMap",
-        currentMapLevelTable : levelTiles["firstMap"]
+        currentLevelMapName : "firstMap",
+        currentMapLevel : levels["firstMap"].tilesAndTeleportCoords
       }
       socket.emit("playerID", playerData)
-
       socket.broadcast.emit("playerCreation",playerData);
+      levels[playerData.currentLevelMapName].players[playerData.id] = {};
+      levels[playerData.currentLevelMapName].players[playerData.id].gameData = playerData;
+      findMapNameByPlayerId[playerData.id] = playerData.currentLevelMapName;
+      allPlayers[playerData.id] = {};//only used to check whether player is active or not !
+      allPlayers[playerData.id].active = true;
+      allPlayers[playerData.id].lastTime = new Date().getTime();
 
-      connectedPlayersData[playerData.id] = {};
-      connectedPlayersData[playerData.id].gameData = playerData;
-      connectedPlayersInLevel[playerData.currentLevelMap][playerData.id] = playerData.id;
       tableOfSockets[playerData.id] = socket;
     }catch(e){
       console.log("\n\n ERROR IN PLAYER CREATION !!!! \n\n" + e);
@@ -84,63 +147,36 @@ socket.on("getPlayerID",async (data) => {
     }
 
   }
-  socket.on("playerCreated", () => {
+  socket.on("playerCreated", (data) => {
     // socket.emit("setLevel",{
     //     tableOfTiles : level1Table
     // });
-    socket.emit("addUsers", connectedPlayersData);
-    socket.emit("addStatics", statics);
-    socket.emit("addEnemies", enemiesData);
+    socket.emit("addUsers", levels[findMapNameByPlayerId[data.id]].players);
+    socket.emit("addStatics", levels[findMapNameByPlayerId[data.id]].statics);
+    socket.emit("addEnemies", levels[findMapNameByPlayerId[data.id]].enemyData);
     socket.emit("permissionToLoop");
   })
 
 });
 
   socket.on("skillCreation", (skillData) => {
-    if(connectedPlayersData[skillData.ownerID].gameData.mana >= 10){
-      connectedPlayersData[skillData.ownerID].gameData.mana -= 10;
-      skillTable.push(new KamehamehaWave(Math.floor(Math.random() * 100000),skillData, connectedPlayersData,statics,allEnemies, io, tableOfSockets));
+    var curLev = levels[findMapNameByPlayerId[skillData.ownerID]];
+    var player = curLev.players[skillData.ownerID].gameData;
+
+    if(player.mana >= 10){
+      player.mana -= 10;
+      curLev.skills.push(new KamehamehaWave(Math.floor(Math.random() * 100000),skillData, curLev.players,curLev.statics,curLev.enemies, tableOfSockets));
     }
   });
 
-  if(!entitiesCreated){
-    for(var i=0;i<10;i++){
-      allEnemies[i + "h"] = new Hit(i + "h",Math.floor(Math.random()*500+ 1500),Math.floor(Math.random()*500),connectedPlayersInLevel["secondMap"],connectedPlayersData,enemiesData,tableOfSockets,statics,io);
-      allEnemies[i + "y"] = new Yeti(i + "y",Math.floor(Math.random()*850+ 20),Math.floor(Math.random()*400+ 700 ),connectedPlayersInLevel["secondMap"],connectedPlayersData,enemiesData,tableOfSockets,statics,io);
-      allEnemies[i + "hu"] = new Hulk(i + "hu",Math.floor(Math.random()*1000+ 500),Math.floor(Math.random()*400),connectedPlayersInLevel["secondMap"],connectedPlayersData,enemiesData,tableOfSockets,statics,io);
-    }
-
-    for(var i = 0;i < 50;i++){
-      allEnemies[i + "dr"] = new Dragon(i + "dr",Math.floor(Math.random()*1950 + 20),Math.floor(Math.random()*400 + 1000),connectedPlayersInLevel["secondMap"],connectedPlayersData,enemiesData,tableOfSockets,statics,io);
-    }
-
-    entitiesCreated = true;
-    console.log("CREATED ENTITIES");
-    enemies = [];
-    var i = 0;
-  }
 
 
-  socket.on("addEnemies", (data) => {
-    for(var i =0;i<data.numberOfEnemies;i++){
-      var temp = Math.floor(Math.random() * 100000);
-      var tempID =  temp + "e";
-      if(data.type == "hulk"){
-        allEnemies[tempID] = new Hulk(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersInLevel["firstMap"],connectedPlayersData,enemiesData,tableOfSockets,statics,io);
-      }else if(data.type == "dragon"){
-        allEnemies[tempID] = new Dragon(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersInLevel["firstMap"],connectedPlayersData,enemiesData,tableOfSockets,statics,io);
-      }else if(data.type == "yeti"){
-        allEnemies[tempID] = new Yeti(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersInLevel["firstMap"],connectedPlayersData,enemiesData,tableOfSockets,statics,io);
-      }else {
-        allEnemies[tempID] = new Hit(tempID,Math.floor(Math.random()*700 + 200 ),Math.floor(Math.random()*700 + 200 ),connectedPlayersInLevel["firstMap"],connectedPlayersData,enemiesData,tableOfSockets,statics,io);
-      }
-    }
 
-    updateEnemyData();
-    io.emit("addEnemies", enemiesData);
-  })
+
 
   socket.on("damageEnemy",(data) => {
+    var allEnemies = levels[findMapNameByPlayerId[data.idOfPlayer]].enemies;
+    var connectedPlayersData = levels[findMapNameByPlayerId[data.idOfPlayer]].players;
     if(allEnemies[data.idOfEnemy]){
       allEnemies[data.idOfEnemy].health -= connectedPlayersData[data.idOfPlayer].gameData.damage;
       if(allEnemies[data.idOfEnemy].health<=0){
@@ -165,9 +201,7 @@ socket.on("getPlayerID",async (data) => {
 
 
   socket.on('userData', (playerData) => {
-    // console.log(playerData.health);
-
-  //  console.log("PLAYER X FROM userData: " + playerData.x);
+    var connectedPlayersData = levels[findMapNameByPlayerId[playerData.id]].players;
     if(connectedPlayersData[playerData.id]){
 
       connectedPlayersData[playerData.id].gameData.x = playerData.x;
@@ -180,8 +214,8 @@ socket.on("getPlayerID",async (data) => {
   });
 
   socket.on("checkedConnection", (playerData) => {
-    if(connectedPlayersData[playerData.id])
-      connectedPlayersData[playerData.id].active = true;
+    if(allPlayers[playerData.id])
+      allPlayers[playerData.id].active = true;
   })
 
 
@@ -190,134 +224,60 @@ socket.on("getPlayerID",async (data) => {
 
 
     if(time - lastTime > 1000/20){
-      updateShootData();
-      updateEnemyData();
-      skillTable.forEach(skill => skill.tick());
-      enemies.forEach(enemy => enemy.tick());
 
-      for (var playerID in connectedPlayersData) {
-          // skip loop if the property is from prototype
-        if (!connectedPlayersData.hasOwnProperty(playerID)) continue;
-        var player = connectedPlayersData[playerID].gameData;
-        //console.log(player.mana);
-        if(player.health < player.maxHealth){
-          player.health += player.healthRegeneration;
-        }
 
-        if(player.health < 0){
-          player.health = 0;
-        }
-
-        if(player.mana < player.maxMana){
-          player.mana += player.manaRegeneration;
-        }
-        //console.log(player.mana);
-      }
       lastTime = time;
-
-      io.emit("playerData", connectedPlayersData);
-
+      for(var levelID in levels){
+        if(!levels.hasOwnProperty(levelID)) continue;
+        levels[levelID].tick();
+      }
 
 		}
   }
 
-  function updateEnemyData(){
-    enemies = [];
-    for(var enemyID in allEnemies){
-      if(!allEnemies.hasOwnProperty(enemyID)) continue;
-      var enemy = allEnemies[enemyID];
-      if(enemy){
-
-        if(enemy.health <= 0){
-          io.emit("removeEnemy", {
-            id : enemy.id
-          });
-          delete allEnemies[enemy.id];
-        }else{
-          enemies.push(enemy);
-        }
-      }
-    }
-
-    enemiesData = enemies.map(enemy => {
-      return {
-        x : enemy.x,
-        y : enemy.y,
-        id : enemy.id,
-        type : enemy.type,
-        currentSprite : enemy.currentSprite,
-        collisionWidth : enemy.collisionWidth,
-        collisionHeight : enemy.collisionHeight,
-        width : enemy.width,
-        height : enemy.height
-      };
-    })
-  }
 
 
-  var updateShootData = function(){
-    skillTable = skillTable.filter((shoot) => {
-  		if(shoot.detonated){
-        if(shoot.tickCounter < 10){
-          return true;
-        }else {
-          io.emit("removeSkill", {
-            id : shoot.id
-          })
-          return false;
-        }
-  		}else{
-  			if(shoot.tickCounter < 45){
-          return true;
-        }else {
-          io.emit("removeSkill", {
-            id : shoot.id
-          })
-          return false;
-        }
-  		}
-  	})
 
 
-  }
   var checkForConnection = (time) => {
     requestAnimationFrame(checkForConnection);
 
 
+
+
     if(time - lastTimeForCheckingIfPlayersAreActive > 10000){//every 10 sec we check for connection
       lastTimeForCheckingIfPlayersAreActive = time;
-      for (var playerID in connectedPlayersData) {
+      for (var playerID in allPlayers) {
           // skip loop if the property is from prototype
-          if (!connectedPlayersData.hasOwnProperty(playerID)) continue;
+          if (!allPlayers.hasOwnProperty(playerID)) continue;
 
 
 
-          if(!connectedPlayersData[playerID]) continue;
-          var player = connectedPlayersData[playerID];
-          connectedPlayersData[playerID].active = false;
+          if(!allPlayers[playerID]) continue;
+          allPlayers[playerID].active = false;
       }
       io.emit("checkForConnection");
       setTimeout(async function(){
-        for (var playerID in connectedPlayersData) {
+        for (var playerID in allPlayers) {
             // skip loop if the property is from prototype
-            if (!connectedPlayersData.hasOwnProperty(playerID)) continue;
+            if (!allPlayers.hasOwnProperty(playerID)) continue;
 
 
 
-            if(!connectedPlayersData[playerID]) continue;
-            var player = connectedPlayersData[playerID];
-
-            if(!connectedPlayersData[playerID].active){
+            if(!allPlayers[playerID]) continue;
+            var player = allPlayers[playerID];
+            if(!allPlayers[playerID].active){
               io.emit("removePlayer", {
                 id : playerID
               })
 
               try {
+                var player = levels[findMapNameByPlayerId[playerID]].players[playerID];
                 var user = await User.findById(playerID);
-                user.x = connectedPlayersData[playerID].gameData.x;
-                user.y = connectedPlayersData[playerID].gameData.y;
-                user.level = connectedPlayersData[playerID].gameData.level;
-                user.experience = connectedPlayersData[playerID].gameData.experience;
+                user.x = player.gameData.x;
+                user.y = player.gameData.y;
+                user.level = player.gameData.level;
+                user.experience = player.gameData.experience;
                 await user.save();
 
                 console.log("saved statis of :", user._id);
@@ -326,8 +286,9 @@ socket.on("getPlayerID",async (data) => {
               }
 
               delete tableOfSockets[playerID];
-              delete connectedPlayersInLevel[connectedPlayersData[playerID].gameData.currentLevelMap][playerID];
-              delete connectedPlayersData[playerID];
+              delete allPlayers[playerID];
+              delete levels[findMapNameByPlayerId[playerID]].players[playerID];
+              delete findMapNameByPlayerId[playerID];
 
             }
         }
@@ -336,9 +297,14 @@ socket.on("getPlayerID",async (data) => {
 
 		}
   };
-  updateEnemyData();
-  sendToUserData();
-  checkForConnection();
+
+
+
+  if(!serverStarted){
+    sendToUserData();
+    checkForConnection();
+    serverStarted = true;
+  }
 }
 
 
@@ -364,6 +330,5 @@ socket.on("getPlayerID",async (data) => {
 
 
 module.exports = {
-  handleSocketsWork,
-  connectedPlayersData
+  handleSocketsWork
 }

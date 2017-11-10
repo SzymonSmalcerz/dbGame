@@ -33,7 +33,7 @@ class MainCharacter extends Mob{
     this.collisionWidth = playerData.collisionWidth ;
 
     socket.emit('message',"user " + this.id + " has been created");
-    socket.emit("playerCreated");//and now add enemies statics etc.
+    socket.emit("playerCreated", {id : this.id});//and now add enemies statics etc.
 
   }
 

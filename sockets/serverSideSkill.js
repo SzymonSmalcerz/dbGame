@@ -4,7 +4,7 @@ var SkillStatic = {
 }
 
 class Skill{
-  constructor(id,skillData,damage,radius, frameTable, speed, attackTable, players,statics,enemies, io, tableOfSockets){
+  constructor(id,skillData,damage,radius, frameTable, speed, attackTable, players,statics,enemies, tableOfSockets){
 
     this.ownerID = skillData.ownerID;
     this.id = id;
@@ -25,7 +25,6 @@ class Skill{
     this.playersInMap = players;
     this.statics = statics;
     this.enemies = enemies;
-    this.io = io;
     this.tableOfSockets = tableOfSockets;
 
   }
@@ -148,7 +147,6 @@ class Skill{
          (Math.sqrt(Math.pow(this.width/2,2) + Math.pow(this.height/2,2))) >= (Math.sqrt(Math.pow((enemy.x + enemy.width/2) - (this.x + this.width/2),2) +
          Math.pow((enemy.y + enemy.height * 0.9 - enemy.collisionHeight/2) - (this.y + this.height/2),2)))){
            this.detonated = true;
-
            enemy.health = enemy.health - this.playersInMap[this.ownerID].gameData.damage * 3;
            if(enemy.health <= 0){
              this.playersInMap[this.ownerID].gameData.experience += enemy.experience;

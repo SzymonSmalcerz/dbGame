@@ -49,7 +49,7 @@ const playerStatics = {
 
 class Enemy{
 
-  constructor(io,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,id,moveSprite,x,y,width,height,collisionHeight,collisionWidth,manaRegeneration,healthRegeneration,health,damage,speed,mana,range){
+  constructor(playersInMap,enemiesData,tableOfSockets,statics,id,moveSprite,x,y,callbackOnDeath,width,height,collisionHeight,collisionWidth,manaRegeneration,healthRegeneration,health,damage,speed,mana,range){
 
     this.range = range || 400;
     this.id = id || Math.floor((Math.random() * 100000) + 1);
@@ -58,7 +58,7 @@ class Enemy{
     this.collisionHeight = collisionHeight || this.height/3;
   	this.collisionWidth = collisionWidth || this.width/3 ;
     this.tickCounter = 0;
-
+    this.callbackOnDeath = callbackOnDeath;
     //SPRITES
     this.up = moveSprite.up;
   	this.left = moveSprite.left;
@@ -77,7 +77,6 @@ class Enemy{
     this.playersInMap = playersInMap;
     this.enemiesData = enemiesData;
     this.statics = statics;
-    this.connectedPlayersData = connectedPlayersData;
     //PHYSICS AND LOGIC THINGS BELOW
     this.x = x;
     this.y = y;
@@ -91,10 +90,15 @@ class Enemy{
     this.healthRegeneration = healthRegeneration || health/400 || 10;
     this.experience = 10;
 
-    this.io = io;
 
 
 
+  }
+
+  onDie(){
+    if(this.callbackOnDeath){
+      this.callbackOnDeath();
+    }
   }
 
   checkForCollisionWithStaticEntity(staticEntity,directionOfThisEnemyMovement){
@@ -228,7 +232,7 @@ class Enemy{
         // skip loop if the property is from prototype
       if (!this.playersInMap.hasOwnProperty(playerID)) continue;
 
-      var player = this.connectedPlayersData[playerID].gameData;
+      var player = this.playersInMap[playerID].gameData;
 
     	if(!this.checkForCollisionWithPlayer(player)){
 
@@ -269,7 +273,7 @@ class Enemy{
     for(var playerID in this.playersInMap){
       if(!this.playersInMap.hasOwnProperty(playerID)) continue;
 
-      var player = this.connectedPlayersData[playerID].gameData;
+      var player = this.playersInMap[playerID].gameData;
 
       var realRangeWidth;
       var realRangeHeight;
@@ -351,7 +355,7 @@ class Enemy{
         if (!this.playersInMap.hasOwnProperty(playerID)) continue;
 
 
-        var player = this.connectedPlayersData[playerID].gameData;
+        var player = this.playersInMap[playerID].gameData;
         if(player.x + player.width/2 - player.collisionWidth/2 > this.x + this.speed + this.width/2 + this.collisionWidth/2 ){
 
           for(var staticEntity in this.statics){
@@ -375,7 +379,7 @@ class Enemy{
         if (!this.playersInMap.hasOwnProperty(playerID)) continue;
 
 
-        var player = this.connectedPlayersData[playerID].gameData;
+        var player = this.playersInMap[playerID].gameData;
         if(player.x + player.width/2 + player.collisionWidth/2 < this.x - this.speed + this.width/2 - this.collisionWidth/2 ){
 
           for(var staticEntity in this.statics){
@@ -400,7 +404,7 @@ class Enemy{
         if (!this.playersInMap.hasOwnProperty(playerID)) continue;
 
 
-        var player = this.connectedPlayersData[playerID].gameData;
+        var player = this.playersInMap[playerID].gameData;
 
         if(player.y + player.height * 0.9 - player.collisionHeight > this.y + this.speed - this.height * 0.9){
           for(var staticEntity in this.statics){
@@ -424,7 +428,7 @@ class Enemy{
         if (!this.playersInMap.hasOwnProperty(playerID)) continue;
 
 
-        var player = this.connectedPlayersData[playerID].gameData;
+        var player = this.playersInMap[playerID].gameData;
 
         if(player.y - player.height * 0.9 < this.y - this.speed + this.height * 0.9 - this.collisionHeight){
           for(var staticEntity in this.statics){
@@ -450,8 +454,8 @@ class Enemy{
 
 class Hit extends Enemy{
 
-	constructor(id,x,y,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
-    super( io,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.hit,x,y)
+	constructor(id,x,y,playersInMap,enemiesData,statics,tableOfSockets,callbackOnDeath){
+    super(playersInMap,enemiesData,tableOfSockets,statics,id,EnemySprites.hit,x,y,callbackOnDeath)
     this.type = "hit";
     this.experience = 2000;
     this.health = 1500;
@@ -462,8 +466,8 @@ class Hit extends Enemy{
 }
 
 class Hulk extends Enemy{
-  constructor(id,x,y,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
-    super( io,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.hulk,x,y,100,100,25)
+  constructor(id,x,y,playersInMap,enemiesData,statics,tableOfSockets,callbackOnDeath){
+    super(playersInMap,enemiesData,tableOfSockets,statics,id,EnemySprites.hulk,x,y,callbackOnDeath,100,100,25)
     this.type = "hulk";
     this.experience = 3000;
     this.health = 3000;
@@ -473,8 +477,8 @@ class Hulk extends Enemy{
 }
 
 class Dragon extends Enemy{
-  constructor(id,x,y,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
-    super( io,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.dragon,x,y,50,50);
+  constructor(id,x,y,playersInMap,enemiesData,statics,tableOfSockets,callbackOnDeath){
+    super(playersInMap,enemiesData,tableOfSockets,statics,id,EnemySprites.dragon,x,y,callbackOnDeath,50,50);
     this.type = "dragon";
     this.experience = 2000;
     this.health = 700;
@@ -485,8 +489,8 @@ class Dragon extends Enemy{
 
 
 class Yeti extends Enemy{
-  constructor(id,x,y,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,io){
-    super( io,playersInMap,connectedPlayersData,enemiesData,tableOfSockets,statics,id,EnemySprites.yeti,x,y,80,80);
+  constructor(id,x,y,playersInMap,enemiesData,statics,tableOfSockets){
+    super(playersInMap,enemiesData,tableOfSockets,statics,id,EnemySprites.yeti,x,y,callbackOnDeath,80,80);
     this.type = "yeti";
     this.experience = 1500;
     this.health = 500;
