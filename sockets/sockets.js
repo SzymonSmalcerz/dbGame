@@ -30,14 +30,10 @@ socket.on("changeLevel", (data) => {
   var oldMapName = findMapNameByPlayerId[data.idOfPlayer];
   var player = levels[oldMapName].players[data.idOfPlayer].gameData;
   if(allPlayers[player.id].lastTime + 5000 > new Date().getTime()){
-    console.log("____________________________")
-    console.log(allPlayers[player.id].lastTime + 5000 - new Date().getTime());
-    console.log("____________________________")
     return;
   }
-  
+
   allPlayers[player.id].lastTime = new Date().getTime();
-  console.log(allPlayers[player.id].lastTime + 5000 + "vs" + new Date().getTime());
   if(!levels[oldMapName]){
     console.log("LEVELS NIE ISTNIEJE ! ");
     return;
@@ -136,7 +132,7 @@ socket.on("getPlayerID",async (data) => {
       findMapNameByPlayerId[playerData.id] = playerData.currentLevelMapName;
       allPlayers[playerData.id] = {};//only used to check whether player is active or not !
       allPlayers[playerData.id].active = true;
-      allPlayers[playerData.id].lastTime = new Date().getTime();
+      allPlayers[playerData.id].lastTime = 0;
 
       tableOfSockets[playerData.id] = socket;
     }catch(e){
