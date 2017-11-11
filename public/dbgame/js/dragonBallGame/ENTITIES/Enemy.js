@@ -8,7 +8,8 @@ class Enemy extends Mob{
 const hitSprite = new Image();
 class Hit extends Enemy{
 	constructor(id,x,y){
-    hitSprite.src = "dbgame/js/dragonBallGame/sprites/hitSprite.png";
+    if(!hitSprite.src)
+      hitSprite.src = "dbgame/js/dragonBallGame/sprites/hitSprite.png";
     super(id,hitSprite,x,y);
   }
 }
@@ -17,7 +18,8 @@ class Hit extends Enemy{
 const hulkSprite = new Image();
 class Hulk extends Enemy{
   constructor(id,x,y){
-    hulkSprite.src = "dbgame/js/dragonBallGame/sprites/hulkSprite.png";
+    if(!hulkSprite.src)
+      hulkSprite.src = "dbgame/js/dragonBallGame/sprites/hulkSprite.png";
     super(id,hulkSprite,x,y);
   }
 }
@@ -26,7 +28,8 @@ class Hulk extends Enemy{
 const dragonSprite = new Image();
 class Dragon extends Enemy{
   constructor(id,x,y){
-    dragonSprite.src = "dbgame/js/dragonBallGame/sprites/dragonSprite.png";
+    if(!dragonSprite.src)
+      dragonSprite.src = "dbgame/js/dragonBallGame/sprites/dragonSprite.png";
     super(id,dragonSprite,x,y);
   }
 }
@@ -36,7 +39,8 @@ class Dragon extends Enemy{
 const yetiSprite = new Image();
 class Yeti extends Enemy{
   constructor(id,x,y){
-    yetiSprite.src = "dbgame/js/dragonBallGame/sprites/yetiSprite.png";
+    if(!yetiSprite.src)
+      yetiSprite.src = "dbgame/js/dragonBallGame/sprites/yetiSprite.png";
     super(id,yetiSprite,x,y);
   }
 }

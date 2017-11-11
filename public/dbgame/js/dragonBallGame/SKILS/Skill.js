@@ -7,7 +7,8 @@ const SkillStatic = {
 
 class Skill{
   constructor(x,y){
-    SkillStatic.sprite.src = "dbgame/js/dragonBallGame/sprites/shootSprite.png";
+    if(!SkillStatic.sprite.src)
+      SkillStatic.sprite.src = "dbgame/js/dragonBallGame/sprites/shootSprite.png";
   	this.x = x;
   	this.y = y;
   	this.renderX = x;
