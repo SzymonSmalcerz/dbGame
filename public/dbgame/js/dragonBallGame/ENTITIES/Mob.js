@@ -1,5 +1,5 @@
 class Mob {
-  
+
   constructor(id,sprite,x,y){
 
     // SPRITE HANDLING THINGS BELOW
@@ -25,10 +25,16 @@ class Mob {
     							  	this.width,this.height);		        // width and height of the particular image on the screen
       //then draw hp
     	this.drawHp();
+      this.drawCollisionCtx();
     	this.tickCounter+=0.25;
     }
   }
 
+  drawCollisionCtx(){
+    this.handler.collisionCtx.fillStyle = "rgba(1,0,0,1.0)";
+    //this.handler.collisionCtx.fillRect(this.handler.scale*(this.renderX + (this.width - this.collisionWidth)/2),this.handler.scale*(this.renderY + (this.height - this.collisionHeight - this.height/10)), this.collisionWidth*this.handler.scale, this.collisionHeight*this.handler.scale)
+    this.handler.collisionCtx.fillRect(this.renderX + (this.width - this.collisionWidth)/2,this.renderY + (this.height*0.9 - this.collisionHeight), this.collisionWidth, this.collisionHeight);
+  }
   drawHp(){
     if(this != this.handler.character){
       this.handler.ctx.fillStyle = "rgb(90,0,0)";
@@ -36,10 +42,6 @@ class Mob {
 
     	this.handler.ctx.fillStyle = "rgb(255,0,0)";
     	this.handler.ctx.fillRect(this.renderX ,this.renderY - this.height/8, this.width * this.health/this.maxHealth,	Math.min(4,Math.max(Math.floor(this.height/15),1)));
-
-    	this.handler.collisionCtx.fillStyle = "rgba(1,0,0,1.0)";
-    	//this.handler.collisionCtx.fillRect(this.handler.scale*(this.renderX + (this.width - this.collisionWidth)/2),this.handler.scale*(this.renderY + (this.height - this.collisionHeight - this.height/10)), this.collisionWidth*this.handler.scale, this.collisionHeight*this.handler.scale)
-    	this.handler.collisionCtx.fillRect(this.renderX + (this.width - this.collisionWidth)/2,this.renderY + (this.height*0.9 - this.collisionHeight), this.collisionWidth, this.collisionHeight);
     }
   }
 
