@@ -203,15 +203,17 @@ socket.on("getPlayerID",async (data) => {
 
 
   socket.on('userData', (playerData) => {
-    var connectedPlayersData = levels[findMapNameByPlayerId[playerData.id]].players;
-    if(connectedPlayersData[playerData.id]){
 
+    if(findMapNameByPlayerId[playerData.id]){
+      var connectedPlayersData = levels[findMapNameByPlayerId[playerData.id]].players;
       connectedPlayersData[playerData.id].gameData.x = playerData.x;
       connectedPlayersData[playerData.id].gameData.y = playerData.y;
       connectedPlayersData[playerData.id].gameData.currentSprite = playerData.currentSprite;
       connectedPlayersData[playerData.id].gameData.rangeOfSeeingWidth = playerData.rangeOfSeeingWidth;
       connectedPlayersData[playerData.id].gameData.rangeOfSeeingHeight = playerData.rangeOfSeeingHeight;
       connectedPlayersData[playerData.id].active = true;
+    }else{
+      socket.emit("someKindOfLogout");//TODO 
     }
   });
 
