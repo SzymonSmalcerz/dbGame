@@ -444,7 +444,7 @@ class Dragon extends Enemy{
   constructor(id,x,y,playersInMap,enemiesData,statics,tableOfSockets,callbackOnDeath){
     super(playersInMap,enemiesData,tableOfSockets,statics,id,EnemySprites.dragon,x,y,callbackOnDeath,50,50);
     this.type = "dragon";
-    this.experience = 200000000;
+    this.experience = 2000;
     this.health = 700;
     this.maxHealth = 700;
     this.damage = 5;
