@@ -199,6 +199,13 @@ const Game = {
       level.moveX -= player.speed;
       player.renderX -= player.speed;
   	}
+
+    for(var i=0;i<level.allEntities.length;i++){
+      if(level.allEntities[i] !== player){
+        level.allEntities[i].renderX = level.allEntities[i].x + level.moveX;
+        level.allEntities[i].renderY = level.allEntities[i].y + level.moveY;
+      }
+    }
   },
   handleTilesLevelsAndOther : function(){
     Game.handler.tiles.G = new Tile(0,0);
@@ -490,3 +497,24 @@ const Game = {
 
   }
 }
+
+
+window.addEventListener("resize", function(){
+
+  Game.handler.currentLevel.moveX = 0;
+  Game.handler.currentLevel.moveY = 0;
+  Game.handler.character.renderX = Game.handler.character.x;
+  Game.handler.character.renderY = Game.handler.character.y;
+
+  Game.handleMoveXandMoveY();
+
+  Game.handler.canvas.width = window.innerWidth;
+  Game.handler.canvas.height = window.innerHeight;
+
+  Game.handler.referencedWidth = Math.min(Game.handler.canvas.width, Game.handler.canvas.height);
+
+  Game.handler.collisionCanvas.width = window.innerWidth;
+  Game.handler.collisionCanvas.height = window.innerHeight;
+
+  Game.handler.ctx.font =  Game.handler.referencedWidth/25 + "px Arial";
+});
