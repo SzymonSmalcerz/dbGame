@@ -1,45 +1,5 @@
 const {EnemySprites} = require("./Sprites");
-
-const Static = {
-  getTreeData : function(x,y){
-    return {
-
-        type : "tree",
-        x : x,
-        y: y,
-        collisionHeight : 64/8,//collision height
-        collisionWidth : 128/3, //collision width
-        width : 128, //width
-        height : 128//height
-
-    }
-  },getHouse1Data : function(x,y){
-    return {
-
-        type : "house1",
-        x : x,
-        y: y,
-        collisionHeight : 128/5,//collision height
-        collisionWidth : 128/1.05, //collision width
-        width : 128, //width
-        height : 128//height
-
-    }
-  },getHouse2Data : function(x,y){
-    return {
-
-        type : "house2",
-        x : x,
-        y: y,
-        collisionHeight : 210/5,//collision height
-        collisionWidth : 128*0.87, //collision width
-        width : 128, //width
-        height : 210//height
-
-    }
-  }
-}
-
+const Static = require("./serverSideStatic");
 const playerStatics = {
   width : 32,
   height : 32,
@@ -107,6 +67,7 @@ class Enemy{
 
         if (!this.statics.hasOwnProperty(staticEntityID)) continue;
         var staticEntity = this.statics[staticEntityID]
+        if(staticEntity.collisionWidth == 0) continue;
         var de = this.y + this.height * 0.9;
         var ge = de - this.collisionHeight;
         var ds = staticEntity.y + staticEntity.height * 0.9;
@@ -122,7 +83,8 @@ class Enemy{
       for(var staticEntityID in this.statics){
 
         if (!this.statics.hasOwnProperty(staticEntityID)) continue;
-        var staticEntity = this.statics[staticEntityID]
+        var staticEntity = this.statics[staticEntityID];
+        if(staticEntity.collisionWidth == 0) continue;
         var de = this.y + this.height * 0.9;
         var ge = de - this.collisionHeight;
         var ds = staticEntity.y + staticEntity.height * 0.9;
@@ -138,7 +100,8 @@ class Enemy{
       for(var staticEntityID in this.statics){
 
         if (!this.statics.hasOwnProperty(staticEntityID)) continue;
-        var staticEntity = this.statics[staticEntityID]
+        var staticEntity = this.statics[staticEntityID];
+        if(staticEntity.collisionWidth == 0) continue;
         var le = this.x + this.width/2 - this.collisionWidth/2;
         var pe = this.x + this.width/2 + this.collisionWidth/2;
         var ls = staticEntity.x + staticEntity.width/2 - staticEntity.collisionWidth/2;
@@ -155,7 +118,8 @@ class Enemy{
       for(var staticEntityID in this.statics){
 
         if (!this.statics.hasOwnProperty(staticEntityID)) continue;
-        var staticEntity = this.statics[staticEntityID]
+        var staticEntity = this.statics[staticEntityID];
+        if(staticEntity.collisionWidth == 0) continue;
         var le = this.x + this.width/2 - this.collisionWidth/2;
         var pe = this.x + this.width/2 + this.collisionWidth/2;
         var ls = staticEntity.x + staticEntity.width/2 - staticEntity.collisionWidth/2;
@@ -480,7 +444,7 @@ class Dragon extends Enemy{
   constructor(id,x,y,playersInMap,enemiesData,statics,tableOfSockets,callbackOnDeath){
     super(playersInMap,enemiesData,tableOfSockets,statics,id,EnemySprites.dragon,x,y,callbackOnDeath,50,50);
     this.type = "dragon";
-    this.experience = 2000;
+    this.experience = 200000000;
     this.health = 700;
     this.maxHealth = 700;
     this.damage = 5;

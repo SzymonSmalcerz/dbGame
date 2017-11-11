@@ -78,6 +78,10 @@ var userSchema = new mongoose.Schema({
   y : {
     type : Number,
     default : 100
+  },
+  currentLevelMapName : {
+    type : String,
+    default : "firstMap"
   }
 });
 

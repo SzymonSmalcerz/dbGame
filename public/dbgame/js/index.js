@@ -220,7 +220,7 @@ const Game = {
   handleSockets : function() {
 
     socket.on("playerCreation", (newPlayerData) => {
-      
+
       var playerID = newPlayerData.id;
       if(!Game.handler.players[playerID]){
         console.log("NEW PLAYER HAS BEEN CREATED");
@@ -329,6 +329,24 @@ const Game = {
           staticEntity = new House1(staticData[i].x, staticData[i].y);
         }else if(staticData[i].type == "house2"){
           staticEntity = new House2(staticData[i].x, staticData[i].y);
+        }else if(staticData[i].type == "skeleton1"){
+          staticEntity = new Skeleton1(staticData[i].x, staticData[i].y);
+        }else if(staticData[i].type == "skeleton2"){
+          staticEntity = new Skeleton2(staticData[i].x, staticData[i].y);
+        }else if(staticData[i].type == "skeleton3"){
+          staticEntity = new Skeleton3(staticData[i].x, staticData[i].y);
+        }else if(staticData[i].type == "bigSkeleton1"){
+          staticEntity = new BigSkeleton1(staticData[i].x, staticData[i].y);
+        }else if(staticData[i].type == "rock1"){
+          staticEntity = new Rock1(staticData[i].x, staticData[i].y);
+        }else if(staticData[i].type == "dessertPlant1"){
+          staticEntity = new DessertPlant1(staticData[i].x, staticData[i].y);
+        }else if(staticData[i].type == "dessertPlant2"){
+          staticEntity = new DessertPlant2(staticData[i].x, staticData[i].y);
+        }else if(staticData[i].type == "cactus1"){
+          staticEntity = new Cactus1(staticData[i].x, staticData[i].y);
+        }else if(staticData[i].type == "dessertSign"){
+          staticEntity = new DessertSign(staticData[i].x, staticData[i].y);
         }else{
           continue;
         }

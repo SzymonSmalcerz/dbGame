@@ -44,7 +44,8 @@ class Level{
   	var temp;
   	for(var i =0;i<this.allEntities.length;i++){
   		for(var j=0;j<this.allEntities.length;j++){
-  			if(this.allEntities[i] && this.allEntities[j] && this.allEntities[i].y + this.allEntities[i].height < this.allEntities[j].y + this.allEntities[j].height){
+        //flat rendering => tile on tile we do not want it to be sorted
+  			if((this.allEntities[i].flatRendering  || (this.allEntities[i] && this.allEntities[j] && this.allEntities[i].y + this.allEntities[i].height < this.allEntities[j].y + this.allEntities[j].height)) && !this.allEntities[j].flatRendering){
   				temp = this.allEntities[i];
   				this.allEntities[i] = this.allEntities[j];
   				this.allEntities[j] = temp;
@@ -76,7 +77,7 @@ class Level{
   			if((j*32 + this.moveX) * this.handler.scale >= -(32*this.handler.scale) && (j*32 + this.moveX) * this.handler.scale <= window.innerWidth + (32*this.handler.scale)
   				&& ( i*32 + this.moveY) * this.handler.scale >= -(32*this.handler.scale) &&  (i*32 + this.moveY) * this.handler.scale <= window.innerHeight + (32*this.handler.scale)){
   				this.handler.tiles[this.tiles[i][j]].draw(j*32 + this.moveX, i*32 + this.moveY);
-          
+
   			}
 
   		}

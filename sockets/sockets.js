@@ -14,8 +14,10 @@ var tableOfSockets = {};
 var levels = {};
 var level1 = new Level.LevelFirst(tableOfSockets);
 var level2 = new Level.LevelSecond(tableOfSockets);
+var levelDragon = new Level.LevelDragon(tableOfSockets);
 levels[level1.name] = level1;
 levels[level2.name] = level2;
+levels[levelDragon.name] = levelDragon;
 var allPlayers = {};
 var serverStarted = false;
 var findMapNameByPlayerId = {};
@@ -29,7 +31,7 @@ socket.on("changeLevel", (data) => {
 
   var oldMapName = findMapNameByPlayerId[data.idOfPlayer];
   var player = levels[oldMapName].players[data.idOfPlayer].gameData;
-  if(allPlayers[player.id].lastTime + 5000 > new Date().getTime()){
+  if(allPlayers[player.id].lastTime + 500 > new Date().getTime()){
     return;
   }
 
@@ -58,7 +60,7 @@ socket.on("changeLevel", (data) => {
   player.y = nextLevelData.playerNewY;
   player.currentLevelMapName = nextLevelData.nextMapName;
   player.currentMapLevel = levels[nextLevelData.nextMapName].tilesAndTeleportCoords;
-  tableOfSockets[data.idOfPlayer].emit("changeMapLevel",{
+  socket.emit("changeMapLevel",{
     levelData : player.currentMapLevel,
     playerNewX : nextLevelData.playerNewX,
     playerNewY : nextLevelData.playerNewY,
@@ -82,7 +84,7 @@ socket.on("changeLevel", (data) => {
 
 
 
-    tableOfSockets[playerID].emit("playerCreation", player);
+    socket.emit("playerCreation", player);
   }
 
   //END TODO
@@ -106,24 +108,28 @@ socket.on("getPlayerID",async (data) => {
         x : user.x,
         y : user.y,
         id : data.id,
-        collisionHeight : user.collisionHeight,
-        collisionWidth : user.collisionWidth,
-        width : user.width,
-        height : user.height,
+        collisionHeight : user.collisionHeight || 11,
+        collisionWidth : user.collisionWidth || 11,
+        width : user.width || 32,
+        height : user.height || 32,
         currentSprite : [{x:1,y:0}],
-        health : user.maxHealth * (user.level/10 + 1),
-        maxHealth : user.maxHealth * (user.level/10 + 1),
-        healthRegeneration : user.healthRegeneration * (user.level/10 + 1),
-        mana : user.maxMana * (user.level/10 + 1),
-        maxMana : user.maxMana * (user.level/10 + 1),
-        manaRegeneration : user.manaRegeneration * (user.level/10 + 1) * 2,
+        health : user.maxHealth * (user.level/10 + 1) || 1000,
+        maxHealth : user.maxHealth * (user.level/10 + 1) || 1000,
+        healthRegeneration : user.healthRegeneration * (user.level/10 + 1) || 20,
+        mana : user.maxMana * (user.level/10 + 1) || 400,
+        maxMana : user.maxMana * (user.level/10 + 1) || 400,
+        manaRegeneration : user.manaRegeneration * (user.level/10 + 1) * 2 || 5,
         speed : Math.min(Math.floor(7 + user.level/4),10),
-        level : user.level,
-        experience : user.experience,
-        requiredExperience : user.level * 2 * 500,
-        damage : 30 + 3*user.level,
-        currentLevelMapName : "firstMap",
-        currentMapLevel : levels["firstMap"].tilesAndTeleportCoords
+        level : user.level || 1,
+        experience : user.experience || 0,
+        requiredExperience : user.level * 2 * 500 || 1000,
+        damage : 30 + 3*user.level || 30 + 3,
+        currentLevelMapName : user.currentLevelMapName || "firstMap",
+      }
+      if(user.currentLevelMapName){
+        playerData.currentMapLevel = levels[user.currentLevelMapName].tilesAndTeleportCoords;
+      }else{
+        playerData.currentMapLevel = levels["firstMap"].tilesAndTeleportCoords;
       }
       socket.emit("playerID", playerData)
       socket.broadcast.emit("playerCreation",playerData);
@@ -274,6 +280,7 @@ socket.on("getPlayerID",async (data) => {
                 user.y = player.gameData.y;
                 user.level = player.gameData.level;
                 user.experience = player.gameData.experience;
+                user.currentLevelMapName = player.gameData.currentLevelMapName;
                 await user.save();
 
                 console.log("saved statis of :", user._id);
