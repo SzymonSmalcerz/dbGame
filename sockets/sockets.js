@@ -84,7 +84,7 @@ socket.on("changeLevel", (data) => {
 
 
 
-    levels[nextLevelData.nextMapName].tableOfSockets[playerID].emit("playerCreation", player);
+    levels[nextLevelData.nextMapName].socketTable[playerID].emit("playerCreation", player);
   }
 
   //END TODO
