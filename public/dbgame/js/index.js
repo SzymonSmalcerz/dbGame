@@ -178,10 +178,10 @@ const Game = {
   handleMoveXandMoveY(){
     var player = this.handler.character;
     var level  = this.handler.currentLevel;
-    while(player.renderY + player.height >= window.innerHeight/2 ){
+    while(player.renderY + player.height - player.speed >= Math.floor(window.innerHeight/2) + 1 ){
       if(player.y + window.innerHeight/2 + player.height >= level.heightOfMap *  TileStatic.height && player.renderY + player.height <= window.innerHeight){
-        level.moveY -= level.heightOfMap *  TileStatic.height - (player.y + player.height);
-        player.renderY -= level.heightOfMap *  TileStatic.height - (player.y + player.height);
+        level.moveY -= level.heightOfMap *  TileStatic.height - (player.y + player.height + player.speed);
+        player.renderY -= level.heightOfMap *  TileStatic.height - (player.y + player.height + player.speed);
         console.log("break1!");
         break;
       }
@@ -189,10 +189,10 @@ const Game = {
       player.renderY -= player.speed;
   	}
 
-    while(player.renderX + player.width/2 >= window.innerWidth/2 ){
-      if(player.x + window.innerWidth/2 + player.width >= level.widthOfMap *  TileStatic.width &&player.renderX + player.width <= window.innerWidth){
-        level.moveX -= level.widthOfMap *  TileStatic.width - (player.x + player.width);
-        player.renderX -= level.widthOfMap *  TileStatic.width - (player.x + player.width);
+    while(player.renderX + player.width/2 - player.speed >= Math.floor(window.innerWidth/2) + 1 ){
+      if(player.x + window.innerWidth/2 + player.width  >= level.widthOfMap *  TileStatic.width &&player.renderX + player.width <= window.innerWidth){
+        level.moveX -= level.widthOfMap *  TileStatic.width - (player.x + player.width + player.speed);
+        player.renderX -= level.widthOfMap *  TileStatic.width - (player.x + player.width + player.speed);
         console.log("break2!");
         break;
       }

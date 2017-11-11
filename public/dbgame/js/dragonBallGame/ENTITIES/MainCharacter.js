@@ -140,7 +140,8 @@ class MainCharacter extends Mob{
     var canMove = false;
     //console.log(this.idle);
   	if(x > 0){
-  		if(this.handler.collisionCtx.getImageData(this.renderX + this.speed + (this.width + this.collisionWidth)/2,this.renderY + this.height*0.9 - this.collisionHeight/2,1,1).data[0] !== 1 &&
+  		if(this.x < this.handler.currentLevel.widthOfMap * TileStatic.width - this.width &&
+         this.handler.collisionCtx.getImageData(this.renderX + this.speed + (this.width + this.collisionWidth)/2,this.renderY + this.height*0.9 - this.collisionHeight/2,1,1).data[0] !== 1 &&
   		   this.handler.collisionCtx.getImageData(this.renderX + this.speed + (this.width + this.collisionWidth)/2,this.renderY + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1 &&
   		   this.handler.collisionCtx.getImageData(this.renderX + this.speed + (this.width + this.collisionWidth)/2,this.renderY + this.height*0.9,1,1).data[0] !== 1)
   			{
@@ -149,7 +150,9 @@ class MainCharacter extends Mob{
   				this.currentSprite = this.right;
   			}
   	}else if(x < 0){
-  		if(this.handler.collisionCtx.getImageData(this.renderX - this.speed + (this.width - this.collisionWidth)/2,this.renderY + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1 &&
+  		if(
+         this.x  > 0 &&
+         this.handler.collisionCtx.getImageData(this.renderX - this.speed + (this.width - this.collisionWidth)/2,this.renderY + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1 &&
   		   this.handler.collisionCtx.getImageData(this.renderX - this.speed + (this.width - this.collisionWidth)/2,this.renderY + this.height*0.9 - this.collisionHeight/2,1,1).data[0] !== 1 &&
   		   this.handler.collisionCtx.getImageData(this.renderX - this.speed + (this.width - this.collisionWidth)/2,this.renderY + this.height*0.9,1,1).data[0] !== 1)
   			{
@@ -158,7 +161,9 @@ class MainCharacter extends Mob{
   				this.currentSprite = this.left;
   			}
   	}else if(y > 0){
-  		if(this.handler.collisionCtx.getImageData(this.renderX + (this.width + this.collisionWidth)/2,this.renderY + this.speed + this.height*0.9,1,1).data[0] !== 1 &&
+  		if(
+         this.y < this.handler.currentLevel.heightOfMap * TileStatic.height - this.height &&
+         this.handler.collisionCtx.getImageData(this.renderX + (this.width + this.collisionWidth)/2,this.renderY + this.speed + this.height*0.9,1,1).data[0] !== 1 &&
   		   this.handler.collisionCtx.getImageData(this.renderX + (this.width )/2,this.renderY + this.speed + this.height*0.9,1,1).data[0] !== 1 &&
   		   this.handler.collisionCtx.getImageData(this.renderX + (this.width - this.collisionWidth)/2,this.renderY + this.speed + this.height*0.9,1,1).data[0] !== 1)
   			{
@@ -168,7 +173,8 @@ class MainCharacter extends Mob{
   			}
   	}else if(y < 0){
 
-  		if(this.handler.collisionCtx.getImageData(this.renderX + (this.width + this.collisionWidth)/2,this.renderY - this.speed + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1 &&
+  		if(this.y > 0&&
+         this.handler.collisionCtx.getImageData(this.renderX + (this.width + this.collisionWidth)/2,this.renderY - this.speed + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1 &&
   		   this.handler.collisionCtx.getImageData(this.renderX + (this.width)/2,this.renderY - this.speed + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1 &&
   		   this.handler.collisionCtx.getImageData(this.renderX + (this.width - this.collisionWidth)/2,this.renderY - this.speed + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1)
   			{
