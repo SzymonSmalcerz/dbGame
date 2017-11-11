@@ -528,6 +528,10 @@ const Game = {
     this.handler.canvas.height = this.handler.gameCanvasesHeight;
     this.handler.collisionCanvas.width = this.handler.gameCanvasesWidth;
     this.handler.collisionCanvas.height = this.handler.gameCanvasesHeight;
+    this.handler.itemCanvas.height = this.handler.gameCanvasesHeight;
+    this.handler.eqCanvas.width = this.handler.gameCanvasesWidth;
+    this.handler.eqCanvas.height = this.handler.gameCanvasesHeight;
+    this.handler.itemCanvas.width = this.handler.gameCanvasesWidth;
   }
 }
 
