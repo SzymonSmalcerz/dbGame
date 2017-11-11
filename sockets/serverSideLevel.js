@@ -283,7 +283,7 @@ class LevelDragon extends Level{
   checkForEnemies(){
     super.checkForEnemies();
     this.respawnFrame += 1;
-    if(this.numberOfDragons < 75 && this.respawnFrame > 40){
+    if(this.numberOfDragons < 200 && this.respawnFrame > 1){
       this.respawnFrame = 0;
       var x = Math.floor(Math.random() * 1000 + 200);
       var y = Math.floor(Math.random() * 1000 + 200);
