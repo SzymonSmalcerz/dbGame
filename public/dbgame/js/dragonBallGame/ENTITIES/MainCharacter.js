@@ -191,8 +191,8 @@ class MainCharacter extends Mob{
       x : this.x,
       y : this.y,
       currentSprite : this.currentSprite,
-      rangeOfSeeingWidth : window.innerWidth/2,
-      rangeOfSeeingHeight : window.innerHeight/2
+      rangeOfSeeingWidth : this.handler.widthOfDisplayWindow/2,
+      rangeOfSeeingHeight : this.handler.heightOfDisplayWindow/2
     });
   }
 

@@ -46,6 +46,8 @@ const Game = {
 
 
 		//technicals
+    widthOfDisplayWindow : 500,
+    heightOfDisplayWindow : 200,
 		fps : 20,
 		lastTime : 0,
 		globalTickCounter : 0, //used only for animations for tiles (nor for mobs)
@@ -54,6 +56,10 @@ const Game = {
 
 
   init : function(){
+
+    Object.freeze(Game.handler.widthOfDisplayWindow);
+    Object.freeze(Game.handler.heightOfDisplayWindow);
+
     Game.handler.oldWidthOfMap = null;
 		Game.handler.currentWidthOfMap = window.innerWidth;
 		Game.handler.oldHeightOfMap = null;
@@ -75,17 +81,27 @@ const Game = {
     Game.handler.itemCanvas = document.getElementById("citem");
     if(!Game.handler.itemCanvas){
       Game.handler.itemCanvas = document.createElement("canvas");
-      Game.handler.itemCanvas.setAttribute("id", "ccoll");
+      Game.handler.itemCanvas.setAttribute("id", "citem");
     }
     Game.handler.itemCtx = Game.handler.itemCanvas.getContext('2d');
     Game.handler.itemCanvas.width = window.innerWidth;
     Game.handler.itemCanvas.height = window.innerHeight;
     document.body.appendChild(Game.handler.itemCanvas);
+    //mapCavas
+    Game.handler.mapCanvas = document.getElementById("cmap");
+    if(!Game.handler.mapCanvas){
+      Game.handler.mapCanvas = document.createElement("canvas");
+      Game.handler.mapCanvas.setAttribute("id", "cmap");
+    }
+    Game.handler.mapCtx = Game.handler.mapCanvas.getContext('2d');
+    Game.handler.mapCanvas.width = window.innerWidth;
+    Game.handler.mapCanvas.height = window.innerHeight;
+    document.body.appendChild(Game.handler.mapCanvas);
     //eq canvas
     Game.handler.eqCanvas = document.getElementById("ceq");
     if(!Game.handler.eqCanvas){
       Game.handler.eqCanvas = document.createElement("canvas");
-      Game.handler.eqCanvas.setAttribute("id", "ccoll");
+      Game.handler.eqCanvas.setAttribute("id", "ceq");
     }
     Game.handler.eqCtx = Game.handler.eqCanvas.getContext('2d');
     Game.handler.eqCanvas.width = window.innerWidth;
@@ -201,6 +217,7 @@ const Game = {
     this.handler.character = new MainCharacter(playerData);
   },
   handleMoveXandMoveY(){
+    
     var player = this.handler.character;
     var level  = this.handler.currentLevel;
 

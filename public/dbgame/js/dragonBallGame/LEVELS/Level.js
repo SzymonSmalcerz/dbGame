@@ -68,33 +68,65 @@ class Level{
 
 
 
-
+  //draw ^^
   draw(){
 
+    //we dont want to draw unneeded tiles and entities so we must declare leftBorderOfDisplayWindow etc
+    //we want to draw tiles and entities inside rectangle with width:(leftBorderOfDisplayWindow to right..)
+    //and height : (top.. to bottom..)
+    //of cource this rectangle must be at the center of the screen
+
+      //creating 4 border points and putting them relatively from the center of the screen
+      var leftBorderOfDisplayWindow = window.innerWidth/2 - this.handler.widthOfDisplayWindow/2;
+      var rightBorderOfDisplayWindow = window.innerWidth/2 + this.handler.widthOfDisplayWindow/2;
+
+      var topBorderOfDisplayWindow = window.innerHeight/2 - this.handler.heightOfDisplayWindow/2;
+      var bottomBorderOfDisplayWindow = window.innerHeight/2 + this.handler.heightOfDisplayWindow/2;
+
+
+
+
+
+
     this.handler.camera.tick();
+
+    //32 is the width and height of tile rectangle, we can assume that it wont change, so we will not
+    //stretch for this value to Tile.js file but we will statically type in 32 (faster loading)
   	for(var i = 0;i < this.tiles.length; i++){
   		for(var j = 0;j < this.tiles[i].length; j++){
-  			if((j*32 + this.moveX) * this.handler.scale >= -(32*this.handler.scale) && (j*32 + this.moveX) * this.handler.scale <= window.innerWidth + (32*this.handler.scale)
-  				&& ( i*32 + this.moveY) * this.handler.scale >= -(32*this.handler.scale) &&  (i*32 + this.moveY) * this.handler.scale <= window.innerHeight + (32*this.handler.scale)){
-  				this.handler.tiles[this.tiles[i][j]].draw(j*32 + this.moveX, i*32 + this.moveY);
-
+  			if(  (j*32 + this.moveX) >= leftBorderOfDisplayWindow - 32
+          && (j*32 + this.moveX) <= rightBorderOfDisplayWindow + 32
+  			  && (i*32 + this.moveY) >= topBorderOfDisplayWindow - 32
+          && (i*32 + this.moveY) <= bottomBorderOfDisplayWindow + 32){
+  				      this.handler.tiles[this.tiles[i][j]].draw(j*32 + this.moveX, i*32 + this.moveY);
   			}
 
   		}
   	}
 
-    this.handleEntities();
+
+    this.handleEntities();//description of handleEntities above function declaration
+
   	for(var i=0;i<this.allEntities.length;i++){
-  		if(this.allEntities[i] && this.allEntities[i].renderX>= -(this.allEntities[i].width) && this.allEntities[i].renderX <= window.innerWidth + this.allEntities[i].width
-  					&& this.allEntities[i].renderY>= -(this.allEntities[i].height) &&  this.allEntities[i].renderY<= window.innerHeight + this.allEntities[i].height){
-  			this.allEntities[i].draw();
+      var entityTemp = this.allEntities[i];
+  		if(   entityTemp
+         && entityTemp.renderX >= leftBorderOfDisplayWindow - entityTemp.width
+         && entityTemp.renderX <= rightBorderOfDisplayWindow + entityTemp.width
+  			 && entityTemp.renderY >= topBorderOfDisplayWindow - entityTemp.height
+         && entityTemp.renderY <= bottomBorderOfDisplayWindow + entityTemp.height){
+  			      entityTemp.draw();
   		}
 
   	};
 
   }
 
+
+  //this function just adds all of entities into one table and then sorts this table
+  //this one SORTED table of entities is usefull when drawing map
   handleEntities(){
+
+
     this.allEntities = [];
 
 
