@@ -39,7 +39,8 @@ class MainCharacter extends Mob{
 
   tick(){
     //TEMPORARY ADDED BELOW @@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    this.emitDataToOthers();
+
+
 
     this.currentSprite = this.idle;
 
@@ -49,18 +50,13 @@ class MainCharacter extends Mob{
 
     if(this.isRegeneratingMana ){
   		this.manageRegenerationMana();
-  		return;
-  	}
-
-    if(this.usingSkill && this.mana >= 3){
+  	}else if(this.usingSkill && this.mana >= 3){
   		this.manageSkills();
-  		return;
-  	}
-
-    if(this.isFighting){
+  	}else if(this.isFighting){
       this.manageFighting();
-  		return;
     }
+
+    this.emitDataToOthers();
   }
 
   manageFighting(){
@@ -137,47 +133,70 @@ class MainCharacter extends Mob{
   move(x,y){
 
   	this.currentSprite = this.idle;
-    var canMove = false;
-    //console.log(this.idle);
+    var canMove = true;
+    var allEntities = this.handler.currentLevel.allEntities;
+    var mainCharacter = this;
   	if(x > 0){
-  		if(this.x < this.handler.currentLevel.widthOfMap * TileStatic.width - this.width &&
-         this.handler.collisionCtx.getImageData(this.renderX + this.speed + (this.width + this.collisionWidth)/2,this.renderY + this.height*0.9 - this.collisionHeight/2,1,1).data[0] !== 1 &&
-  		   this.handler.collisionCtx.getImageData(this.renderX + this.speed + (this.width + this.collisionWidth)/2,this.renderY + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1 &&
-  		   this.handler.collisionCtx.getImageData(this.renderX + this.speed + (this.width + this.collisionWidth)/2,this.renderY + this.height*0.9,1,1).data[0] !== 1)
-  			{
-  				this.x += this.speed;
-  				this.renderX += this.speed;
-  				this.currentSprite = this.right;
-  			}
+
+      allEntities.forEach(function(entity){
+        if(entity === mainCharacter){
+          return;
+        }
+        if(Helper.areTwoEntitiesInRange(mainCharacter,entity,{x:mainCharacter.speed, y:0})){
+          canMove = false;
+        }
+      });
+
+      if(canMove){
+        this.x += this.speed;
+        this.renderX += this.speed;
+        this.currentSprite = this.right;
+      }
+
   	}else if(x < 0){
-  		if(
-         this.x  > 0 &&
-         this.handler.collisionCtx.getImageData(this.renderX - this.speed + (this.width - this.collisionWidth)/2,this.renderY + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1 &&
-  		   this.handler.collisionCtx.getImageData(this.renderX - this.speed + (this.width - this.collisionWidth)/2,this.renderY + this.height*0.9 - this.collisionHeight/2,1,1).data[0] !== 1 &&
-  		   this.handler.collisionCtx.getImageData(this.renderX - this.speed + (this.width - this.collisionWidth)/2,this.renderY + this.height*0.9,1,1).data[0] !== 1)
-  			{
-  				this.x -= this.speed;
+
+      allEntities.forEach(function(entity){
+        if(entity === mainCharacter){
+          return;
+        }
+        if(Helper.areTwoEntitiesInRange(mainCharacter,entity,{x: (-mainCharacter.speed), y:0})){
+          canMove = false;
+        }
+      });
+
+      if(canMove){
+          this.x -= this.speed;
           this.renderX -= this.speed;
   				this.currentSprite = this.left;
   			}
   	}else if(y > 0){
-  		if(
-         this.y < this.handler.currentLevel.heightOfMap * TileStatic.height - this.height &&
-         this.handler.collisionCtx.getImageData(this.renderX + (this.width + this.collisionWidth)/2,this.renderY + this.speed + this.height*0.9,1,1).data[0] !== 1 &&
-  		   this.handler.collisionCtx.getImageData(this.renderX + (this.width )/2,this.renderY + this.speed + this.height*0.9,1,1).data[0] !== 1 &&
-  		   this.handler.collisionCtx.getImageData(this.renderX + (this.width - this.collisionWidth)/2,this.renderY + this.speed + this.height*0.9,1,1).data[0] !== 1)
-  			{
+
+      allEntities.forEach(function(entity){
+        if(entity === mainCharacter){
+          return;
+        }
+        if(Helper.areTwoEntitiesInRange(mainCharacter,entity,{x:0, y:mainCharacter.speed})){
+          canMove = false;
+        }
+      });
+
+        if(canMove){
           this.y += this.speed;
           this.renderY += this.speed;
   				this.currentSprite = this.down;
   			}
   	}else if(y < 0){
 
-  		if(this.y > 0&&
-         this.handler.collisionCtx.getImageData(this.renderX + (this.width + this.collisionWidth)/2,this.renderY - this.speed + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1 &&
-  		   this.handler.collisionCtx.getImageData(this.renderX + (this.width)/2,this.renderY - this.speed + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1 &&
-  		   this.handler.collisionCtx.getImageData(this.renderX + (this.width - this.collisionWidth)/2,this.renderY - this.speed + this.height*0.9 - this.collisionHeight,1,1).data[0] !== 1)
-  			{
+      allEntities.forEach(function(entity){
+        if(entity === mainCharacter){
+          return;
+        }
+        if(Helper.areTwoEntitiesInRange(mainCharacter,entity,{x:0, y:(-mainCharacter.speed)})){
+          canMove = false;
+        }
+      });
+
+  		if(canMove){
   				this.y -= this.speed;
           this.renderY -= this.speed;
   				this.currentSprite = this.up;

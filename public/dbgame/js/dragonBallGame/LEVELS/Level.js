@@ -126,29 +126,30 @@ class Level{
   //this one SORTED table of entities is usefull when drawing map
   handleEntities(){
 
-
-    this.allEntities = [];
+    var tempArrayOfEntities = [];
+    var tempArrayOfEnemies = [];
+    var tempArrayOfSkills = [];
 
 
     for(var i=0;i< this.players.length; i++){
-  		this.allEntities.push(this.players[i]);
+  		tempArrayOfEntities.push(this.players[i]);
   	}
 
   	for(var i=0;i< this.statics.length; i++){
-  		this.allEntities.push(this.statics[i]);
+  		tempArrayOfEntities.push(this.statics[i]);
   	}
-    this.enemies = [];
+
     for(var enemyID in this.handler.enemies){
 
       if (!this.handler.enemies.hasOwnProperty(enemyID)) continue;
       var enemy = this.handler.enemies[enemyID];
 
-      this.enemies.push(enemy);
+      tempArrayOfEnemies.push(enemy);
 
     }
 
     for(var i=0;i< this.enemies.length; i++){
-      this.allEntities.push(this.enemies[i]);
+      tempArrayOfEntities.push(this.enemies[i]);
     }
 
     this.skillTable = [];
@@ -157,14 +158,16 @@ class Level{
       if (!this.handler.skillTable.hasOwnProperty(skillID)) continue;
       var skill = this.handler.skillTable[skillID];
 
-      this.skillTable.push(skill);
+      tempArrayOfSkills.push(skill);
 
     }
   	for(var i=0;i< this.skillTable.length; i++){
-  		this.allEntities.push(this.skillTable[i]);
+  		tempArrayOfEntities.push(this.skillTable[i]);
   	}
 
-
+    this.skillTable = tempArrayOfSkills;
+    this.enemies = tempArrayOfEnemies;
+    this.allEntities = tempArrayOfEntities;
   	this.sortEntityTable();
   }
 

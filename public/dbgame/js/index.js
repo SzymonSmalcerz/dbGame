@@ -47,7 +47,7 @@ const Game = {
 
 		//technicals
     widthOfDisplayWindow : 500,
-    heightOfDisplayWindow : 200,
+    heightOfDisplayWindow : 350,
 		fps : 20,
 		lastTime : 0,
 		globalTickCounter : 0, //used only for animations for tiles (nor for mobs)
@@ -65,7 +65,7 @@ const Game = {
 		Game.handler.oldHeightOfMap = null;
 		Game.handler.currentHeightOfMap = window.innerHeight;
 
-
+    //collision canvas
     Game.handler.collisionCanvas = document.getElementById("ccoll");
     if(!Game.handler.collisionCanvas){
       Game.handler.collisionCanvas = document.createElement("canvas");
@@ -77,37 +77,7 @@ const Game = {
     Game.handler.collisionCanvas.width = window.innerWidth;
     Game.handler.collisionCanvas.height = window.innerHeight;
     document.body.appendChild(Game.handler.collisionCanvas);
-    //item canvas
-    Game.handler.itemCanvas = document.getElementById("citem");
-    if(!Game.handler.itemCanvas){
-      Game.handler.itemCanvas = document.createElement("canvas");
-      Game.handler.itemCanvas.setAttribute("id", "citem");
-    }
-    Game.handler.itemCtx = Game.handler.itemCanvas.getContext('2d');
-    Game.handler.itemCanvas.width = window.innerWidth;
-    Game.handler.itemCanvas.height = window.innerHeight;
-    document.body.appendChild(Game.handler.itemCanvas);
-    //mapCavas
-    Game.handler.mapCanvas = document.getElementById("cmap");
-    if(!Game.handler.mapCanvas){
-      Game.handler.mapCanvas = document.createElement("canvas");
-      Game.handler.mapCanvas.setAttribute("id", "cmap");
-    }
-    Game.handler.mapCtx = Game.handler.mapCanvas.getContext('2d');
-    Game.handler.mapCanvas.width = window.innerWidth;
-    Game.handler.mapCanvas.height = window.innerHeight;
-    document.body.appendChild(Game.handler.mapCanvas);
-    //eq canvas
-    Game.handler.eqCanvas = document.getElementById("ceq");
-    if(!Game.handler.eqCanvas){
-      Game.handler.eqCanvas = document.createElement("canvas");
-      Game.handler.eqCanvas.setAttribute("id", "ceq");
-    }
-    Game.handler.eqCtx = Game.handler.eqCanvas.getContext('2d');
-    Game.handler.eqCanvas.width = window.innerWidth;
-    Game.handler.eqCanvas.height = window.innerHeight;
-    document.body.appendChild(Game.handler.eqCanvas);
-    Game.handler.eqCanvas.style.display = "none";
+
 
     //main canvas
     Game.handler.canvas = document.getElementById("cnorm");
@@ -125,12 +95,6 @@ const Game = {
     Game.handler.canvas.width = window.innerWidth;
     Game.handler.canvas.height = window.innerHeight;
     document.body.appendChild(Game.handler.canvas);
-
-    // Game.handler.collisionCanvas = document.createElement("canvas");
-		// Game.handler.collisionCanvas.width = window.innerWidth;
-		// Game.handler.collisionCanvas.height = window.innerHeight;
-		// Game.handler.collisionCtx = Game.handler.collisionCanvas.getContext('2d');
-		// document.body.appendChild(Game.handler.collisionCanvas);
 
     Game.handler.gameCanvasesWidth = window.innerWidth;
     Game.handler.gameCanvasesHeight = window.innerHeight;
@@ -154,8 +118,7 @@ const Game = {
 
 
 		if(time - Game.handler.lastTime > 1000/Game.handler.fps){
-      Game.handler.itemCtx.fillStyle = "rgba(0,0,0,1.0)";
-      Game.handler.itemCtx.fillRect(0,0,Game.handler.itemCanvas.width,Game.handler.itemCanvas.height);
+
       Game.handler.collisionCtx.fillStyle = "rgba(0,120,120,1.0)";
       Game.handler.collisionCtx.fillRect(0,0,Game.handler.collisionCanvas.width,Game.handler.collisionCanvas.height);
       Game.handler.collisionCtx.fillStyle = "rgba(1,0,0,0.2)";
@@ -164,6 +127,7 @@ const Game = {
 
       Game.handler.globalTickCounter += 1;
 			Game.drawMenu();
+
 
 		}
 	},
@@ -217,7 +181,7 @@ const Game = {
     this.handler.character = new MainCharacter(playerData);
   },
   handleMoveXandMoveY(){
-    
+
     var player = this.handler.character;
     var level  = this.handler.currentLevel;
 
@@ -545,32 +509,22 @@ const Game = {
     this.handler.canvas.height = this.handler.gameCanvasesHeight;
     this.handler.collisionCanvas.width = this.handler.gameCanvasesWidth;
     this.handler.collisionCanvas.height = this.handler.gameCanvasesHeight;
-    this.handler.itemCanvas.height = this.handler.gameCanvasesHeight;
-    this.handler.eqCanvas.width = this.handler.gameCanvasesWidth;
-    this.handler.eqCanvas.height = this.handler.gameCanvasesHeight;
-    this.handler.itemCanvas.width = this.handler.gameCanvasesWidth;
   }
 }
 
 window.addEventListener("click", function(event){
-  var x = event.clientX;
-  var y = event.clientY;
-  var data = Game.handler.itemCtx.getImageData(x,y,1,1).data[0];
-  if(data != 0){
-    console.log("WOOORKING :3");
-  }
+  // var x = event.clientX;
+  // var y = event.clientY;
+  // var data = Game.handler.itemCtx.getImageData(x,y,1,1).data[0];
+  // if(data != 0){
+  //   console.log("WOOORKING :3");
+  // }
 
 });
 
 
 window.addEventListener("resize", function(){
-  var temp = 0;
-  if(Game.handler.eqCanvas.style.display == "block"){
-    temp = 200;
-  }
 
-  Game.handler.gameCanvasesWidth += window.innerWidth - Game.handler.gameCanvasesWidth - temp;
-  Game.handler.gameCanvasesHeight += window.innerHeight - Game.handler.gameCanvasesHeight;
   Game.setWidthAndHeightOfCanvases();
 
   Game.handler.currentLevel.moveX = 0;
@@ -581,29 +535,4 @@ window.addEventListener("resize", function(){
   Game.handleMoveXandMoveY();
 
 
-});
-
-window.addEventListener("keypress", function(event){
-  var char = event.key;
-
-  if(char === "i"){
-
-    if(Game.handler.eqCanvas.style.display == "none"){
-      Game.handler.gameCanvasesWidth = Game.handler.gameCanvasesWidth - 200;
-      Game.setWidthAndHeightOfCanvases();
-      Game.handler.eqCanvas.style.display = "block";
-    }else{
-      Game.handler.gameCanvasesWidth = Game.handler.gameCanvasesWidth + 200;
-      Game.setWidthAndHeightOfCanvases();
-      Game.handler.eqCanvas.style.display = "none";
-    }
-
-    Game.setWidthAndHeightOfCanvases();
-    Game.handler.currentLevel.moveX = 0;
-    Game.handler.currentLevel.moveY = 0;
-    Game.handler.character.renderX = Game.handler.character.x;
-    Game.handler.character.renderY = Game.handler.character.y;
-
-    Game.handleMoveXandMoveY();
-  }
 });

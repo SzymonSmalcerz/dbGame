@@ -24,142 +24,140 @@ var findMapNameByPlayerId = {};
 var handleSocketsWork = (socket,io) => {
 
 
-socket.on("changeLevel", (data) => {
+  socket.on("changeLevel", (data) => {
 
-
-
-
-  var oldMapName = findMapNameByPlayerId[data.idOfPlayer];
-  var player = levels[oldMapName].players[data.idOfPlayer].gameData;
-  if(allPlayers[player.id].lastTime + 500 > new Date().getTime()){
-    return;
-  }
-
-  allPlayers[player.id].lastTime = new Date().getTime();
-  if(!levels[oldMapName]){
-    console.log("LEVELS NIE ISTNIEJE ! ");
-    return;
-  }
-  var nextLevelData = levels[oldMapName].getNextLevelData(player.id);
-
-  if(nextLevelData.error) {
-    console.log(nextLevelData.error);
-    return;
-  }
-
-  if(!nextLevelData.nextMapName || !levels[nextLevelData.nextMapName]){
-    console.log("map name nof found");
-    return;
-  }
-
-
-  io.emit("removePlayer", {
-    id : data.idOfPlayer
-  })
-  player.x = nextLevelData.playerNewX;
-  player.y = nextLevelData.playerNewY;
-  player.currentLevelMapName = nextLevelData.nextMapName;
-  player.currentMapLevel = levels[nextLevelData.nextMapName].tilesAndTeleportCoords;
-  socket.emit("changeMapLevel",{
-    levelData : player.currentMapLevel,
-    playerNewX : nextLevelData.playerNewX,
-    playerNewY : nextLevelData.playerNewY,
-    moveX : 0,
-    moveY : 0
-  });
-  levels[nextLevelData.nextMapName].players[data.idOfPlayer] = levels[oldMapName].players[data.idOfPlayer];
-
-  socket.emit("addUsers", levels[nextLevelData.nextMapName].players);
-  socket.emit("addStatics", levels[nextLevelData.nextMapName].statics);
-  socket.emit("addEnemies", levels[nextLevelData.nextMapName].enemyData);
-
-  delete levels[oldMapName].players[data.idOfPlayer];
-  findMapNameByPlayerId[data.idOfPlayer] = nextLevelData.nextMapName;
-
-  //TODO
-
-  for(var playerID in levels[nextLevelData.nextMapName].players){
-
-    if(!levels[nextLevelData.nextMapName].players.hasOwnProperty(playerID)) continue;
-
-
-
-    levels[nextLevelData.nextMapName].socketTable[playerID].emit("playerCreation", player);
-  }
-
-  //END TODO
-
-})
-
-socket.on("getPlayerID",async (data) => {
-
-  if(allPlayers[data.id]){
-    socket.emit("alreadyLoggedIn", {
-      msg : "You are already logged in !"
-    })
-  }else{
-
-    try {
-
-      var playerData;
-      var user = await User.findById(data.id);
-    //  data.id = Math.floor(Math.random() * 100000000) + "abcdefghi";
-      playerData = {
-        x : user.x,
-        y : user.y,
-        id : data.id,
-        collisionHeight : user.collisionHeight || 11,
-        collisionWidth : user.collisionWidth || 11,
-        width : user.width || 32,
-        height : user.height || 32,
-        currentSprite : [{x:1,y:0}],
-        health : user.maxHealth * (user.level/10 + 1) || 1000,
-        maxHealth : user.maxHealth * (user.level/10 + 1) || 1000,
-        healthRegeneration : user.healthRegeneration * (user.level/10 + 1) || 20,
-        mana : user.maxMana * (user.level/10 + 1) || 400,
-        maxMana : user.maxMana * (user.level/10 + 1) || 400,
-        manaRegeneration : user.manaRegeneration * (user.level/10 + 1) * 2 || 5,
-        speed : Math.min(Math.floor(7 + user.level/4),10),
-        level : user.level || 1,
-        experience : user.experience || 0,
-        requiredExperience : user.level * 2 * 500 || 1000,
-        damage : 30 + 3*user.level || 30 + 3,
-        currentLevelMapName : user.currentLevelMapName || "firstMap",
-      }
-      if(user.currentLevelMapName){
-        playerData.currentMapLevel = levels[user.currentLevelMapName].tilesAndTeleportCoords;
-      }else{
-        playerData.currentMapLevel = levels["firstMap"].tilesAndTeleportCoords;
-      }
-      socket.emit("playerID", playerData)
-      socket.broadcast.emit("playerCreation",playerData);
-      levels[playerData.currentLevelMapName].players[playerData.id] = {};
-      levels[playerData.currentLevelMapName].players[playerData.id].gameData = playerData;
-      findMapNameByPlayerId[playerData.id] = playerData.currentLevelMapName;
-      allPlayers[playerData.id] = {};//only used to check whether player is active or not !
-      allPlayers[playerData.id].active = true;
-      allPlayers[playerData.id].lastTime = 0;
-
-      tableOfSockets[playerData.id] = socket;
-    }catch(e){
-      console.log("\n\n ERROR IN PLAYER CREATION !!!! \n\n" + e);
-      socket.emit("alreadyLoggedIn", {
-        msg : e
-      })
+    var oldMapName = findMapNameByPlayerId[data.idOfPlayer];
+    var player = levels[oldMapName].players[data.idOfPlayer].gameData;
+    if(allPlayers[player.id].lastTime + 500 > new Date().getTime()){
+      return;
     }
 
-  }
-  socket.on("playerCreated", (data) => {
-    // socket.emit("setLevel",{
-    //     tableOfTiles : level1Table
-    // });
-    socket.emit("addUsers", levels[findMapNameByPlayerId[data.id]].players);
-    socket.emit("addStatics", levels[findMapNameByPlayerId[data.id]].statics);
-    socket.emit("addEnemies", levels[findMapNameByPlayerId[data.id]].enemyData);
-    socket.emit("permissionToLoop");
+    allPlayers[player.id].lastTime = new Date().getTime();
+
+    if(!levels[oldMapName]){
+      console.log("LEVELS NIE ISTNIEJE ! ");
+      return;
+    }
+    var nextLevelData = levels[oldMapName].getNextLevelData(player.id);
+
+    if(nextLevelData.error) {
+      console.log(nextLevelData.error);
+      return;
+    }
+
+    if(!nextLevelData.nextMapName || !levels[nextLevelData.nextMapName]){
+      console.log("map name nof found");
+      return;
+    }
+
+
+    io.emit("removePlayer", {
+      id : data.idOfPlayer
+    })
+    player.x = nextLevelData.playerNewX;
+    player.y = nextLevelData.playerNewY;
+    player.currentLevelMapName = nextLevelData.nextMapName;
+    player.currentMapLevel = levels[nextLevelData.nextMapName].tilesAndTeleportCoords;
+    socket.emit("changeMapLevel",{
+      levelData : player.currentMapLevel,
+      playerNewX : nextLevelData.playerNewX,
+      playerNewY : nextLevelData.playerNewY,
+      moveX : 0,
+      moveY : 0
+    });
+    levels[nextLevelData.nextMapName].players[data.idOfPlayer] = levels[oldMapName].players[data.idOfPlayer];
+
+    socket.emit("addUsers", levels[nextLevelData.nextMapName].players);
+    socket.emit("addStatics", levels[nextLevelData.nextMapName].statics);
+    socket.emit("addEnemies", levels[nextLevelData.nextMapName].enemyData);
+
+    delete levels[oldMapName].players[data.idOfPlayer];
+    findMapNameByPlayerId[data.idOfPlayer] = nextLevelData.nextMapName;
+
+    //TODO
+
+    for(var playerID in levels[nextLevelData.nextMapName].players){
+
+      if(!levels[nextLevelData.nextMapName].players.hasOwnProperty(playerID)) continue;
+
+
+
+      levels[nextLevelData.nextMapName].socketTable[playerID].emit("playerCreation", player);
+    }
+
+    //END TODO
+
   })
 
-});
+  socket.on("getPlayerID",async (data) => {
+
+    if(allPlayers[data.id]){
+      socket.emit("alreadyLoggedIn", {
+        msg : "You are already logged in !"
+      })
+    }else{
+
+      try {
+
+        var playerData;
+        var user = await User.findById(data.id);
+      //  data.id = Math.floor(Math.random() * 100000000) + "abcdefghi";
+        playerData = {
+          x : user.x,
+          y : user.y,
+          id : data.id,
+          collisionHeight : user.collisionHeight || 11,
+          collisionWidth : user.collisionWidth || 11,
+          width : user.width || 32,
+          height : user.height || 32,
+          currentSprite : [{x:1,y:0}],
+          health : user.maxHealth * (user.level/10 + 1) || 1000,
+          maxHealth : user.maxHealth * (user.level/10 + 1) || 1000,
+          healthRegeneration : user.healthRegeneration * (user.level/10 + 1) || 20,
+          mana : user.maxMana * (user.level/10 + 1) || 400,
+          maxMana : user.maxMana * (user.level/10 + 1) || 400,
+          manaRegeneration : user.manaRegeneration * (user.level/10 + 1) * 2 || 5,
+          speed : Math.min(Math.floor(7 + user.level/4),10),
+          level : user.level || 1,
+          experience : user.experience || 0,
+          requiredExperience : user.level * 2 * 500 || 1000,
+          damage : 30 + 3*user.level || 30 + 3,
+          currentLevelMapName : user.currentLevelMapName || "firstMap",
+        }
+        if(user.currentLevelMapName){
+          playerData.currentMapLevel = levels[user.currentLevelMapName].tilesAndTeleportCoords;
+        }else{
+          playerData.currentMapLevel = levels["firstMap"].tilesAndTeleportCoords;
+        }
+        socket.emit("playerID", playerData)
+        socket.broadcast.emit("playerCreation",playerData);
+        levels[playerData.currentLevelMapName].players[playerData.id] = {};
+        levels[playerData.currentLevelMapName].players[playerData.id].gameData = playerData;
+        findMapNameByPlayerId[playerData.id] = playerData.currentLevelMapName;
+        allPlayers[playerData.id] = {};//only used to check whether player is active or not !
+        allPlayers[playerData.id].active = true;
+        allPlayers[playerData.id].lastTime = 0;
+
+        tableOfSockets[playerData.id] = socket;
+      }catch(e){
+        console.log("\n\n ERROR IN PLAYER CREATION !!!! \n\n" + e);
+        socket.emit("alreadyLoggedIn", {
+          msg : e
+        })
+      }
+
+    }
+    socket.on("playerCreated", (data) => {
+      // socket.emit("setLevel",{
+      //     tableOfTiles : level1Table
+      // });
+      socket.emit("addUsers", levels[findMapNameByPlayerId[data.id]].players);
+      socket.emit("addStatics", levels[findMapNameByPlayerId[data.id]].statics);
+      socket.emit("addEnemies", levels[findMapNameByPlayerId[data.id]].enemyData);
+      socket.emit("permissionToLoop");
+    })
+
+  });
 
   socket.on("skillCreation", (skillData) => {
     var curLev = levels[findMapNameByPlayerId[skillData.ownerID]];
@@ -213,7 +211,7 @@ socket.on("getPlayerID",async (data) => {
       connectedPlayersData[playerData.id].gameData.rangeOfSeeingHeight = playerData.rangeOfSeeingHeight;
       connectedPlayersData[playerData.id].active = true;
     }else{
-      socket.emit("someKindOfLogout");//TODO 
+      socket.emit("someKindOfLogout");//TODO
     }
   });
 

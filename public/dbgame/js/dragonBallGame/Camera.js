@@ -6,11 +6,13 @@ class Camera{
 
 
   tick(){
+
+
     var level = this.handler.currentLevel;
   	var player = this.handler.character;
 
     if(player.renderX + player.width/2 >= this.handler.gameCanvasesWidth/2){
-
+      
     	if(player.currentSprite === player.right && (player.renderX + player.width -  level.moveX <= player.speed + TileStatic.width * level.widthOfMap - this.handler.gameCanvasesWidth/2)){
 
   			level.moveX -= player.speed;
