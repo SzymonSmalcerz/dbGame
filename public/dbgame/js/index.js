@@ -180,32 +180,55 @@ const Game = {
   createMainCharacter : function(playerData) {
     this.handler.character = new MainCharacter(playerData);
   },
+
+//by default after resizing player.renderY = player.y and after creating new player, player.y = player.renderY
+//maybe it is not beutifull but dont change it, whole camera depends on this principle :)
   handleMoveXandMoveY(){
 
     var player = this.handler.character;
     var level  = this.handler.currentLevel;
 
-    while(player.renderY + player.height - player.speed >= Math.floor(this.handler.gameCanvasesHeight/2) + 1 ){
-      if(player.y + this.handler.gameCanvasesHeight/2 + player.height >= level.heightOfMap *  TileStatic.height && player.renderY + player.height <= this.handler.gameCanvasesHeight){
-        level.moveY -= level.heightOfMap *  TileStatic.height - (player.y + player.height + player.speed);
-        player.renderY -= level.heightOfMap *  TileStatic.height - (player.y + player.height + player.speed);
-        console.log("break1!");
-        break;
+    if(player.y + player.height/2 < Math.floor(window.innerHeight/2)) {
+      level.moveY += (window.innerHeight - Game.handler.heightOfDisplayWindow)/2;
+      player.renderY += (window.innerHeight - Game.handler.heightOfDisplayWindow)/2;
+    }else{
+      var diffrenceBetweenBottomBorderAndYCenterOfPlayer = (TileStatic.height * level.heightOfMap) - (player.height + player.y);
+      if(diffrenceBetweenBottomBorderAndYCenterOfPlayer < Game.handler.heightOfDisplayWindow/2){
+        var yChangeTemp = (window.innerHeight - Game.handler.heightOfDisplayWindow)/2 + (Game.handler.heightOfDisplayWindow - diffrenceBetweenBottomBorderAndYCenterOfPlayer);
+        level.moveY -= (player.y  - yChangeTemp);
+        player.renderY -= (player.y  - yChangeTemp);
+      }else {
+
+        while(player.renderY + player.height/2>= Math.floor(window.innerHeight/2)){
+          level.moveY -= 1;
+          player.renderY -= 1;
+        }
       }
-      level.moveY -= player.speed;
-      player.renderY -= player.speed;
+    }
+
+
+
+
+    if(player.x + player.width/2< Math.floor(window.innerWidth/2) ){
+      level.moveX += (window.innerWidth - Game.handler.widthOfDisplayWindow)/2;
+      player.renderX += (window.innerWidth - Game.handler.widthOfDisplayWindow)/2;
+    }else {
+      var diffrenceBetweenRightBorderAndYCenterOfPlayer = (TileStatic.width * level.widthOfMap) - (player.width/2 + player.x);
+      if(diffrenceBetweenRightBorderAndYCenterOfPlayer < Game.handler.widthOfDisplayWindow/2){
+        var xChangeTemp = (window.innerWidth - Game.handler.widthOfDisplayWindow)/2 + (Game.handler.widthOfDisplayWindow - diffrenceBetweenRightBorderAndYCenterOfPlayer);
+        level.moveX -= (player.x + player.width/2  - xChangeTemp);
+        player.renderX -= (player.x + player.width/2   - xChangeTemp);
+      }else {
+
+        while(player.renderX + player.width/2 >= Math.floor(window.innerWidth/2)){
+          level.moveX -= 1;
+          player.renderX -= 1;
+        }
+      }
   	}
 
-    while(player.renderX + player.width/2 - player.speed >= Math.floor(this.handler.gameCanvasesWidth/2) + 1 ){
-      if(player.x + this.handler.gameCanvasesWidth/2 + player.width  >= level.widthOfMap *  TileStatic.width &&player.renderX + player.width <= this.handler.gameCanvasesWidth){
-        level.moveX -= level.widthOfMap *  TileStatic.width - (player.x + player.width + player.speed);
-        player.renderX -= level.widthOfMap *  TileStatic.width - (player.x + player.width + player.speed);
-        console.log("break2!");
-        break;
-      }
-      level.moveX -= player.speed;
-      player.renderX -= player.speed;
-  	}
+
+
 
     for(var i=0;i<level.allEntities.length;i++){
       if(level.allEntities[i] !== player){
@@ -506,6 +529,8 @@ const Game = {
   },
 
   setWidthAndHeightOfCanvases : function(){
+    this.handler.gameCanvasesWidth = window.innerWidth;
+    this.handler.gameCanvasesHeight = window.innerHeight;
     this.handler.canvas.width = this.handler.gameCanvasesWidth;
     this.handler.canvas.height = this.handler.gameCanvasesHeight;
     this.handler.collisionCanvas.width = this.handler.gameCanvasesWidth;

@@ -11,6 +11,8 @@ class MainCharacter extends Mob{
 
     this.renderX = this.x;//must be that way !!
     this.renderY = this.y;//must be that way !!
+    // this.renderX = 0;//must be that way !!
+    // this.renderY = 0;//must be that way !!
 
     Game.handler.players[this.id] = this;
 

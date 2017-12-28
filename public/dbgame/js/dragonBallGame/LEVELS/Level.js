@@ -41,6 +41,7 @@ class Level{
   	this.moveX = 0; // this two variables used onlyt to "move" tiles while moving player
   	this.moveY = 0; //
 
+    //just how many tiles in verticly and horozontally
   	this.widthOfMap = this.tiles[0].length;	//not scaled !!!!
   	this.heightOfMap = this.tiles.length;
   }
@@ -115,7 +116,11 @@ class Level{
   	for(var i=0;i<this.allEntities.length;i++){
       var entityTemp = this.allEntities[i];
   		if(entityTemp){
-  			      entityTemp.draw();
+          if(entityTemp !== Game.handler.character){
+            entityTemp.renderX = entityTemp.x + this.moveX;
+            entityTemp.renderY = entityTemp.y + this.moveY;
+          }
+          entityTemp.draw();
   		}
 
   	};
@@ -138,14 +143,14 @@ class Level{
     }
 
 
-
+    //TODO IT IS NOT RESPONSIBILITY TODO OF LEVEL SO CHANGE IT !!! TODO
     //also clear all parts of rendered entites which were rendered aside from our display window
-    this.handler.ctx.fillStyle = "rgb(100,100,100)";
-    this.handler.ctx.fillRect(0,0,window.innerWidth,(window.innerHeight - this.handler.heightOfDisplayWindow)/2-28);
-    this.handler.ctx.fillRect(0,0,(window.innerWidth - this.handler.widthOfDisplayWindow)/2-28,window.innerHeight);
-    this.handler.ctx.fillRect(0,(window.innerHeight + this.handler.heightOfDisplayWindow)/2+60,window.innerWidth,(window.innerHeight - this.handler.heightOfDisplayWindow)/2-32);
-    this.handler.ctx.fillRect((window.innerWidth + this.handler.widthOfDisplayWindow)/2+60,0,(window.innerWidth - this.handler.widthOfDisplayWindow)/2,window.innerHeight);
-
+      this.handler.ctx.fillStyle = "rgb(100,100,100)";
+      this.handler.ctx.fillRect(0,0,window.innerWidth,(window.innerHeight - this.handler.heightOfDisplayWindow)/2-28);
+      this.handler.ctx.fillRect(0,0,(window.innerWidth - this.handler.widthOfDisplayWindow)/2-28,window.innerHeight);
+      this.handler.ctx.fillRect(0,(window.innerHeight + this.handler.heightOfDisplayWindow)/2+60,window.innerWidth,(window.innerHeight - this.handler.heightOfDisplayWindow)/2-32);
+      this.handler.ctx.fillRect((window.innerWidth + this.handler.widthOfDisplayWindow)/2+60,0,(window.innerWidth - this.handler.widthOfDisplayWindow)/2,window.innerHeight);
+    //TODO TODO TODO TODO TODO
 
   }
 
