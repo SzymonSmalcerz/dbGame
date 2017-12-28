@@ -116,10 +116,6 @@ class Level{
   	for(var i=0;i<this.allEntities.length;i++){
       var entityTemp = this.allEntities[i];
   		if(entityTemp){
-          if(entityTemp !== Game.handler.character){
-            entityTemp.renderX = entityTemp.x + this.moveX;
-            entityTemp.renderY = entityTemp.y + this.moveY;
-          }
           entityTemp.draw();
   		}
 
@@ -128,16 +124,16 @@ class Level{
     //drawing wall around our display screen
     var tempYPosOfWall = this.topBorderOfDisplayWindow - 32;
     while(tempYPosOfWall - 1 < this.bottomBorderOfDisplayWindow + 32){
-      Game.handler.tiles.WALL.draw(this.rightBorderOfDisplayWindow + 32, tempYPosOfWall);
-      Game.handler.tiles.WALL.draw(this.leftBorderOfDisplayWindow - 32, tempYPosOfWall);
+      Game.handler.tiles.WALL.draw(this.rightBorderOfDisplayWindow + 30, tempYPosOfWall);
+      Game.handler.tiles.WALL.draw(this.leftBorderOfDisplayWindow - 30, tempYPosOfWall);
 
       tempYPosOfWall += 30;
     }
 
     var tempXPosOfWall = this.leftBorderOfDisplayWindow - 32;
     while(tempXPosOfWall - 1 < this.rightBorderOfDisplayWindow + 32){
-      Game.handler.tiles.WALL.draw(tempXPosOfWall, this.topBorderOfDisplayWindow - 32);
-      Game.handler.tiles.WALL.draw(tempXPosOfWall, this.bottomBorderOfDisplayWindow + 32);
+      Game.handler.tiles.WALL.draw(tempXPosOfWall, this.topBorderOfDisplayWindow - 30);
+      Game.handler.tiles.WALL.draw(tempXPosOfWall, this.bottomBorderOfDisplayWindow + 30);
 
       tempXPosOfWall += 30;
     }
@@ -166,6 +162,10 @@ class Level{
 
     for(var i=0;i< this.players.length; i++){
       entityTemp = this.players[i];
+      if(entityTemp !== Game.handler.character){
+        entityTemp.renderX = entityTemp.x + this.moveX;
+        entityTemp.renderY = entityTemp.y + this.moveY;
+      }
       if(entityTemp.renderX >= this.leftBorderOfDisplayWindow - entityTemp.width
       && entityTemp.renderX <= this.rightBorderOfDisplayWindow + entityTemp.width
       && entityTemp.renderY >= this.topBorderOfDisplayWindow - entityTemp.height
@@ -176,6 +176,8 @@ class Level{
 
   	for(var i=0;i< this.statics.length; i++){
       entityTemp = this.statics[i];
+      entityTemp.renderX = entityTemp.x + this.moveX;
+      entityTemp.renderY = entityTemp.y + this.moveY;
       if(entityTemp.renderX >= this.leftBorderOfDisplayWindow - entityTemp.width
       && entityTemp.renderX <= this.rightBorderOfDisplayWindow + entityTemp.width
       && entityTemp.renderY >= this.topBorderOfDisplayWindow - entityTemp.height
@@ -195,6 +197,9 @@ class Level{
 
     for(var i=0;i< tempArrayOfEnemies.length; i++){
       entityTemp = tempArrayOfEnemies[i];
+
+      entityTemp.renderX = entityTemp.x + this.moveX;
+      entityTemp.renderY = entityTemp.y + this.moveY;
       if(entityTemp.renderX >= this.leftBorderOfDisplayWindow - entityTemp.width
       && entityTemp.renderX <= this.rightBorderOfDisplayWindow + entityTemp.width
       && entityTemp.renderY >= this.topBorderOfDisplayWindow - entityTemp.height
@@ -214,6 +219,9 @@ class Level{
     }
   	for(var i=0;i< tempArrayOfSkills.length; i++){
       entityTemp = tempArrayOfSkills[i];
+
+      entityTemp.renderX = entityTemp.x + this.moveX;
+      entityTemp.renderY = entityTemp.y + this.moveY;
       if(entityTemp.renderX >= this.leftBorderOfDisplayWindow - entityTemp.width
       && entityTemp.renderX <= this.rightBorderOfDisplayWindow + entityTemp.width
       && entityTemp.renderY >= this.topBorderOfDisplayWindow - entityTemp.height

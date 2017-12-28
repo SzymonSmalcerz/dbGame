@@ -46,8 +46,8 @@ const Game = {
 
 
 		//technicals
-    widthOfDisplayWindow : 540,
-    heightOfDisplayWindow : 360,
+    widthOfDisplayWindow : 600,
+    heightOfDisplayWindow : 420,
 		fps : 20,
 		lastTime : 0,
 		globalTickCounter : 0, //used only for animations for tiles (nor for mobs)
@@ -188,10 +188,11 @@ const Game = {
     var player = this.handler.character;
     var level  = this.handler.currentLevel;
 
-    if(player.y + player.height/2 < Math.floor(window.innerHeight/2)) {
+    if(player.y + player.height/2 < (window.innerHeight)/2) {
       level.moveY += (window.innerHeight - Game.handler.heightOfDisplayWindow)/2;
       player.renderY += (window.innerHeight - Game.handler.heightOfDisplayWindow)/2;
-    }else{
+    }
+    if(player.renderY + player.height/2 > (window.innerHeight)/2){
       var diffrenceBetweenBottomBorderAndYCenterOfPlayer = (TileStatic.height * level.heightOfMap) - (player.height + player.y);
       if(diffrenceBetweenBottomBorderAndYCenterOfPlayer < Game.handler.heightOfDisplayWindow/2){
         var yChangeTemp = (window.innerHeight - Game.handler.heightOfDisplayWindow)/2 + (Game.handler.heightOfDisplayWindow - diffrenceBetweenBottomBorderAndYCenterOfPlayer);
@@ -209,33 +210,25 @@ const Game = {
 
 
 
-    if(player.x + player.width/2< Math.floor(window.innerWidth/2) ){
+    if(player.x + player.width/2< (window.innerWidth)/2 ){
       level.moveX += (window.innerWidth - Game.handler.widthOfDisplayWindow)/2;
       player.renderX += (window.innerWidth - Game.handler.widthOfDisplayWindow)/2;
-    }else {
+    }
+    if(player.renderX + player.width/2 > (window.innerWidth)/2) {
       var diffrenceBetweenRightBorderAndYCenterOfPlayer = (TileStatic.width * level.widthOfMap) - (player.width/2 + player.x);
       if(diffrenceBetweenRightBorderAndYCenterOfPlayer < Game.handler.widthOfDisplayWindow/2){
         var xChangeTemp = (window.innerWidth - Game.handler.widthOfDisplayWindow)/2 + (Game.handler.widthOfDisplayWindow - diffrenceBetweenRightBorderAndYCenterOfPlayer);
-        level.moveX -= (player.x + player.width/2  - xChangeTemp);
-        player.renderX -= (player.x + player.width/2   - xChangeTemp);
+        level.moveX -= (player.x - player.width/2 - xChangeTemp);
+        player.renderX -= (player.x - player.width/2 - xChangeTemp);
       }else {
 
-        while(player.renderX + player.width/2 >= Math.floor(window.innerWidth/2)){
+        console.log("im in HEREEEE !!!");
+        while(player.renderX + player.width/2 - 3 >= window.innerWidth/2 + 1){
           level.moveX -= 1;
           player.renderX -= 1;
         }
       }
   	}
-
-
-
-
-    for(var i=0;i<level.allEntities.length;i++){
-      if(level.allEntities[i] !== player){
-        level.allEntities[i].renderX = level.allEntities[i].x + level.moveX;
-        level.allEntities[i].renderY = level.allEntities[i].y + level.moveY;
-      }
-    }
   },
   handleTilesLevelsAndOther : function(){
     Game.handler.tiles.G = new Tile(0,0);
@@ -552,7 +545,6 @@ window.addEventListener("click", function(event){
 window.addEventListener("resize", function(){
 
   Game.setWidthAndHeightOfCanvases();
-
   Game.handler.currentLevel.moveX = 0;
   Game.handler.currentLevel.moveY = 0;
   Game.handler.character.renderX = Game.handler.character.x;

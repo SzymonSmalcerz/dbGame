@@ -6,83 +6,55 @@ class Camera{
 
 
   tick(){
-    return;
 
     var level = this.handler.currentLevel;
   	var player = this.handler.character;
 
     if(player.currentSprite === player.right && player.renderX + player.width/2 >= (this.handler.gameCanvasesWidth)/2){
 
-    	if( (player.renderX + player.width -  level.moveX <= player.speed + TileStatic.width * level.widthOfMap - (this.handler.widthOfDisplayWindow)/2)){
 
-  			level.moveX -= player.speed;
-        for(var i=0;i<level.statics.length;i++){
-  				level.statics[i].renderX-=player.speed;
-  			}
+      if(player.x + player.width + player.speed <= TileStatic.width * level.widthOfMap - Game.handler.widthOfDisplayWindow/2){
 
-        for(var i=0;i<level.players.length;i++){
-  				level.players[i].renderX-=player.speed;
-  			}
-        for(var i=0;i<level.skillTable.length;i++){
-  				level.skillTable[i].renderX-=player.speed;
-  			}
-        for(var i=0;i<level.enemies.length;i++){
-  				level.enemies[i].renderX-=player.speed;
-  			}
+        while(player.renderX + player.width/2 - 3 >= window.innerWidth/2 + 1){
+          level.moveX -= 1;
+          player.renderX -= 1;
+        }
+
   		}
 
-  	}else if(player.currentSprite === player.left && level.moveX <= (window.innerWidth - this.handler.widthOfDisplayWindow)/2 && (player.renderX + player.width/2 - player.speed  <  (this.handler.gameCanvasesWidth)/2 )){
+  	}else if(player.currentSprite === player.left && player.renderX + player.width/2 <= this.handler.gameCanvasesWidth/2){
 
-      level.moveX += player.speed;
-      for(var i=0;i<level.statics.length;i++){
-        level.statics[i].renderX+=player.speed;
-      }
-      for(var i=0;i<level.players.length;i++){
-        level.players[i].renderX+=player.speed;
-      }
-      for(var i=0;i<level.enemies.length;i++){
-        level.enemies[i].renderX+=player.speed;
-      }
-      for(var i=0;i<level.skillTable.length;i++){
-        level.skillTable[i].renderX+=player.speed;
-      }
+      if(player.x + player.width/2 >=Game.handler.widthOfDisplayWindow/2){
+
+        while(player.renderX + player.width/2 <= window.innerWidth/2 + 4){
+          level.moveX += 1;
+          player.renderX += 1;
+        }
+
+  		}
     }
-  	if(player.renderY + player.height/2>= this.handler.gameCanvasesHeight/2){
+  	if(player.currentSprite === player.down && player.renderY >= this.handler.gameCanvasesHeight/2){
 
 
-      if(player.currentSprite === player.down && (player.renderY  - level.moveY  + player.height < player.speed  +  level.heightOfMap *  TileStatic.height - (this.handler.heightOfDisplayWindow/2 ) )){
+      if(player.y + player.height <=(TileStatic.height * level.heightOfMap - Game.handler.heightOfDisplayWindow/2)){
 
-        level.moveY -= player.speed;
-        for(var i=0;i<level.statics.length;i++){
-          level.statics[i].renderY-=player.speed;
+        while(player.renderY >= window.innerHeight/2){
+          level.moveY -= 1;
+          player.renderY -= 1;
         }
-        for(var i=0;i<level.players.length;i++){
-          level.players[i].renderY-=player.speed;
+
+  		}
+
+  	}else if(player.currentSprite === player.up && (player.renderY  <= this.handler.gameCanvasesHeight/2)){
+
+      if(player.y + player.height >=Game.handler.heightOfDisplayWindow/2){
+
+        while(player.renderY + player.height<= window.innerHeight/2){
+          level.moveY += 1;
+          player.renderY += 1;
         }
-        for(var i=0;i<level.enemies.length;i++){
-          level.enemies[i].renderY-=player.speed;
-        }
-        for(var i=0;i<level.skillTable.length;i++){
-  				level.skillTable[i].renderY-=player.speed;
-  			}
 
-      }
-
-  	}else if(player.currentSprite === player.up && level.moveY < (window.innerHeight - this.handler.heightOfDisplayWindow)/2 && (player.renderY + player.speed < this.handler.gameCanvasesHeight/2 - player.height)){
-
-      level.moveY += player.speed;
-      for(var i=0;i<level.statics.length;i++){
-        level.statics[i].renderY+=player.speed;
-      }
-      for(var i=0;i<level.players.length;i++){
-        level.players[i].renderY+=player.speed;
-      }
-      for(var i=0;i<level.enemies.length;i++){
-        level.enemies[i].renderY+=player.speed;
-      }
-      for(var i=0;i<level.skillTable.length;i++){
-        level.skillTable[i].renderY+=player.speed;
-      }
+  		}
 
     }
   }
