@@ -5,6 +5,21 @@ class Camera{
   }
 
 
+  setWidthAndHeightOfDisplayWindow(){
+    if(window.innerWidth- 300 < 600){
+      Game.handler.widthOfDisplayWindow = window.innerWidth- 300;
+    }else{
+      Game.handler.widthOfDisplayWindow = 600;
+    }
+
+    if(window.innerHeight - 300 < 350){
+      Game.handler.heightOfDisplayWindow = window.innerHeight - 300;
+    }else{
+      Game.handler.heightOfDisplayWindow = 350;
+    }
+  }
+
+
   tick(){
 
     var level = this.handler.currentLevel;

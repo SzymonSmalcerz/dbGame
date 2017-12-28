@@ -141,7 +141,7 @@ class Level{
 
     //TODO IT IS NOT RESPONSIBILITY TODO OF LEVEL SO CHANGE IT !!! TODO
     //also clear all parts of rendered entites which were rendered aside from our display window
-      this.handler.ctx.fillStyle = "rgb(100,100,100)";
+      this.handler.ctx.fillStyle = "rgba(190,190,255,1.0)";
       this.handler.ctx.fillRect(0,0,window.innerWidth,(window.innerHeight - this.handler.heightOfDisplayWindow)/2-28);
       this.handler.ctx.fillRect(0,0,(window.innerWidth - this.handler.widthOfDisplayWindow)/2-28,window.innerHeight);
       this.handler.ctx.fillRect(0,(window.innerHeight + this.handler.heightOfDisplayWindow)/2+60,window.innerWidth,(window.innerHeight - this.handler.heightOfDisplayWindow)/2-32);

@@ -46,8 +46,8 @@ const Game = {
 
 
 		//technicals
-    widthOfDisplayWindow : 600,
-    heightOfDisplayWindow : 420,
+    widthOfDisplayWindow : 0,
+    heightOfDisplayWindow : 0,
 		fps : 20,
 		lastTime : 0,
 		globalTickCounter : 0, //used only for animations for tiles (nor for mobs)
@@ -57,8 +57,8 @@ const Game = {
 
   init : function(){
 
-    Object.freeze(Game.handler.widthOfDisplayWindow);
-    Object.freeze(Game.handler.heightOfDisplayWindow);
+    // Object.freeze(Game.handler.widthOfDisplayWindow);
+    // Object.freeze(Game.handler.heightOfDisplayWindow);
 
     Game.handler.oldWidthOfMap = null;
 		Game.handler.currentWidthOfMap = window.innerWidth;
@@ -99,13 +99,25 @@ const Game = {
     Game.handler.gameCanvasesWidth = window.innerWidth;
     Game.handler.gameCanvasesHeight = window.innerHeight;
     Game.handler.camera = new Camera();
-    Game.handler.menu.headImage = new Image();
+
     Game.handler.ctx.fillStyle = "rgb(120,120,120)";
     Game.handler.ctx.fillRect(0,0,Game.handler.canvas.width,Game.handler.canvas.height);
+
+    Game.handler.menu.headImage = new Image();
 		Game.handler.menu.headImage.src = "dbgame/js/dragonBallGame/sprites/gokuHead.png";
+
+    Game.handler.menu.dragonBallImage = new Image();
+    Game.handler.menu.dragonBallImage.src = "dbgame/js/dragonBallGame/sprites/dragonBall4Stars.png";
+
+    Game.handler.menu.logo = new Image();
+    Game.handler.menu.logo.src = "dbgame/js/dragonBallGame/sprites/logo.png";
+
     Game.handler.ctx.drawImage(Game.handler.menu.headImage,0,0,256,256,window.innerWidth/2 - 128,window.innerHeight/2 - 128 ,256 ,256 );
     Game.handleSockets();
     Game.handleTilesLevelsAndOther();
+
+
+    Game.handler.camera.setWidthAndHeightOfDisplayWindow();
     Game.handleMoveXandMoveY();
     socket.emit("initialized", (this.handler.character.id));
     socket.on("permissionToLoop", function() {
@@ -134,47 +146,66 @@ const Game = {
   drawMenu : function(){
 
 			var player = Game.handler.character;
+      var headAndBarsXOffset = window.innerWidth/2 - Game.handler.widthOfDisplayWindow/2 - 48;
+      var barsLength = Game.handler.widthOfDisplayWindow/4;
 
       //draw image
-			Game.handler.ctx.drawImage(Game.handler.menu.headImage,0,0,256,256,window.innerWidth/100,window.innerHeight - 150 ,128 ,128 );
+      var tempMultiplier = Game.handler.widthOfDisplayWindow/640;
+      Game.handler.ctx.drawImage(Game.handler.menu.logo,0,0,640,128,(window.innerWidth - Game.handler.widthOfDisplayWindow)/2 + 32 * (1 - tempMultiplier),64 * (1 - tempMultiplier) ,640 * tempMultiplier ,128 * tempMultiplier );
+
+			Game.handler.ctx.drawImage(Game.handler.menu.headImage,0,0,256,256,headAndBarsXOffset,window.innerHeight - 120 ,128 ,128 );
+      if(barsLength > 120)
+        Game.handler.ctx.drawImage(Game.handler.menu.dragonBallImage,0,0,256,256,window.innerWidth/2 - 64 + 16,window.innerHeight - 112 ,128 ,128 );
 
 
+      headAndBarsXOffset += 128;
+
+
+      if(barsLength < 0){
+        barsLength = 15;
+      }
       //draw player health
+
 			Game.handler.ctx.fillStyle = "rgb(90,0,0)";
-			Game.handler.ctx.fillRect(140  ,window.innerHeight - 64 , window.innerWidth/6,	Math.min(10,Math.max(Math.floor(player.height/2),7)));
+			Game.handler.ctx.fillRect(headAndBarsXOffset  ,window.innerHeight - 64 , barsLength,	Math.min(10,Math.max(Math.floor(player.height/2),7)));
 			Game.handler.ctx.fillStyle = "rgb(255,0,0)";
-			Game.handler.ctx.fillRect(140  ,window.innerHeight - 64 , window.innerWidth/6 * player.health/player.maxHealth,	Math.min(8,Math.max(Math.floor(player.height/2),5)));
+			Game.handler.ctx.fillRect(headAndBarsXOffset  ,window.innerHeight - 64 , barsLength * player.health/player.maxHealth,	Math.min(8,Math.max(Math.floor(player.height/2),5)));
 
 
       //draw player mana
       Game.handler.ctx.fillStyle = "rgb(0,0,20)";
-			Game.handler.ctx.fillRect(140  ,window.innerHeight - 48 , window.innerWidth/10,	Math.min(10,Math.max(Math.floor(player.height/2),4)));
+			Game.handler.ctx.fillRect(headAndBarsXOffset  ,window.innerHeight - 48 , barsLength,	Math.min(10,Math.max(Math.floor(player.height/2),4)));
 			var manaColor = 150;
 			if( player.isRegeneratingMana){
 				manaColor = Math.floor(Math.random()*(255-225) + 225);
 			}
 			Game.handler.ctx.fillStyle = "rgb(0," + (manaColor - 150) + "," + manaColor + ")";
-			Game.handler.ctx.fillRect(140  ,window.innerHeight - 48 , window.innerWidth/10 * player.mana/player.maxMana,	Math.min(8,Math.max(Math.floor(player.height/3),3)));
+			Game.handler.ctx.fillRect(headAndBarsXOffset  ,window.innerHeight - 48 , barsLength * player.mana/player.maxMana,	Math.min(8,Math.max(Math.floor(player.height/3),3)));
 
       //draw player experience
 			Game.handler.ctx.fillStyle = "rgb(125,125,50)";
-			Game.handler.ctx.fillRect(140  ,window.innerHeight - 80 , window.innerWidth/6,	Math.min(10,Math.max(Math.floor(player.height/2),7)));
+			Game.handler.ctx.fillRect(headAndBarsXOffset  ,window.innerHeight - 80 , barsLength,	Math.min(10,Math.max(Math.floor(player.height/2),7)));
 			Game.handler.ctx.fillStyle = "rgb(250,250,100)";
-			Game.handler.ctx.fillRect(140  ,window.innerHeight - 80 , window.innerWidth/6 * (player.experience/player.requiredExperience),	Math.min(8,Math.max(Math.floor(player.height/2),5)));
+			Game.handler.ctx.fillRect(headAndBarsXOffset  ,window.innerHeight - 80 , barsLength * (player.experience/player.requiredExperience),	Math.min(8,Math.max(Math.floor(player.height/2),5)));
 
-      //fonts etc TODO !!!! zrob to duuzo ladniej ! za duzo liczenia w tym momencie :C
-      Game.handler.ctx.font = Math.min(10,Math.max(Math.floor(player.height/2),7)) + "px Arial";
-      Game.handler.ctx.fillStyle = "rgb(0,0,0)";
-
-      Game.handler.ctx.fillText("exp : " + player.experience + "/" + player.requiredExperience,150,window.innerHeight - 80 + Math.min(7,Math.max(Math.floor(player.height/2),5)) );
-
-      Game.handler.ctx.fillText("hp  : " + Math.floor(player.health) + "/" + player.maxHealth,150,window.innerHeight - 64 + Math.min(7,Math.max(Math.floor(player.height/2),5)) );
-
-      Game.handler.ctx.fillText("mana: " + Math.floor(player.mana) + "/" + player.maxMana,150,window.innerHeight - 48 + Math.min(7,Math.max(Math.floor(player.height/2),5)) );
+      if(barsLength > 100){
+        //fonts etc TODO !!!! zrob to duuzo ladniej ! za duzo liczenia w tym momencie :C
+        Game.handler.ctx.font = Math.min(10,Math.max(Math.floor(player.height/2),7)) + "px Arial";
+        Game.handler.ctx.fillStyle = "rgb(0,0,0)";
 
 
-      Game.handler.ctx.font = "20px Arial";
-      Game.handler.ctx.fillText("lv: " + player.level,150,window.innerHeight - 100 + Math.min(7,Math.max(Math.floor(player.height/2),5)) );
+        headAndBarsXOffset+=10;
+        Game.handler.ctx.fillText("exp : " + player.experience + "/" + player.requiredExperience,headAndBarsXOffset,window.innerHeight - 80 + Math.min(7,Math.max(Math.floor(player.height/2),5)) );
+
+        Game.handler.ctx.fillText("hp  : " + Math.floor(player.health) + "/" + player.maxHealth,headAndBarsXOffset,window.innerHeight - 64 + Math.min(7,Math.max(Math.floor(player.height/2),5)) );
+
+        Game.handler.ctx.fillText("mana: " + Math.floor(player.mana) + "/" + player.maxMana,headAndBarsXOffset,window.innerHeight - 48 + Math.min(7,Math.max(Math.floor(player.height/2),5)) );
+
+
+        Game.handler.ctx.font = "20px Arial";
+        Game.handler.ctx.fillText("lv: " + player.level,headAndBarsXOffset,window.innerHeight - 100 + Math.min(7,Math.max(Math.floor(player.height/2),5)) );
+
+      }
 
   },
   createMainCharacter : function(playerData) {
@@ -544,6 +575,8 @@ window.addEventListener("click", function(event){
 
 window.addEventListener("resize", function(){
 
+
+  Game.handler.camera.setWidthAndHeightOfDisplayWindow();
   Game.setWidthAndHeightOfCanvases();
   Game.handler.currentLevel.moveX = 0;
   Game.handler.currentLevel.moveY = 0;
