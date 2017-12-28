@@ -16,6 +16,8 @@ class Skill{
   	this.handler = Game.handler;
   	this.height = SkillStatic.height;
   	this.width = SkillStatic.width;
+    this.collisionWidth = SkillStatic.width;
+    this.collisionHeight = SkillStatic.height;
     this.tickCounter = 0;
 
   }

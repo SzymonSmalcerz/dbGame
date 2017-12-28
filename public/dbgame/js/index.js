@@ -46,8 +46,8 @@ const Game = {
 
 
 		//technicals
-    widthOfDisplayWindow : 500,
-    heightOfDisplayWindow : 350,
+    widthOfDisplayWindow : 540,
+    heightOfDisplayWindow : 360,
 		fps : 20,
 		lastTime : 0,
 		globalTickCounter : 0, //used only for animations for tiles (nor for mobs)
@@ -220,6 +220,7 @@ const Game = {
     Game.handler.tiles.S = new Tile(5,0);
     Game.handler.tiles.L = new Tile(6,0);
     Game.handler.tiles.P = new Tile(7,0);
+    Game.handler.tiles.WALL = new Tile(0,1);
 
   },
 

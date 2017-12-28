@@ -1,3 +1,5 @@
+const Helper = require("./Helper");
+
 var SkillStatic = {
   width : 32,
   height : 32
@@ -18,6 +20,8 @@ class Skill{
   	this.frameTable = frameTable;
   	this.height = 32;
   	this.width = 32;
+    this.collisionWidth = 32;
+    this.collisionHeight = 32;
   	this.detonated = false;
   	this.attackTable = attackTable;
 
@@ -140,6 +144,7 @@ class Skill{
          }
       }
 
+
       for (var enemyID in this.enemies) {
         if (!this.enemies.hasOwnProperty(enemyID)) continue;
         var enemy = this.enemies[enemyID];
@@ -166,11 +171,10 @@ class Skill{
          }
       }
 
+      var thisSkill = this;
       for(var i=0;i<this.statics.length;i++){
         var staticEntity = this.statics[i];
-        if(staticEntity.collisionWidth !=0 && (Math.sqrt(Math.pow(staticEntity.collisionWidth/2,2) + Math.pow(staticEntity.collisionHeight/2,2))) +
-         (Math.sqrt(Math.pow(this.width/2,2) + Math.pow(this.height/2,2))) >= (Math.sqrt(Math.pow((staticEntity.x + staticEntity.width/2) - (this.x + this.width/2),2) +
-         Math.pow((staticEntity.y + staticEntity.height * 0.9 - staticEntity.collisionHeight/2) - (this.y + this.height/2),2)))){
+        if(Helper.areTwoEntitiesInRange(thisSkill,staticEntity)){
            this.detonated = true;
          }
       }
