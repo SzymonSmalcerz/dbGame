@@ -231,7 +231,7 @@ class LevelSecond extends Level{
   checkForEnemies(){
     super.checkForEnemies();
     this.respawnFrame += 1;
-    if(this.numberOfHits < 75 && this.respawnFrame > 40){
+    if(this.numberOfHits < 600 && this.respawnFrame > 5){
       this.respawnFrame = 0;
       var x = Math.floor(Math.random() * 1000 + 200);
       var y = Math.floor(Math.random() * 1000 + 200);
