@@ -29,6 +29,8 @@ class Enemy{
   	this.left_fight = moveSprite.left_fight;
   	this.right_fight = moveSprite.right_fight;
   	this.idle = moveSprite.idle;
+  	this.dying_SpriteTable = moveSprite.dying_SpriteTable || moveSprite.idle;
+  	this.dead_SpriteTable = moveSprite.dead_SpriteTable || moveSprite.idle;
     this.currentSprite = this.idle;
 
 
@@ -50,6 +52,8 @@ class Enemy{
     this.healthRegeneration = healthRegeneration || health/400 || 10;
     this.experience = 10;
 
+    this.dead = false;
+    this.dying = false;
 
 
 
@@ -189,6 +193,12 @@ class Enemy{
 
   tick(){
 
+    if(this.dead || this.dying){
+      this.emitTick();
+      return;
+    }
+
+
     this.currentSprite = this.idle;
 
 
@@ -297,10 +307,41 @@ class Enemy{
 
  };
 
+ emitDeadTick(){
+   for(var playerID in this.playersInMap){
+     if(!this.playersInMap.hasOwnProperty(playerID)) continue;
+
+     var player = this.playersInMap[playerID].gameData;
+
+
+
+       this.tableOfSockets[player.id].emit("enemyDeadTick",{
+        id : this.id
+      });
+
+
+   }
+
+};
+
   handleManaAndHp(){
+
+
+
+    if(this.dead || this.dying){
+      return;
+    }
+    
+    if(this.health < 0){
+      this.health = -1;
+      this.dying = true;
+      return;
+    }
     if(this.health < this.maxHealth){
       this.health += this.healthRegeneration;
     }
+
+
 
     if(this.mana < this.maxMana){
       this.mana += this.manaRegeneration;
@@ -433,7 +474,7 @@ class Hulk extends Enemy{
   constructor(id,x,y,playersInMap,enemiesData,statics,tableOfSockets,callbackOnDeath){
     super(playersInMap,enemiesData,tableOfSockets,statics,id,EnemySprites.hulk,x,y,callbackOnDeath,100,100,25)
     this.type = "hulk";
-    this.experience = 3000;
+    this.experience = 300000000;
     this.health = 3000;
     this.maxHealth = 3000;
     this.damage = 15;
@@ -453,13 +494,24 @@ class Dragon extends Enemy{
 
 
 class Yeti extends Enemy{
-  constructor(id,x,y,playersInMap,enemiesData,statics,tableOfSockets){
+  constructor(id,x,y,playersInMap,enemiesData,statics,tableOfSockets,callbackOnDeath){
     super(playersInMap,enemiesData,tableOfSockets,statics,id,EnemySprites.yeti,x,y,callbackOnDeath,80,80);
     this.type = "yeti";
     this.experience = 1500;
     this.health = 500;
     this.maxHealth = 500;
     this.damage = 3;
+  }
+}
+
+class DarkKnight extends Enemy{
+  constructor(id,x,y,playersInMap,enemiesData,statics,tableOfSockets,callbackOnDeath){
+    super(playersInMap,enemiesData,tableOfSockets,statics,id,EnemySprites.darkKnight,x,y,callbackOnDeath,32,32);
+    this.type = "darkKnight";
+    this.experience = 15000;
+    this.health = 5000;
+    this.maxHealth = 5000;
+    this.damage = 30;
   }
 }
 
@@ -471,5 +523,6 @@ module.exports = {
   Hulk,
   Dragon,
   Yeti,
+  DarkKnight,
   Static
 }

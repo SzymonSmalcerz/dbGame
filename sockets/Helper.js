@@ -3,6 +3,9 @@ var Helper = {};
 
 Helper.areTwoEntitiesInRange = function(entity1, entity2, speedOfEntity1){
 
+  if(entity1.collisionWidth == 0 || entity2.collisionWidth == 0 || entity2.dead || entity1.dead){
+    return false;
+  }
   speedOfEntity1 = speedOfEntity1 || {x:0, y:0};
 
   var centerOfEntity1 = Helper.getCenterOfEntityCollision(entity1);

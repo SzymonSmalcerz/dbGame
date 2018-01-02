@@ -1,30 +1,44 @@
+var staticSprite;
+var staticSprite32px;
 
 
-const staticSprite =  new Image();
-const staticSprite32px = new Image();
+setTimeout(() => {
+  staticSprite = new Image();
+  staticSprite32px = new Image()
+  staticSprite.src = "dbgame/js/dragonBallGame/sprites/spriteStaticEntities.png";
+  staticSprite32px.src = "dbgame/js/dragonBallGame/sprites/spriteStaticEntities32px.png";
+},0);
+
+
+
 class StaticEntity{
 
-  constructor(spriteX, spriteY,x ,y,collisionHeight,collisionWidth,widthInImage ,heightInImage ){
+  constructor(data){
+
+
     this.handler = Game.handler;
-    this.xPositionInImage = spriteX;
-  	this.yPositionInImage = spriteY;
+    this.xPositionInImage = data.xPosInSprite;
+  	this.yPositionInImage = data.yPosInSprite;
+    this.x = data.x;
+  	this.renderX = data.x;
+  	this.y = data.y;
+  	this.renderY = data.y;
+
+
+    this.widthInImage = data.widthInImage || 64;
+  	this.width = this.widthInImage;
+  	this.heightInImage = data.heightInImage || 64;
+  	this.height = this.heightInImage;
+  	this.collisionHeight = data.collisionHeight || this.height/8;
+  	this.collisionWidth = data.collisionWidth || this.width/3;
+
+    if(data.collisionWidth == 0 || data.collisionHeight == 0){
+      this.flatRendering = true;
+    }
 
     this.sprite = staticSprite;
-    staticSprite.src = "dbgame/js/dragonBallGame/sprites/spriteStaticEntities.png";
-
-  	this.x = x;
-  	this.renderX = x;
-  	this.y = y;
-  	this.renderY = y;
 
 
-
-  	this.widthInImage = widthInImage || 64;
-  	this.width = this.widthInImage;
-  	this.heightInImage = heightInImage || 64;
-  	this.height = this.heightInImage;
-  	this.collisionHeight = collisionHeight || this.height/8;
-  	this.collisionWidth = collisionWidth || this.width/3;
 
     this.gridSize = 64;
   };
@@ -45,102 +59,9 @@ class StaticEntity{
 }
 
 class StaticEntity32 extends StaticEntity{
-  constructor(spriteX, spriteY,x ,y,collisionHeight,collisionWidth){
-      super(spriteX, spriteY,x ,y,13,32/2,32,32);
+  constructor(data){
+      super(data);
       this.gridSize = 32;
       this.sprite = staticSprite32px;
-      staticSprite32px.src = "dbgame/js/dragonBallGame/sprites/spriteStaticEntities32px.png";
-  }
-}
-
-//PARTICULAR STATICS :
-class Skeleton1 extends StaticEntity32{
-  constructor(x,y){
-    super(0,0,x,y);
-      this.flatRendering = true;//it means that we do not want to render it as normal entity, rather as a tile on tile
-      this.collisionWidth = 0;
-      this.collisionHeight = 0;
-  }
-};
-
-class Skeleton2 extends StaticEntity32{
-  constructor(x,y){
-    super(1,0,x,y);
-    this.flatRendering = true;//it means that we do not want to render it as normal entity, rather as a tile on tile
-    this.collisionWidth = 0;
-    this.collisionHeight = 0;
-  }
-};
-
-class Skeleton3 extends StaticEntity32{
-  constructor(x,y){
-    super(2,0,x,y);
-    this.flatRendering = true;//it means that we do not want to render it as normal entity, rather as a tile on tile
-    this.collisionWidth = 0;
-    this.collisionHeight = 0;
-  }
-};
-
-
-class Cactus1 extends StaticEntity32{
-  constructor(x,y){
-    super(3,0,x,y);
-  }
-}
-class DessertPlant1 extends StaticEntity32{
-  constructor(x,y){
-    super(4,0,x,y);
-  }
-}
-class DessertPlant2 extends StaticEntity32{
-  constructor(x,y){
-    super(5,0,x,y);
-  }
-}
-class Rock1 extends StaticEntity32{
-  constructor(x,y){
-    super(6,0,x,y);
-  }
-}
-class DessertSign extends StaticEntity32{
-  constructor(x,y){
-    super(7,0,x,y);
-  }
-}
-
-
-class BigSkeleton1 extends StaticEntity{
-
-  constructor(x,y){
-    super(5,4,x,y,0,0,64,64);
-    this.flatRendering = true;//it means that we do not want to render it as normal entity, rather as a tile on tile
-    this.collisionWidth = 0;
-    this.collisionHeight = 0;
-  }
-}
-
-class Tree extends StaticEntity{
-
-  constructor(x,y){
-    super(1,0,x,y,null,128/3,128,128);
-  }
-
-};
-
-class House1 extends StaticEntity{
-
-  constructor(x,y){
-
-    super(0,2,x,y,128/5,128/1.05,128,128);
-
-  }
-}
-
-
-
-class House2 extends StaticEntity{
-
-  constructor(x,y){
-    super(6,0,x,y,210/5,128*0.87,128,210);
   }
 }

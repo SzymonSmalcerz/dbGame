@@ -5,6 +5,10 @@ var SkillStatic = {
   height : 32
 }
 
+var detonationTable = [];
+detonationTable[0] = [{x:4,y:0},{x:5,y:0},{x:6,y:0},{x:7,y:0},{x:0,y:1},{x:1,y:1},{x:2,y:1},{x:3,y:1},{x:4,y:1},{x:5,y:1}];
+detonationTable[1] = [{x:0,y:3},{x:1,y:3},{x:2,y:3},{x:3,y:3},{x:4,y:3},{x:5,y:3},{x:6,y:3},{x:7,y:3}];
+
 class Skill{
   constructor(id,skillData,damage,radius, frameTable, speed, attackTable, players,statics,enemies, tableOfSockets){
 
@@ -22,7 +26,7 @@ class Skill{
   	this.width = 32;
     this.collisionWidth = 32;
     this.collisionHeight = 32;
-  	this.detonated = false;
+
   	this.attackTable = attackTable;
 
     this.skillName = skillData.skillName;
@@ -30,6 +34,10 @@ class Skill{
     this.statics = statics;
     this.enemies = enemies;
     this.tableOfSockets = tableOfSockets;
+
+    this.detonated = false;
+    this.deleted = false;
+    this.ttl = 45; //time to live, like in ipv4
 
   }
 
@@ -46,7 +54,7 @@ class Skill{
       }
     }
 
-    this.tickCounter+=1;
+
 
     if(this.turn === "left"){
       this.x -= this.speed;
@@ -58,10 +66,14 @@ class Skill{
       this.y += this.speed;
     }
 
+
+    this.checkIfSkillIsValid();
     this.checkForCollisionWithEntity();
     if(this.frameTable){
       this.emitData();
     }
+
+    this.tickCounter+=1;
   }
 
   emitData(){
@@ -123,22 +135,62 @@ class Skill{
   }
 
   handleDetonation(){
-    this.frameTable = [{x:4,y:0},{x:5,y:0},{x:6,y:0},{x:7,y:0},{x:0,y:1},{x:1,y:1},{x:2,y:1},{x:3,y:1},{x:4,y:1},{x:5,y:1}];
+
+    this.detonated = true;
+
+    this.frameTable = this.detonationTable;
 
     this.speed = this.speed/3;
 
     this.tickCounter = 0;
   }
 
+  deleteSkill(){
+    this.deleted = true;
+  }
+
+
+  checkIfSkillIsValid(){
+
+    if(this.tickCounter > this.ttl){
+      this.deleteSkill();
+    }else if(this.detonated){
+      if(this.tickCounter >= this.detonationTable.length){
+        this.deleteSkill();
+      }
+    }
+  }
+
+  checkForCollisionWithEntity__Helper__CalculateSpeed(){
+
+    var x =0;
+    var y=0;
+    if(this.turn === "left"){
+      x-=this.speed;
+    }else if(this.turn === "right"){
+      x += this.speed;
+    }else if(this.turn === "up"){
+      y -= this.speed;
+    }else if(this.turn === "down"){
+      y += this.speed;
+    };
+
+    return {
+      x,
+      y
+    };
+  }
+
   checkForCollisionWithEntity(){
+
+
 
   	if(!this.detonated ){
       for (var playerID in this.playersInMap) {
         if (!this.playersInMap.hasOwnProperty(playerID)) continue;
         var player = this.playersInMap[playerID].gameData;
-        if((Math.sqrt(Math.pow(player.collisionWidth/2,2) + Math.pow(player.collisionHeight/2,2))) +
-         (Math.sqrt(Math.pow(this.width/2,2) + Math.pow(this.height/2,2))) >= (Math.sqrt(Math.pow((player.x + player.width/2) - (this.x + this.width/2),2) +
-         Math.pow((player.y + player.height * 0.9 - player.collisionHeight/2) - (this.y + this.height/2),2)))){
+        var thisSkill = this;
+        if(Helper.areTwoEntitiesInRange(thisSkill,player,thisSkill.checkForCollisionWithEntity__Helper__CalculateSpeed())){
            this.detonated = true;
            player.health = player.health - this.damage;
          }
@@ -148,9 +200,8 @@ class Skill{
       for (var enemyID in this.enemies) {
         if (!this.enemies.hasOwnProperty(enemyID)) continue;
         var enemy = this.enemies[enemyID];
-        if((Math.sqrt(Math.pow(enemy.collisionWidth/2,2) + Math.pow(enemy.collisionHeight/2,2))) +
-         (Math.sqrt(Math.pow(this.width/2,2) + Math.pow(this.height/2,2))) >= (Math.sqrt(Math.pow((enemy.x + enemy.width/2) - (this.x + this.width/2),2) +
-         Math.pow((enemy.y + enemy.height * 0.9 - enemy.collisionHeight/2) - (this.y + this.height/2),2)))){
+        var thisSkill = this;
+        if(Helper.areTwoEntitiesInRange(thisSkill,enemy,thisSkill.checkForCollisionWithEntity__Helper__CalculateSpeed())){
            this.detonated = true;
            enemy.health = enemy.health - this.playersInMap[this.ownerID].gameData.damage * 3;
            if(enemy.health <= 0){
@@ -189,6 +240,7 @@ class Skill{
 class KamehamehaWave extends Skill{
   constructor(id,skillData,players,statics,enemies, io, tableOfSockets){
     super(id,skillData,null,25,null,15,[[{x:0,y:2}],[{x:1,y:2}],[{x:2,y:2}],[{x:3,y:2}]], players,statics,enemies, io, tableOfSockets);
+    this.detonationTable = detonationTable[1];
   }
 }
 

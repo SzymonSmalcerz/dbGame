@@ -14,6 +14,15 @@ class Hit extends Enemy{
   }
 }
 
+const darkKnightSprite = new Image();
+class DarkKnight extends Enemy{
+	constructor(id,x,y){
+    if(!darkKnightSprite.src)
+      darkKnightSprite.src = "dbgame/js/dragonBallGame/sprites/darkKnightSprite.png";
+    super(id,darkKnightSprite,x,y);
+  }
+}
+
 
 const hulkSprite = new Image();
 class Hulk extends Enemy{

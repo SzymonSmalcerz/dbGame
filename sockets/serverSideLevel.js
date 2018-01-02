@@ -1,6 +1,6 @@
 var {Static} = require("./serverSideEnemy");
 var levelTiles = require("./serverSideLevelTiles");
-var {Enemy,Hit , Hulk, Dragon ,Yeti} = require("./serverSideEnemy");
+var {Enemy,Hit , Hulk, Dragon ,Yeti, DarkKnight} = require("./serverSideEnemy");
 class Level{
   constructor(name,tilesAndTeleportCoords,players,enemies,statics,skills,socketTable){
     this.name = name;
@@ -42,35 +42,21 @@ class Level{
   }
 
   checkForSkills(){
+
     this.skills = this.skills.filter((shoot) => {
-  		if(shoot.detonated){
-        if(shoot.tickCounter < 10){
-          return true;
-        }else {
-          for(var playerID in this.players){
-            if(!this.players.hasOwnProperty(playerID)) continue;
+      if(shoot.deleted){
+        for(var playerID in this.players){
+          if(!this.players.hasOwnProperty(playerID)) continue;
 
-            this.socketTable[playerID].emit("removeSkill", {
-              id:shoot.id
-            })
-          }
-          return false;
+          this.socketTable[playerID].emit("removeSkill", {
+            id:shoot.id
+          })
         }
-  		}else{
-  			if(shoot.tickCounter < 45){
-          return true;
-        }else {
-          for(var playerID in this.players){
-            if(!this.players.hasOwnProperty(playerID)) continue;
-
-            this.socketTable[playerID].emit("removeSkill", {
-              id:shoot.id
-            })
-          }
-          return false;
-        }
-  		}
-  	})
+        return false;
+      }else {
+        return true;
+      }
+  	});
   }
 
   checkForEnemies(){
@@ -80,15 +66,43 @@ class Level{
       var enemy = this.enemies[enemyID];
       if(enemy){
         if(enemy.health <= 0){
-          for(var playerID in this.players){
-            if(!this.players.hasOwnProperty(playerID)) continue;
 
-            this.socketTable[playerID].emit("removeEnemy", {
-              id:enemy.id
-            })
+
+          if(!enemy.deathCounter){
+            enemy.emitDeadTick();
+            enemy.dying = true;
+            enemy.collisionWidth = 0;
+            enemy.collisionHeight = 0;
+            enemy.currentSprite = enemy.dying_SpriteTable;
+            enemy.deathCounter = enemy.dying_SpriteTable.length;
+            continue;
           }
-          this.enemies[enemy.id].onDie();
-          delete this.enemies[enemy.id];
+
+          enemy.deathCounter-=1;
+
+
+
+          if(enemy.deathCounter <= 0 && !enemy.dead){
+
+            enemy.currentSprite = enemy.dead_SpriteTable;
+            enemy.deathCounter = 60;
+            enemy.dead = true;
+            this.enemies[enemy.id].onDie();
+          }
+
+          if(enemy.deathCounter <= 0 && enemy.dead){
+            for(var playerID in this.players){
+              if(!this.players.hasOwnProperty(playerID)) continue;
+
+              this.socketTable[playerID].emit("removeEnemy", {
+                id:enemy.id
+              })
+            }
+            delete this.enemies[enemy.id];
+          }
+
+
+
         }else{
           temp.push(enemy);
         }
@@ -168,7 +182,11 @@ class LevelFirst extends Level{
       ];
 
       for(var i=0;i<50;i++){
-        statics.push(Static.getTreeData(Math.floor(Math.random() * 1150 + 50),Math.floor(Math.random() * 650 + 650)));
+        if(Math.random() > 0.5){
+          statics.push(Static.getTreeData(Math.floor(Math.random() * 1150 + 50),Math.floor(Math.random() * 650 + 650)));
+        }else{
+          statics.push(Static.getTree2Data(Math.floor(Math.random() * 1150 + 50),Math.floor(Math.random() * 650 + 650)));
+        }
       }
     super("firstMap", levelTiles["firstMap"],{},{},statics,[],socketTable);
     this.numberOfHulks = 0;
@@ -177,7 +195,7 @@ class LevelFirst extends Level{
   checkForEnemies(){
     super.checkForEnemies();
     this.respawnFrame += 1;
-    if(this.numberOfHulks < 20 && this.respawnFrame > 20){
+    if(this.numberOfHulks < 100 && this.respawnFrame > 10){
 
         this.respawnFrame = 0;
 
@@ -185,7 +203,7 @@ class LevelFirst extends Level{
       var y = Math.floor(Math.random() * 200 + 200);
       var tempID = "hu" + Math.floor(Math.random() * 10000) + this.name;
       var here = this;
-      this.enemies[tempID] = new Hulk(tempID,x,y,this.players,this.enemies,this.statics,this.socketTable, function(){
+      this.enemies[tempID] = new DarkKnight(tempID,x,y,this.players,this.enemies,this.statics,this.socketTable, function(){
         here.numberOfHulks -= 1;
       });
       this.numberOfHulks += 1;

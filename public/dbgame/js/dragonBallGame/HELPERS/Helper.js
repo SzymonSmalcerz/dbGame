@@ -3,7 +3,14 @@ var Helper = {};
 
 Helper.areTwoEntitiesInRange = function(entity1, entity2, speedOfEntity1){
 
-  speedOfEntity1 = speedOfEntity1 || 0;
+  if(entity1.flatRendering || entity2.flatRendering ||  entity2.dead || entity1.dead){
+    return false;
+  }
+
+  speedOfEntity1 = speedOfEntity1 || {
+    x : 0,
+    y : 0
+  };
 
   var centerOfEntity1 = Helper.getCenterOfEntityCollision(entity1);
   var centerOfEntity2 = Helper.getCenterOfEntityCollision(entity2);

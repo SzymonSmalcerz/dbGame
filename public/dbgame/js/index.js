@@ -385,33 +385,13 @@ const Game = {
 
       for(var i=0;i<staticData.length;i++){
         var staticEntity;
-        if(staticData[i].type == "tree"){
-          staticEntity = new Tree(staticData[i].x, staticData[i].y);
-        }else if(staticData[i].type == "house1"){
-          staticEntity = new House1(staticData[i].x, staticData[i].y);
-        }else if(staticData[i].type == "house2"){
-          staticEntity = new House2(staticData[i].x, staticData[i].y);
-        }else if(staticData[i].type == "skeleton1"){
-          staticEntity = new Skeleton1(staticData[i].x, staticData[i].y);
-        }else if(staticData[i].type == "skeleton2"){
-          staticEntity = new Skeleton2(staticData[i].x, staticData[i].y);
-        }else if(staticData[i].type == "skeleton3"){
-          staticEntity = new Skeleton3(staticData[i].x, staticData[i].y);
-        }else if(staticData[i].type == "bigSkeleton1"){
-          staticEntity = new BigSkeleton1(staticData[i].x, staticData[i].y);
-        }else if(staticData[i].type == "rock1"){
-          staticEntity = new Rock1(staticData[i].x, staticData[i].y);
-        }else if(staticData[i].type == "dessertPlant1"){
-          staticEntity = new DessertPlant1(staticData[i].x, staticData[i].y);
-        }else if(staticData[i].type == "dessertPlant2"){
-          staticEntity = new DessertPlant2(staticData[i].x, staticData[i].y);
-        }else if(staticData[i].type == "cactus1"){
-          staticEntity = new Cactus1(staticData[i].x, staticData[i].y);
-        }else if(staticData[i].type == "dessertSign"){
-          staticEntity = new DessertSign(staticData[i].x, staticData[i].y);
-        }else{
-          continue;
-        }
+
+          if(staticData[i].typeOfSprite == "32"){
+            staticEntity = new StaticEntity32(staticData[i]);
+          }else{
+            staticEntity = new StaticEntity(staticData[i]);
+          }
+
 
         staticEntity.renderX += Game.handler.currentLevel.moveX;
         staticEntity.renderY += Game.handler.currentLevel.moveY;
@@ -455,6 +435,11 @@ const Game = {
           Game.handler.enemies[(enemyData.id)].renderX += Game.handler.currentLevel.moveX;
           Game.handler.enemies[(enemyData.id)].renderY += Game.handler.currentLevel.moveY;
           Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData.id]);
+        }else if(enemyData.type == "darkKnight"){
+          Game.handler.enemies[(enemyData.id)] = new DarkKnight(enemyData.id,enemyData.x, enemyData.y);
+          Game.handler.enemies[(enemyData.id)].renderX += Game.handler.currentLevel.moveX;
+          Game.handler.enemies[(enemyData.id)].renderY += Game.handler.currentLevel.moveY;
+          Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData.id]);
         }else if(enemyData.type == "hulk"){
           Game.handler.enemies[(enemyData.id)] = new Hulk(enemyData.id,enemyData.x, enemyData.y);
           Game.handler.enemies[(enemyData.id)].renderX += Game.handler.currentLevel.moveX;
@@ -481,6 +466,11 @@ const Game = {
         if(!Game.handler.enemies[(enemyData[i].id)]){
           if(enemyData[i].type == "hit"){
             Game.handler.enemies[(enemyData[i].id)] = new Hit(enemyData[i].id,enemyData[i].x, enemyData[i].y);
+            Game.handler.enemies[(enemyData[i].id)].renderX += Game.handler.currentLevel.moveX;
+            Game.handler.enemies[(enemyData[i].id)].renderY += Game.handler.currentLevel.moveY;
+            Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData[i].id]);
+          }else if(enemyData[i].type == "darkKnight"){
+            Game.handler.enemies[(enemyData[i].id)] = new DarkKnight(enemyData[i].id,enemyData[i].x, enemyData[i].y);
             Game.handler.enemies[(enemyData[i].id)].renderX += Game.handler.currentLevel.moveX;
             Game.handler.enemies[(enemyData[i].id)].renderY += Game.handler.currentLevel.moveY;
             Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData[i].id]);
@@ -531,6 +521,12 @@ const Game = {
     socket.on("removeSkill", (skillData) => {
       if(this.handler.skillTable[skillData.id]){
         delete this.handler.skillTable[skillData.id];
+      }
+    });
+
+    socket.on("enemyDeadTick", (data) => {
+      if(this.handler.enemies[data.id]){
+        this.handler.enemies[data.id].dead = true;
       }
     });
 

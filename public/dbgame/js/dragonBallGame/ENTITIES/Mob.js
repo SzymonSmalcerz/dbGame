@@ -36,7 +36,7 @@ class Mob {
     this.handler.collisionCtx.fillRect(this.renderX + (this.width - this.collisionWidth)/2,this.renderY + (this.height*0.9 - this.collisionHeight), this.collisionWidth, this.collisionHeight);
   }
   drawHp(){
-    if(this != this.handler.character){
+    if(this != this.handler.character && !this.dead){
       this.handler.ctx.fillStyle = "rgb(90,0,0)";
     	this.handler.ctx.fillRect(this.renderX ,this.renderY - this.height/8, this.width,	Math.min(4,Math.max(Math.floor(this.height/15),1)));
 
