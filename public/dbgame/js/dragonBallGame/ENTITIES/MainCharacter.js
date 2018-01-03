@@ -261,7 +261,7 @@ class MainCharacter extends Mob{
     if(this.currentSprite === this.idleLeft){
       if(keyHandler["50"]){
         socket.emit("skillCreation", {
-          x : this.x -  SkillStatic.width * 0.8,
+          x : this.x -  SkillStatic.width * 0.51,
           y : this.y,
           turn : "left",
           skillName : "KamehamehaWave",
@@ -274,7 +274,7 @@ class MainCharacter extends Mob{
 
       if(keyHandler["50"]){
         socket.emit("skillCreation", {
-          x : this.x +  SkillStatic.width * 0.8,
+          x : this.x +  SkillStatic.width * 0.51,
           y : this.y,
           turn : "right",
           skillName : "KamehamehaWave",
@@ -288,7 +288,7 @@ class MainCharacter extends Mob{
       if(keyHandler["50"]){
         socket.emit("skillCreation", {
           x : this.x,
-          y : this.y  - SkillStatic.height * 0.4,
+          y : this.y  - 1,
           turn : "up",
           skillName : "KamehamehaWave",
           ownerID : this.id
@@ -302,7 +302,7 @@ class MainCharacter extends Mob{
       if(keyHandler["50"]){
         socket.emit("skillCreation", {
           x : this.x,
-          y : this.y  + SkillStatic.height * 0.75,
+          y : this.y + 1 + SkillStatic.height * 0.51,
           turn : "down",
           skillName : "KamehamehaWave",
           ownerID : this.id

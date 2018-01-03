@@ -1,6 +1,6 @@
 var {Static} = require("./serverSideEnemy");
 var levelTiles = require("./serverSideLevelTiles");
-var {Enemy,Hit , Hulk, Dragon ,Yeti, DarkKnight} = require("./serverSideEnemy");
+var {Enemy,Hit , Hulk, Dragon ,Yeti, DarkKnight, MinionSkeleton} = require("./serverSideEnemy");
 class Level{
   constructor(name,tilesAndTeleportCoords,players,enemies,statics,skills,socketTable){
     this.name = name;
@@ -330,8 +330,66 @@ class LevelDragon extends Level{
     }
   }
 }
+
+
+class LevelMinions1 extends Level{
+  constructor(socketTable){
+    var statics = [];
+
+      for(var i=0;i<110;i++){
+        if(Math.random() > 0.5){
+          statics.push(Static.getTreeData(Math.floor(Math.random() * 1750 + 30),Math.floor(Math.random() * 1950 + 150)));
+        }else{
+          statics.push(Static.getTree2Data(Math.floor(Math.random() * 1750 + 30),Math.floor(Math.random() * 1950 + 150)));
+        }
+      }
+
+      for(var i=0; i<5;i++){
+        statics.push(Static.getSkeleton2Data(Math.floor(Math.random()*1300 + 50),Math.floor(Math.random()*1300 + 50)));
+      }
+
+      for(var i=0;i<2;i++){
+        statics.push(Static.getDessertPlant2Data(Math.floor(Math.random()*1300 + 50),Math.floor(Math.random()*1300 + 50)));
+      }
+    super("minions1Map", levelTiles["minions1Map"],{},{},statics,[],socketTable);
+    this.numberOfMinions = 0;
+  }
+
+  checkForEnemies(){
+    super.checkForEnemies();
+    this.respawnFrame += 1;
+    if(this.numberOfMinions < 50 && this.respawnFrame > 1){
+      this.respawnFrame = 0;
+      var x = Math.floor(Math.random() * 1000 + 200);
+      var y = Math.floor(Math.random() * 1000 + 200);
+      var tempID = "dr" + Math.floor(Math.random() * 10000) + this.name;
+      var here = this;
+      this.enemies[tempID] = new MinionSkeleton(tempID,x,y,this.players,this.enemies,this.statics,this.socketTable, function(){
+        here.numberOfMinions -= 1;
+      });
+      this.numberOfMinions += 1;
+      for(var playerID in this.players){
+
+        if(!this.players.hasOwnProperty(playerID)) continue;
+
+        this.socketTable[playerID].emit("pushNewEnemy", {
+          x : this.enemies[tempID].x,
+          y : this.enemies[tempID].y,
+          id : this.enemies[tempID].id,
+          type : this.enemies[tempID].type,
+          currentSprite : this.enemies[tempID].currentSprite,
+          collisionWidth : this.enemies[tempID].collisionWidth,
+          collisionHeight : this.enemies[tempID].collisionHeight,
+          width : this.enemies[tempID].width,
+          height : this.enemies[tempID].height
+        })
+      }
+    }
+  }
+}
 module.exports = {
   LevelFirst,
   LevelSecond,
-  LevelDragon
+  LevelDragon,
+  LevelMinions1
 };

@@ -331,7 +331,7 @@ class Enemy{
     if(this.dead || this.dying){
       return;
     }
-    
+
     if(this.health < 0){
       this.health = -1;
       this.dying = true;
@@ -506,12 +506,22 @@ class Yeti extends Enemy{
 
 class DarkKnight extends Enemy{
   constructor(id,x,y,playersInMap,enemiesData,statics,tableOfSockets,callbackOnDeath){
-    super(playersInMap,enemiesData,tableOfSockets,statics,id,EnemySprites.darkKnight,x,y,callbackOnDeath,32,32);
+    super(playersInMap,enemiesData,tableOfSockets,statics,id,EnemySprites.darkKnight,x,y,callbackOnDeath,50,50);
     this.type = "darkKnight";
     this.experience = 15000;
     this.health = 5000;
     this.maxHealth = 5000;
     this.damage = 30;
+  }
+}
+class MinionSkeleton extends Enemy{
+  constructor(id,x,y,playersInMap,enemiesData,statics,tableOfSockets,callbackOnDeath){
+    super(playersInMap,enemiesData,tableOfSockets,statics,id,EnemySprites.minionSkeleton,x,y,callbackOnDeath,20,20);
+    this.type = "minionSkeleton";
+    this.experience = 1000;
+    this.health = 50;
+    this.maxHealth = 50;
+    this.damage = 2;
   }
 }
 
@@ -524,5 +534,6 @@ module.exports = {
   Dragon,
   Yeti,
   DarkKnight,
+  MinionSkeleton,
   Static
 }

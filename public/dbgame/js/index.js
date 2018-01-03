@@ -445,6 +445,11 @@ const Game = {
           Game.handler.enemies[(enemyData.id)].renderX += Game.handler.currentLevel.moveX;
           Game.handler.enemies[(enemyData.id)].renderY += Game.handler.currentLevel.moveY;
           Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData.id]);
+        }else if(enemyData.type == "minionSkeleton"){
+          Game.handler.enemies[(enemyData.id)] = new MinionSkeleton(enemyData.id,enemyData.x, enemyData.y);
+          Game.handler.enemies[(enemyData.id)].renderX += Game.handler.currentLevel.moveX;
+          Game.handler.enemies[(enemyData.id)].renderY += Game.handler.currentLevel.moveY;
+          Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData.id]);
         }else if(enemyData.type == "dragon"){
           Game.handler.enemies[(enemyData.id)] = new Dragon(enemyData.id,enemyData.x, enemyData.y);
           Game.handler.enemies[(enemyData.id)].renderX += Game.handler.currentLevel.moveX;
@@ -476,6 +481,11 @@ const Game = {
             Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData[i].id]);
           }else if(enemyData[i].type == "hulk"){
             Game.handler.enemies[(enemyData[i].id)] = new Hulk(enemyData[i].id,enemyData[i].x, enemyData[i].y);
+            Game.handler.enemies[(enemyData[i].id)].renderX += Game.handler.currentLevel.moveX;
+            Game.handler.enemies[(enemyData[i].id)].renderY += Game.handler.currentLevel.moveY;
+            Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData[i].id]);
+          }else if(enemyData[i].type == "minionSkeleton"){
+            Game.handler.enemies[(enemyData[i].id)] = new MinionSkeleton(enemyData[i].id,enemyData[i].x, enemyData[i].y);
             Game.handler.enemies[(enemyData[i].id)].renderX += Game.handler.currentLevel.moveX;
             Game.handler.enemies[(enemyData[i].id)].renderY += Game.handler.currentLevel.moveY;
             Game.handler.currentLevel.enemies.push(Game.handler.enemies[enemyData[i].id]);

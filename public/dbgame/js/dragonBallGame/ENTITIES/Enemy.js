@@ -43,6 +43,14 @@ class Dragon extends Enemy{
   }
 }
 
+const minionSkeletonSprite = new Image();
+class MinionSkeleton extends Enemy{
+  constructor(id,x,y){
+    if(!minionSkeletonSprite.src)
+      minionSkeletonSprite.src = "dbgame/js/dragonBallGame/sprites/minionSkeletonSprite.png";
+    super(id,minionSkeletonSprite,x,y);
+  }
+}
 
 
 const yetiSprite = new Image();

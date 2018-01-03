@@ -190,7 +190,7 @@ class Skill{
         if (!this.playersInMap.hasOwnProperty(playerID)) continue;
         var player = this.playersInMap[playerID].gameData;
         var thisSkill = this;
-        if(Helper.areTwoEntitiesInRange(thisSkill,player,thisSkill.checkForCollisionWithEntity__Helper__CalculateSpeed())){
+        if(Helper.areTwoEntitiesInRange(thisSkill,player)){
            this.detonated = true;
            player.health = player.health - this.damage;
          }
@@ -201,7 +201,7 @@ class Skill{
         if (!this.enemies.hasOwnProperty(enemyID)) continue;
         var enemy = this.enemies[enemyID];
         var thisSkill = this;
-        if(Helper.areTwoEntitiesInRange(thisSkill,enemy,thisSkill.checkForCollisionWithEntity__Helper__CalculateSpeed())){
+        if(Helper.areTwoEntitiesInRange(thisSkill,enemy)){
            this.detonated = true;
            enemy.health = enemy.health - this.playersInMap[this.ownerID].gameData.damage * 3;
            if(enemy.health <= 0){
