@@ -5,20 +5,18 @@ const SkillStatic = {
 };
 
 
-class Skill{
+class Skill extends Entity{
   constructor(x,y){
+
+    super(x,y);
+
     if(!SkillStatic.sprite.src)
       SkillStatic.sprite.src = "dbgame/js/dragonBallGame/sprites/shootSprite.png";
-  	this.x = x;
-  	this.y = y;
-  	this.renderX = x;
-  	this.renderY = y;
-  	this.handler = Game.handler;
+
   	this.height = SkillStatic.height;
   	this.width = SkillStatic.width;
     this.collisionWidth = SkillStatic.width;
     this.collisionHeight = SkillStatic.height;
-    this.tickCounter = 0;
 
   }
 

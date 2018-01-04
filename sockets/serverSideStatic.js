@@ -6,7 +6,7 @@ const Static = {
         type : "tree",
         x : x,
         y: y,
-        collisionHeight : 64/8,//collision height
+        collisionHeight : 64/5,//collision height
         collisionWidth : 128/3, //collision width
         width : 128, //width
         height : 128,//height
@@ -24,7 +24,7 @@ const Static = {
         type : "tree2",
         x : x,
         y: y,
-        collisionHeight : 64/8,//collision height
+        collisionHeight : 64/5,//collision height
         collisionWidth : 128/3, //collision width
         width : 128, //width
         height : 128,//height

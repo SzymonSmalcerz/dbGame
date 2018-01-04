@@ -1,28 +1,20 @@
-var staticSprite;
-var staticSprite32px;
-
-
-setTimeout(() => {
-  staticSprite = new Image();
-  staticSprite32px = new Image()
-  staticSprite.src = "dbgame/js/dragonBallGame/sprites/spriteStaticEntities.png";
-  staticSprite32px.src = "dbgame/js/dragonBallGame/sprites/spriteStaticEntities32px.png";
-},0);
+var staticSprite = new Image();
+var staticSprite32px = new Image();
 
 
 
-class StaticEntity{
+
+class StaticEntity extends Entity{
 
   constructor(data){
+    // WHAT THE FUUUUUUUUUUUUUCK
+    staticSprite.src = "dbgame/js/dragonBallGame/sprites/spriteStaticEntities.png";
+    staticSprite32px.src = "dbgame/js/dragonBallGame/sprites/spriteStaticEntities32px.png";
+    super(data.x,data.y,);
 
 
-    this.handler = Game.handler;
     this.xPositionInImage = data.xPosInSprite;
   	this.yPositionInImage = data.yPosInSprite;
-    this.x = data.x;
-  	this.renderX = data.x;
-  	this.y = data.y;
-  	this.renderY = data.y;
 
 
     this.widthInImage = data.widthInImage || 64;
@@ -37,9 +29,6 @@ class StaticEntity{
     }
 
     this.sprite = staticSprite;
-
-
-
     this.gridSize = 64;
   };
 
@@ -49,12 +38,16 @@ class StaticEntity{
   							   this.xPositionInImage*this.gridSize,this.yPositionInImage*this.gridSize,	// x and y position of particular image in sprite
   							   this.widthInImage,this.heightInImage,												// width and height of particular image in sprite
   							   this.renderX,this.renderY,											// x and y on the screen
-  							   this.width,this.height);		// width and height of the particular image on the screen
+  							   this.width,this.height);		// width and height of the particular image on the
+                   this.handler.collisionCtx.fillStyle = "rgba(1,0,0,1.0)";
 
-  	this.handler.collisionCtx.fillStyle = "rgba(1,0,0,1.0)";
-  	this.handler.collisionCtx.fillRect((this.renderX + (this.width - this.collisionWidth)/2),(this.renderY + (this.height - this.collisionHeight - this.height/10)), this.collisionWidth, this.collisionHeight);
+
+    this.handler.collisionCtx.fillRect((this.renderX + (this.width - this.collisionWidth)/2),(this.renderY + (this.height - this.collisionHeight - this.height/10)), this.collisionWidth, this.collisionHeight);
+
 
   };
+
+
 
 }
 
