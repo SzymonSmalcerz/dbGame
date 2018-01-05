@@ -2,7 +2,7 @@
 
 
 ShortestPath = {};
-
+ShortestPath.playerMovesStack = [];
 
 ShortestPath.calculateShortestPath = function(sourceX, sourceY, destinationX, destinationY){
 
@@ -11,16 +11,25 @@ ShortestPath.calculateShortestPath = function(sourceX, sourceY, destinationX, de
   sourceX = Math.round(sourceX);
   sourceY = Math.round(sourceY);
 
-  console.log("sources x:y " + sourceX + " " + sourceY);
-  if(Game.handler.collisionCtx.getImageData(destinationX,destinationY,1,1).data[0] === 1){
-    console.log("jest collision")
-    return;
-  }
-
+  var allEntities = Game.handler.currentLevel.statics;
   var player = Game.handler.character;
+  var mockEntity = new Entity(player.x, player.y);
+
+
+  mockEntity.renderX = sourceX;
+  mockEntity.renderY = sourceY;
+  mockEntity.width = player.width;
+  mockEntity.height = player.height;
+  mockEntity.collisionWidth = Math.abs(player.collisionWidth);
+  mockEntity.collisionHeight = Math.abs(player.collisionHeight);
+
   var change = player.speed;
   var source ; //sourceNode
   var destinationNode;
+
+
+
+
 
   var width = Game.handler.widthOfDisplayWindow;
   var height = Game.handler.heightOfDisplayWindow;
@@ -55,15 +64,37 @@ ShortestPath.calculateShortestPath = function(sourceX, sourceY, destinationX, de
         source = nodes[w + " " + h];
         source.g = 0;
         source.f = source.h;
-        console.log("im here in setting source node!");
+        // console.log("im here in setting source node!");
       }
 
       if(Math.abs(w - destinationX) <= player.speed/2 && Math.abs(h - destinationY) <= player.speed/2){
         destinationNode = nodes[w + " " + h];
-        console.log("im here in setting destination node!");
+        // console.log("im here in setting destination node!");
       }
     }
   }
+
+  var canMove = true;
+
+  mockEntity.renderX = destinationNode.x - player.width/2;
+  mockEntity.renderY = destinationNode.y - player.height*0.9 + player.collisionHeight/2;
+
+
+
+  allEntities.forEach(function(entity){
+    if(entity === player){
+      return;
+    }
+    if(Helper.areTwoEntitiesInRange(mockEntity,entity)){
+      canMove = false;
+    }
+  });
+
+  if(!canMove){
+    return;
+  }
+
+
 
 
   openList.push(source);
@@ -88,6 +119,10 @@ ShortestPath.calculateShortestPath = function(sourceX, sourceY, destinationX, de
     for(var w=q.x-change;w<=q.x+change;w+=change) {
 				for(var h=q.y-change;h<=q.y+change;h+=change) {
 
+
+
+
+
           if(w==(q.x+change) && (h==(q.y+change) || h==(q.y-change))) {
 						continue;
 					}
@@ -96,12 +131,27 @@ ShortestPath.calculateShortestPath = function(sourceX, sourceY, destinationX, de
 					}
 
           if(w>=leftBorder && w<rightBorder && h>=topBorder && h<bottomBoreder && !(h==q.y && w==q.x)) {
-						if(Game.handler.collisionCtx.getImageData(w - player.collisionWidth/2,h + player.collisionHeight/2,1,1).data[0] === 1
-            || Game.handler.collisionCtx.getImageData(w - player.collisionWidth/2,h - player.collisionHeight/2,1,1).data[0] === 1
-            || Game.handler.collisionCtx.getImageData(w + player.collisionWidth/2,h + player.collisionHeight/2,1,1).data[0] === 1
-            || Game.handler.collisionCtx.getImageData(w + player.collisionWidth/2,h - player.collisionHeight/2,1,1).data[0] === 1
-            ){
-              console.log("wlasnie odrzucam bo mam collision");
+
+
+            canMove = true;
+            mockEntity.renderX = w - player.width/2;
+            mockEntity.renderY = h - player.height*0.9 + player.collisionHeight/2;
+            allEntities.forEach(function(entity){
+              if(entity === player){
+                return;
+              }
+              if(Helper.areTwoEntitiesInRange(mockEntity,entity)){
+                canMove = false;
+              }
+            });
+
+						// if(Game.handler.collisionCtx.getImageData(w - player.collisionWidth/2,h + player.collisionHeight/2,1,1).data[0] === 1
+            // || Game.handler.collisionCtx.getImageData(w - player.collisionWidth/2,h - player.collisionHeight/2,1,1).data[0] === 1
+            // || Game.handler.collisionCtx.getImageData(w + player.collisionWidth/2,h + player.collisionHeight/2,1,1).data[0] === 1
+            // || Game.handler.collisionCtx.getImageData(w + player.collisionWidth/2,h - player.collisionHeight/2,1,1).data[0] === 1
+            // ){
+            if(!canMove){
+            ///  console.log("wlasnie odrzucam bo mam collision");
 						 continue;
 						}
 
@@ -122,17 +172,17 @@ ShortestPath.calculateShortestPath = function(sourceX, sourceY, destinationX, de
             nodes[w + " " + h].g = calculatedG;
             nodes[w + " " + h].parent = q;
 							if(destinationNode === nodes[w + " " + h]) {
-								console.log("FOUND A WAYYYYYYYYY :333333");
 
-                ShortestPath.drawWay(destinationNode,player);
-
+                var temp = destinationNode;
+                ShortestPath.drawWay(temp,player);
+                temp = destinationNode;
+                ShortestPath.createWay(temp,player)
 
 								return;
 							}
 
 
 							openList.push(nodes[w + " " + h]);
-            //  console.log(openList);
           }
 
           closedList.push(q);
@@ -142,8 +192,8 @@ ShortestPath.calculateShortestPath = function(sourceX, sourceY, destinationX, de
 
 
   }
-
-  console.log("couldnt find a way :C");
+  //
+  // console.log("couldnt find a way :C");
 }
 
 ShortestPath.calculateBorder = function(displayBorder,change, position){
@@ -170,6 +220,44 @@ ShortestPath.drawWay = function(destinationNode,player){
     // }
   }
 }
+
+ShortestPath.createWay = function(destinationNode,player){
+
+  ShortestPath.playerMovesStack = [];
+  player.movesStack = [];
+  while(true){
+
+    if(!destinationNode.parent){
+      break;
+    }
+
+    if(destinationNode.parent.x > destinationNode.x){
+      ShortestPath.playerMovesStack.push("left")
+      player.movesStack.push("left");
+    }else if(destinationNode.parent.x < destinationNode.x){
+      ShortestPath.playerMovesStack.push("right")
+      player.movesStack.push("right");
+    }else if(destinationNode.parent.y > destinationNode.y){
+      ShortestPath.playerMovesStack.push("up")
+      player.movesStack.push("up");
+    }else{
+      ShortestPath.playerMovesStack.push("down")
+      player.movesStack.push("down");
+    }
+
+    destinationNode = destinationNode.parent;
+
+  }
+  var temp ="";
+  while(ShortestPath.playerMovesStack.length > 0){
+    temp += " " + ShortestPath.playerMovesStack.pop();
+  }
+
+
+  // console.log(temp);
+}
+
+
 
 ShortestPath.findNodeWithLowestF = function(openList){
 

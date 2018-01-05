@@ -336,7 +336,7 @@ class LevelMinions1 extends Level{
   constructor(socketTable){
     var statics = [];
 
-      for(var i=0;i<110;i++){
+      for(var i=0;i<1000;i++){
         if(Math.random() > 0.5){
           statics.push(Static.getTreeData(Math.floor(Math.random() * 1750 + 30),Math.floor(Math.random() * 1950 + 150)));
         }else{
@@ -358,7 +358,7 @@ class LevelMinions1 extends Level{
   checkForEnemies(){
     super.checkForEnemies();
     this.respawnFrame += 1;
-    if(this.numberOfMinions < 50 && this.respawnFrame > 1){
+    if(this.numberOfMinions < 2 && this.respawnFrame > 1){
       this.respawnFrame = 0;
       var x = Math.floor(Math.random() * 1000 + 200);
       var y = Math.floor(Math.random() * 1000 + 200);

@@ -22,18 +22,18 @@ class Mob extends Entity{
       //then draw hp
     	this.drawHp();
 
-      if(this!== Game.handler.character){
-        this.drawCollisionCtx();
-      }
+      // if(this!== Game.handler.character){
+      //   this.drawCollisionCtx();
+      // }
     	this.tickCounter+=0.25;
     }
   }
 
-  drawCollisionCtx(){
-    this.handler.collisionCtx.fillStyle = "rgba(1,0,0,1.0)";
-    //this.handler.collisionCtx.fillRect(this.handler.scale*(this.renderX + (this.width - this.collisionWidth)/2),this.handler.scale*(this.renderY + (this.height - this.collisionHeight - this.height/10)), this.collisionWidth*this.handler.scale, this.collisionHeight*this.handler.scale)
-    this.handler.collisionCtx.fillRect(this.renderX + (this.width - this.collisionWidth)/2,this.renderY + (this.height*0.9 - this.collisionHeight), this.collisionWidth, this.collisionHeight);
-  }
+  // drawCollisionCtx(){
+  //   this.handler.collisionCtx.fillStyle = "rgba(1,0,0,1.0)";
+  //   //this.handler.collisionCtx.fillRect(this.handler.scale*(this.renderX + (this.width - this.collisionWidth)/2),this.handler.scale*(this.renderY + (this.height - this.collisionHeight - this.height/10)), this.collisionWidth*this.handler.scale, this.collisionHeight*this.handler.scale)
+  //   this.handler.collisionCtx.fillRect(this.renderX + (this.width - this.collisionWidth)/2,this.renderY + (this.height*0.9 - this.collisionHeight), this.collisionWidth, this.collisionHeight);
+  // }
 
   drawHp(){
     if(this != this.handler.character && !this.dead){

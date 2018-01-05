@@ -42,7 +42,7 @@ class StaticEntity extends Entity{
                    this.handler.collisionCtx.fillStyle = "rgba(1,0,0,1.0)";
 
 
-    this.handler.collisionCtx.fillRect((this.renderX + (this.width - this.collisionWidth)/2),(this.renderY + (this.height - this.collisionHeight - this.height/10)), this.collisionWidth, this.collisionHeight);
+    //this.handler.collisionCtx.fillRect((this.renderX + (this.width - this.collisionWidth)/2),(this.renderY + (this.height - this.collisionHeight - this.height/10)), this.collisionWidth, this.collisionHeight);
 
 
   };

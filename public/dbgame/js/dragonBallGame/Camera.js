@@ -6,16 +6,16 @@ class Camera{
 
 
   setWidthAndHeightOfDisplayWindow(){
-    if(window.innerWidth- 300 < 600){
+    if(window.innerWidth- 300 < 800){
       Game.handler.widthOfDisplayWindow = window.innerWidth- 300;
     }else{
-      Game.handler.widthOfDisplayWindow = 600;
+      Game.handler.widthOfDisplayWindow = 800;
     }
 
-    if(window.innerHeight - 300 < 350){
+    if(window.innerHeight - 300 < 450){
       Game.handler.heightOfDisplayWindow = window.innerHeight - 300;
     }else{
-      Game.handler.heightOfDisplayWindow = 350;
+      Game.handler.heightOfDisplayWindow = 450;
     }
   }
 

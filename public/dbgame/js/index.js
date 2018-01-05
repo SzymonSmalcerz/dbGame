@@ -67,6 +67,20 @@ const Game = {
 
 
 
+        //collision canvas
+        Game.handler.collisionCanvas = document.getElementById("ccoll");
+        if(!Game.handler.collisionCanvas){
+
+      		Game.handler.collisionCanvas = document.createElement("canvas");
+          Game.handler.collisionCanvas.setAttribute("id", "ccoll");
+        }
+
+        Game.handler.collisionCtx = Game.handler.collisionCanvas.getContext('2d');
+
+        Game.handler.collisionCanvas.width = window.innerWidth;
+        Game.handler.collisionCanvas.height = window.innerHeight;
+
+
     //main canvas
     Game.handler.canvas = document.getElementById("cnorm");
     if(!Game.handler.canvas){
@@ -85,21 +99,9 @@ const Game = {
     document.body.appendChild(Game.handler.canvas);
 
 
-    //collision canvas
-    Game.handler.collisionCanvas = document.getElementById("ccoll");
-    if(!Game.handler.collisionCanvas){
 
-  		Game.handler.collisionCanvas = document.createElement("canvas");
-      Game.handler.collisionCanvas.setAttribute("id", "ccoll");
-    }
 
-    Game.handler.collisionCtx = Game.handler.collisionCanvas.getContext('2d');
-
-    Game.handler.collisionCanvas.width = window.innerWidth;
-    Game.handler.collisionCanvas.height = window.innerHeight;
     document.body.appendChild(Game.handler.collisionCanvas);
-
-
 
 
 
@@ -143,16 +145,18 @@ const Game = {
 
 
 		if(time - Game.handler.lastTime > 1000/Game.handler.fps){
-
-      Game.handler.collisionCtx.fillStyle = "rgba(0,0,0,0)";
+      //
+      // Game.handler.collisionCtx.fillStyle = "rgba(0,0,0,1)";
+      // // Game.handler.collisionCtx.fillRect(0,0,Game.handler.canvas.width,Game.handler.canvas.height);
       // Game.handler.collisionCtx.fillRect(0,0,Game.handler.canvas.width,Game.handler.canvas.height);
-      Game.handler.collisionCtx.fillRect(0,0,Game.handler.canvas.width,Game.handler.canvas.height);
 
       Game.handler.lastTime = time;
       Game.handler.currentLevel.tick();
-
       Game.handler.globalTickCounter += 1;
 			Game.drawMenu();
+
+
+
 
 
 		}
@@ -585,14 +589,24 @@ const Game = {
 window.addEventListener("click", function(event){
   var x = event.clientX;
   var y = event.clientY;
-  // var data = Game.handler.itemCtx.getImageData(x,y,1,1).data[0];
-  // if(data != 0){
-  //   console.log("WOOORKING :3");
-  // }
 
   ShortestPath.calculateShortestPath(Game.handler.character.renderX + Game.handler.character.width/2, Game.handler.character.renderY + Game.handler.character.height*0.9 - Game.handler.character.collisionHeight/2, x, y);
 
 });
+//
+// src.addEventListener('touchstart', function(e) {
+//
+//   // var middle = Math.abs(e.touches.length/2)
+//   //
+//   alert(e.touches[middle].screenX + " : " + e.touches[middle].screenY);
+//
+//   var x = e.touches[middle].screenX;
+//   var y = e.touches[middle].screenY;
+//
+//   ShortestPath.calculateShortestPath(Game.handler.character.renderX + Game.handler.character.width/2, Game.handler.character.renderY + Game.handler.character.height*0.9 - Game.handler.character.collisionHeight/2, x, y);
+//
+//
+// });
 
 
 window.addEventListener("resize", function(){

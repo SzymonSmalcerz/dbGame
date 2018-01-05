@@ -34,13 +34,14 @@ class MainCharacter extends Mob{
     this.collisionHeight = playerData.collisionHeight;
     this.collisionWidth = playerData.collisionWidth ;
 
+
+    this.movesStack = [];
     socket.emit('message',"user " + this.id + " has been created");
     socket.emit("playerCreated", {id : this.id});//and now add enemies statics etc.
 
   }
 
   tick(){
-    //TEMPORARY ADDED BELOW @@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
 
@@ -48,16 +49,33 @@ class MainCharacter extends Mob{
 
     if(keyHandler["37"] || keyHandler["38"] || keyHandler["39"] || keyHandler["40"] ){
   		this.manageKeyPressing();
+      this.movesStack = [];
   	}
 
     if(this.isRegeneratingMana ){
   		this.manageRegenerationMana();
+      this.movesStack = [];
   	}else if(this.usingSkill && this.mana >= 3){
   		this.manageSkills();
+      this.movesStack = [];
   	}else if(this.isFighting){
       this.manageFighting();
+      this.movesStack = [];
     }
 
+
+    if(this.movesStack.length>0){
+      var move = this.movesStack.pop();
+      if(move == "right"){
+        this.move(this.speed,0);
+      }else if(move == "left"){
+        this.move(-(this.speed),0);
+      }else if(move == "down"){
+        this.move(0,this.speed);
+      }else{
+        this.move(0,-(this.speed));
+      }
+    }
     this.emitDataToOthers();
   }
 
