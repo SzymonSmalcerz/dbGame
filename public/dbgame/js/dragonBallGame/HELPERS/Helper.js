@@ -4,7 +4,9 @@ var Helper = {};
 Helper.areTwoEntitiesInRange = function(entity1, entity2, speedOfEntity1){
 
   if(entity1.flatRendering || entity2.flatRendering ||  entity2.dead || entity1.dead){
+
     return false;
+
   }
 
   speedOfEntity1 = speedOfEntity1 || {
@@ -29,18 +31,8 @@ Helper.areTwoEntitiesInRange = function(entity1, entity2, speedOfEntity1){
     return false;
   }
 
-  // var radius1 = Helper.getDistanceBetweenTwo2DPoints(centerOfEntity1,rightCornerOfEntity1);
-  // var radius2 = Helper.getDistanceBetweenTwo2DPoints(centerOfEntity2,rightCornerOfEntity2);
-  // var radiusBetweenTwoEntites = Helper.getDistanceBetweenTwo2DPoints(centerOfEntity1,centerOfEntity2);
-
-  //if entites are in circle range
-  // if(radius1 + radius2 >= radiusBetweenTwoEntites){
-  //
-  // }else {
-  //   return false;
-  // }
-
 };
+
 
 Helper.getDistanceBetweenTwo2DPoints = function(point1, point2){
 
@@ -60,5 +52,27 @@ Helper.getRightCornerOfEntityCollision = function(entity){
   return {
     renderX : entity.renderX + entity.width/2 + entity.collisionWidth/2,
     renderY : entity.renderY + entity.height*0.9
+  }
+}
+
+Helper.getWidthAndHeightOfDisplayWindow = function(){
+  var width;
+  var height;
+
+  if(window.innerWidth< 550){
+    width = window.innerWidth;
+  }else{
+    width = 550;
+  }
+
+  if(window.innerHeight< 400){
+    height = window.innerHeight;
+  }else{
+    height = 400;
+  }
+
+  return {
+    width,
+    height
   }
 }

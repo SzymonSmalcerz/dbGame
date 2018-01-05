@@ -12,7 +12,7 @@ class Entity{
 
     this.tickCounter = 0;
 
-
+    
     //flat rendering -> it means that every entity that has set flatRendering will be rendered at the beginning
     this.flatRendering = false;
   }
