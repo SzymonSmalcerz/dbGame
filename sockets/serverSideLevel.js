@@ -205,7 +205,7 @@ class LevelFirst extends Level{
       var here = this;
       if(true){
         this.enemies[tempID] = new DarkKnight(tempID,x,y,this.players,this.enemies,this.statics,this.socketTable, function(){
-          here.numberOfHulks -= 1;
+          here.numberOfHulks -= 1; 
         });
       }
       }
