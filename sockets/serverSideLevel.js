@@ -195,17 +195,24 @@ class LevelFirst extends Level{
   checkForEnemies(){
     super.checkForEnemies();
     this.respawnFrame += 1;
-    if(this.numberOfHulks < 1 && this.respawnFrame > 10){
+    if(this.numberOfHulks < 10 && this.respawnFrame > 10){
 
         this.respawnFrame = 0;
 
-      var x = Math.floor(Math.random() * 200 + 200);
-      var y = Math.floor(Math.random() * 200 + 200);
+      var x = Math.floor(Math.random() * 1000 + 200);
+      var y = Math.floor(Math.random() * 1000 + 200);
       var tempID = "hu" + Math.floor(Math.random() * 10000) + this.name;
       var here = this;
-      this.enemies[tempID] = new DarkKnight(tempID,x,y,this.players,this.enemies,this.statics,this.socketTable, function(){
-        here.numberOfHulks -= 1;
-      });
+      if(Math.random() > 0.2){
+        this.enemies[tempID] = new DarkKnight(tempID,x,y,this.players,this.enemies,this.statics,this.socketTable, function(){
+          here.numberOfHulks -= 1;
+        });
+      } else {
+        this.enemies[tempID] = new Hulk(tempID,x,y,this.players,this.enemies,this.statics,this.socketTable, function(){
+          here.numberOfHulks -= 1;
+        });
+      }
+
       this.numberOfHulks += 1;
       for(var playerID in this.players){
 
@@ -249,7 +256,7 @@ class LevelSecond extends Level{
   checkForEnemies(){
     super.checkForEnemies();
     this.respawnFrame += 1;
-    if(this.numberOfHits < 600 && this.respawnFrame > 5){
+    if(this.numberOfHits < 20 && this.respawnFrame > 5){
       this.respawnFrame = 0;
       var x = Math.floor(Math.random() * 1000 + 200);
       var y = Math.floor(Math.random() * 1000 + 200);
@@ -301,7 +308,7 @@ class LevelDragon extends Level{
   checkForEnemies(){
     super.checkForEnemies();
     this.respawnFrame += 1;
-    if(this.numberOfDragons < 75 && this.respawnFrame > 40){
+    if(this.numberOfDragons < 25 && this.respawnFrame > 40){
       this.respawnFrame = 0;
       var x = Math.floor(Math.random() * 1000 + 200);
       var y = Math.floor(Math.random() * 1000 + 200);
@@ -358,7 +365,7 @@ class LevelMinions1 extends Level{
   checkForEnemies(){
     super.checkForEnemies();
     this.respawnFrame += 1;
-    if(this.numberOfMinions < 50 && this.respawnFrame > 1){
+    if(this.numberOfMinions < 20 && this.respawnFrame > 1){
       this.respawnFrame = 0;
       var x = Math.floor(Math.random() * 1000 + 200);
       var y = Math.floor(Math.random() * 1000 + 200);
