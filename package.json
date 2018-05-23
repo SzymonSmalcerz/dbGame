@@ -1,0 +1,32 @@
+{
+  "name": "0009dbgame",
+  "version": "1.0.0",
+  "description": "Dragon ball game",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm test",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "8.4.0"
+  },
+  "author": "Szymon Smalcerz",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.18.2",
+    "client-sessions": "^0.8.0",
+    "cookie-parser": "^1.4.3",
+    "ejs": "^2.5.7",
+    "express": "^4.16.2",
+    "handlebars": "^4.0.11",
+    "jsonwebtoken": "^8.1.0",
+    "method-override": "^2.3.10",
+    "mongodb": "^2.2.33",
+    "mongoose": "^4.12.3",
+    "mustache": "^2.3.0",
+    "normalize.css": "^7.0.0",
+    "socket.io": "^2.0.3",
+    "validator": "^9.0.0"
+  }
+}
