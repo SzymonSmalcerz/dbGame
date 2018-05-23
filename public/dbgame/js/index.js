@@ -127,9 +127,18 @@ const Game = {
       type,
       numberOfEnemies
     });
-  }
+  },
   //@@@@@TODO@@@@@@@@@@TODO@@@@@@@@@TODO@@@@@@@TODO@@@@@TODO@@@@@@@TODO@@@@@@@@@@@TODO@@@@@@@@@@@TODO@@@@@@@TODO@@@@@@
 
+  respEnemies : function (numOfEnemies,levelName){
+    levelName = levelName || "firstMap";
+    socket.emit("respEnemies",{
+      levelName,
+      numOfEnemies,
+      playerX : Game.handler.character.x,
+      playerY : Game.handler.character.y
+    })
+  }
 
 }
 

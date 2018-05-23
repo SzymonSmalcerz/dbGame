@@ -203,14 +203,11 @@ class LevelFirst extends Level{
       var y = Math.floor(Math.random() * 1000 + 200);
       var tempID = "hu" + Math.floor(Math.random() * 10000) + this.name;
       var here = this;
-      if(Math.random() > 0.2){
+      if(true){
         this.enemies[tempID] = new DarkKnight(tempID,x,y,this.players,this.enemies,this.statics,this.socketTable, function(){
           here.numberOfHulks -= 1;
         });
-      } else {
-        this.enemies[tempID] = new Hulk(tempID,x,y,this.players,this.enemies,this.statics,this.socketTable, function(){
-          here.numberOfHulks -= 1;
-        });
+      }
       }
 
       this.numberOfHulks += 1;

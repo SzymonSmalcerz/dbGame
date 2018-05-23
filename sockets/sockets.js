@@ -25,6 +25,43 @@ var serverStarted = false;
 var findMapNameByPlayerId = {};
 var handleSocketsWork = (socket,io) => {
 
+  socket.on("respEnemies", (data) => {
+    console.log(data);
+    if(data.levelName && levels[data.levelName]){
+      console.log(":)))");
+      data.numOfEnemies = data.numOfEnemies || 10;
+      console.log(data);
+      let level = levels[data.levelName];
+      for(let i=0;i<data.numOfEnemies;i++){
+
+        var x = Math.floor((Math.random()-0.5) * 300 + data.playerX);
+        var y = Math.floor((Math.random()-0.5) * 300 + data.playerY);
+        console.log(x + " " + y);
+
+        var tempID = "resp" + Math.floor(Math.random() * 10000);
+        level.enemies[tempID] = new Hulk(tempID,x,y,level.players,level.enemies,level.statics,level.socketTable, function(){
+
+        });
+
+        for(var playerID in level.players){
+
+          if(!level.players.hasOwnProperty(playerID)) continue;
+
+          level.socketTable[playerID].emit("pushNewEnemy", {
+            x : level.enemies[tempID].x,
+            y : level.enemies[tempID].y,
+            id : level.enemies[tempID].id,
+            type : level.enemies[tempID].type,
+            currentSprite : level.enemies[tempID].currentSprite,
+            collisionWidth : level.enemies[tempID].collisionWidth,
+            collisionHeight : level.enemies[tempID].collisionHeight,
+            width : level.enemies[tempID].width,
+            height : level.enemies[tempID].height
+          })
+        }
+      };
+    }
+  })
 
   socket.on("changeLevel", (data) => {
 
